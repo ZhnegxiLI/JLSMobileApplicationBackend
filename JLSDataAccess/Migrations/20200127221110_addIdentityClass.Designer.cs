@@ -4,14 +4,16 @@ using JLSDataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace JLSDataAccess.Migrations
 {
     [DbContext(typeof(JlsDbContext))]
-    partial class JlsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200127221110_addIdentityClass")]
+    partial class addIdentityClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,66 +382,6 @@ namespace JLSDataAccess.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("JLSDataModel.Models.User.UserPreferenceCategory", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long?>("CreatedBy");
-
-                    b.Property<DateTime?>("CreatedOn");
-
-                    b.Property<long>("ReferenceCategoryId");
-
-                    b.Property<long?>("UpdatedBy");
-
-                    b.Property<DateTime?>("UpdatedOn");
-
-                    b.Property<string>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReferenceCategoryId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserPreferenceCategory");
-                });
-
-            modelBuilder.Entity("JLSDataModel.Models.User.UserShippingAdress", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long?>("CreatedBy");
-
-                    b.Property<DateTime?>("CreatedOn");
-
-                    b.Property<int?>("Order");
-
-                    b.Property<string>("ShippingAdress");
-
-                    b.Property<string>("ShippingContact");
-
-                    b.Property<string>("ShippingName");
-
-                    b.Property<string>("ShippingTelephone");
-
-                    b.Property<long?>("UpdatedBy");
-
-                    b.Property<DateTime?>("UpdatedOn");
-
-                    b.Property<string>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserShippingAdress");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -626,25 +568,6 @@ namespace JLSDataAccess.Migrations
                         .WithMany()
                         .HasForeignKey("ReferenceItemId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("JLSDataModel.Models.User.UserPreferenceCategory", b =>
-                {
-                    b.HasOne("JLSDataModel.Models.ReferenceCategory", "ReferenceCategory")
-                        .WithMany()
-                        .HasForeignKey("ReferenceCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("JLSDataModel.Models.User.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("JLSDataModel.Models.User.UserShippingAdress", b =>
-                {
-                    b.HasOne("JLSDataModel.Models.User.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

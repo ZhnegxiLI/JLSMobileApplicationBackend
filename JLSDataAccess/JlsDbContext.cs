@@ -1,11 +1,13 @@
 ﻿using JLSDataModel.Models;
 using JLSDataModel.Models.Order;
 using JLSDataModel.Models.Product;
+using JLSDataModel.Models.User;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace JLSDataAccess
 {
-    public class JlsDbContext : DbContext
+    public class JlsDbContext  :IdentityDbContext<User>
     {
         public JlsDbContext(DbContextOptions<JlsDbContext> options)
             : base(options)
@@ -31,5 +33,8 @@ namespace JLSDataAccess
         public virtual DbSet<Product> Product { get; set; }
 
         public virtual DbSet<ProductPhotoPath> ProductPhotoPath { get; set; }
+        public virtual DbSet<UserPreferenceCategory> UserPreferenceCategory { get; set; }
+
+        public virtual DbSet<UserShippingAdress> UserShippingAdress { get; set; }
     }
 }

@@ -1,20 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using JLSDataAccess;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JLSMobileApplication.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class ValuesController : Controller
     {
+        private readonly JlsDbContext db;
+        public ValuesController(JlsDbContext jlsDbContext)
+        {
+            db = jlsDbContext;
+        }
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public JsonResult  Get()
         {
-            return new string[] { "value1", "value2" };
+
+            var result = db.ReferenceCategory;
+            return Json(result);
         }
 
         // GET api/values/5
