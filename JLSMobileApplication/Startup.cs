@@ -6,6 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using JLSDataAccess;
 using Microsoft.AspNetCore.Identity;
+using AutoMapper;
+using JLSDataModel.Models.User;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System;
 
 namespace JLSMobileApplication
 {
@@ -21,22 +26,24 @@ namespace JLSMobileApplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddDbContext<JlsDbContext>(
              options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"),
                  builder => builder.UseRowNumberForPaging()) // IMPORTANT : use of ef function take() Skip()
              );
-            services.AddDefaultIdentity<IdentityUser>()
+            services.AddDefaultIdentity<User>()
             .AddEntityFrameworkStores<JlsDbContext>();
 
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings.
                 options.Password.RequireDigit = true;
-                //options.Password.RequireLowercase = true;
-                //options.Password.RequireNonAlphanumeric = true;
-                //options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
                 options.Password.RequiredLength = 6;
                 options.Password.RequiredUniqueChars = 1;
 
@@ -48,8 +55,31 @@ namespace JLSMobileApplication
                 // User settings.
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                //Email settings
+                //options.SignIn.RequireConfirmedEmail = true;
                 options.User.RequireUniqueEmail = true;
             });
+
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "JwtBearer";
+                options.DefaultChallengeScheme = "JwtBearer";
+            })
+             .AddJwtBearer("JwtBearer", jwtBearerOptions =>
+             {
+                 jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+                 {
+                     ValidateIssuerSigningKey = true,
+                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("JWT:Secret").Value)),
+                     ValidateIssuer = true,
+                        ValidIssuer = Configuration.GetSection("JWT:Issuer").Value,
+                        ValidateAudience = true,
+                        ValidAudience = Configuration.GetSection("JWT:Audience").Value,
+                        ValidateLifetime = true, //validate the expiration and not before values in the token
+                        ClockSkew = TimeSpan.FromMinutes(5) //5 minute tolerance for the expiration date
+                };
+             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

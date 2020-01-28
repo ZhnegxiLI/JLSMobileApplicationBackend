@@ -9,8 +9,10 @@ namespace JLSDataModel.Models.User
     {
         public User()
         {
-
+            this.CreatedOn = DateTime.Now;
         }
+        public DateTime? CreatedOn { get; set; }
+        public DateTime? UpdatedOn { get; set; }
         public string Siret { get; set; }
         public string EntrepriseName { get; set; }
         public string EntrepriseAdress { get; set; }
