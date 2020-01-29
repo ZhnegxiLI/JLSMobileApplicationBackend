@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JLSDataAccess.Migrations
 {
     [DbContext(typeof(JlsDbContext))]
-    [Migration("20200127223211_AddUserShippingAndUserPreferenceCategroy")]
-    partial class AddUserShippingAndUserPreferenceCategroy
+    [Migration("20200129225942_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -327,13 +327,16 @@ namespace JLSDataAccess.Migrations
 
             modelBuilder.Entity("JLSDataModel.Models.User.User", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AccessFailedCount");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
+
+                    b.Property<DateTime?>("CreatedOn");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256);
@@ -366,6 +369,8 @@ namespace JLSDataAccess.Migrations
 
                     b.Property<bool>("TwoFactorEnabled");
 
+                    b.Property<DateTime?>("UpdatedOn");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
 
@@ -382,10 +387,75 @@ namespace JLSDataAccess.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+            modelBuilder.Entity("JLSDataModel.Models.User.UserPreferenceCategory", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long?>("CreatedBy");
+
+                    b.Property<DateTime?>("CreatedOn");
+
+                    b.Property<long>("ReferenceCategoryId");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedOn");
+
+                    b.Property<string>("UserId");
+
+                    b.Property<int?>("UserId1");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReferenceCategoryId");
+
+                    b.HasIndex("UserId1");
+
+                    b.ToTable("UserPreferenceCategory");
+                });
+
+            modelBuilder.Entity("JLSDataModel.Models.User.UserShippingAdress", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long?>("CreatedBy");
+
+                    b.Property<DateTime?>("CreatedOn");
+
+                    b.Property<int?>("Order");
+
+                    b.Property<string>("ShippingAdress");
+
+                    b.Property<string>("ShippingContact");
+
+                    b.Property<string>("ShippingName");
+
+                    b.Property<string>("ShippingTelephone");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedOn");
+
+                    b.Property<string>("UserId");
+
+                    b.Property<int?>("UserId1");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId1");
+
+                    b.ToTable("UserShippingAdress");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
@@ -406,7 +476,7 @@ namespace JLSDataAccess.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -416,8 +486,7 @@ namespace JLSDataAccess.Migrations
 
                     b.Property<string>("ClaimValue");
 
-                    b.Property<string>("RoleId")
-                        .IsRequired();
+                    b.Property<int>("RoleId");
 
                     b.HasKey("Id");
 
@@ -426,7 +495,7 @@ namespace JLSDataAccess.Migrations
                     b.ToTable("AspNetRoleClaims");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -436,8 +505,7 @@ namespace JLSDataAccess.Migrations
 
                     b.Property<string>("ClaimValue");
 
-                    b.Property<string>("UserId")
-                        .IsRequired();
+                    b.Property<int>("UserId");
 
                     b.HasKey("Id");
 
@@ -446,7 +514,7 @@ namespace JLSDataAccess.Migrations
                     b.ToTable("AspNetUserClaims");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasMaxLength(128);
@@ -456,8 +524,7 @@ namespace JLSDataAccess.Migrations
 
                     b.Property<string>("ProviderDisplayName");
 
-                    b.Property<string>("UserId")
-                        .IsRequired();
+                    b.Property<int>("UserId");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -466,11 +533,11 @@ namespace JLSDataAccess.Migrations
                     b.ToTable("AspNetUserLogins");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<int>("UserId");
 
-                    b.Property<string>("RoleId");
+                    b.Property<int>("RoleId");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -479,9 +546,9 @@ namespace JLSDataAccess.Migrations
                     b.ToTable("AspNetUserRoles");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<int>("UserId");
 
                     b.Property<string>("LoginProvider")
                         .HasMaxLength(128);
@@ -570,15 +637,34 @@ namespace JLSDataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("JLSDataModel.Models.User.UserPreferenceCategory", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("JLSDataModel.Models.ReferenceCategory", "ReferenceCategory")
+                        .WithMany()
+                        .HasForeignKey("ReferenceCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("JLSDataModel.Models.User.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId1");
+                });
+
+            modelBuilder.Entity("JLSDataModel.Models.User.UserShippingAdress", b =>
+                {
+                    b.HasOne("JLSDataModel.Models.User.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId1");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
                     b.HasOne("JLSDataModel.Models.User.User")
                         .WithMany()
@@ -586,7 +672,7 @@ namespace JLSDataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
                     b.HasOne("JLSDataModel.Models.User.User")
                         .WithMany()
@@ -594,9 +680,9 @@ namespace JLSDataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -607,7 +693,7 @@ namespace JLSDataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
                     b.HasOne("JLSDataModel.Models.User.User")
                         .WithMany()

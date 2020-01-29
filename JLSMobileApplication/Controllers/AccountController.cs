@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using JLSDataAccess;
-using JLSDataModel.Models.Mapping;
+
 using JLSDataModel.Models.User;
+using JLSMobileApplication.Resources;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace JLSMobileApplication.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var userIdentity = _mapper.Map<User>(model);
+            var userIdentity = _mapper.Map<User>(model);// 将UserRegistrationView 映射到User(转化为User(type:User))
             var result = await _userManager.CreateAsync(userIdentity, model.Password);
             if (!result.Succeeded)  {
                 foreach (var error in result.Errors)

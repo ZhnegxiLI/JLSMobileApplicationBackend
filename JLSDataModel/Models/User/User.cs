@@ -5,7 +5,7 @@ using System.Text;
 
 namespace JLSDataModel.Models.User
 {
-    public class User: IdentityUser
+    public class User: IdentityUser<int>
     {
         public User()
         {

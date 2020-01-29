@@ -2,12 +2,13 @@
 using JLSDataModel.Models.Order;
 using JLSDataModel.Models.Product;
 using JLSDataModel.Models.User;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace JLSDataAccess
 {
-    public class JlsDbContext  :IdentityDbContext<User>
+    public class JlsDbContext  :IdentityDbContext<User, IdentityRole<int>, int>
     {
         public JlsDbContext(DbContextOptions<JlsDbContext> options)
             : base(options)

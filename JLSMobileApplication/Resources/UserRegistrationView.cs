@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace JLSDataModel.Models.Mapping
+namespace JLSMobileApplication.Resources
 {
     public class UserRegistrationView
     {
