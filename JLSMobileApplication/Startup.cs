@@ -11,6 +11,9 @@ using JLSDataModel.Models.User;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
+using JLSMobileApplication.Heplers;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using JLSMobileApplication.Services;
 
 namespace JLSMobileApplication
 {
@@ -36,6 +39,17 @@ namespace JLSMobileApplication
              );
             services.AddDefaultIdentity<User>()
             .AddEntityFrameworkStores<JlsDbContext>();
+
+            // Configure strongly typed settings objects
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+
+            //配置邮件发送
+            services.AddTransient<IEmailService, EmailService>();
+
+            //配置JWT 密钥
+            //var appSettings = appSettingsSection.Get<AppSettings>();
+            //var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -94,9 +108,17 @@ namespace JLSMobileApplication
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
             app.UseAuthentication();
             //app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller}/{action=Index}/{id?}");
+            });
         }
     }
 }
