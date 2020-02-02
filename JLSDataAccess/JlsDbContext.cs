@@ -1,4 +1,5 @@
 ﻿using JLSDataModel.Models;
+using JLSDataModel.Models.Adress;
 using JLSDataModel.Models.Order;
 using JLSDataModel.Models.Product;
 using JLSDataModel.Models.User;
@@ -24,8 +25,6 @@ namespace JLSDataAccess
         public virtual DbSet<OrderInfo> OrderInfo { get; set; }
         public virtual DbSet<OrderInfoLog> OrderInfoLog { get; set; }
 
-        public virtual DbSet<OrderInfoShipping> OrderInfoShipping { get; set; }
-
 
         public virtual DbSet<DiscountActivity> DiscountActivity { get; set; }
 
@@ -36,6 +35,6 @@ namespace JLSDataAccess
         public virtual DbSet<ProductPhotoPath> ProductPhotoPath { get; set; }
         public virtual DbSet<UserPreferenceCategory> UserPreferenceCategory { get; set; }
 
-        public virtual DbSet<UserShippingAdress> UserShippingAdress { get; set; }
+        public virtual DbSet<Adress> Adress { get; set; }
     }
 }

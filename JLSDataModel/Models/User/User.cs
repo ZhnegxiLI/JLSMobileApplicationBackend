@@ -15,6 +15,11 @@ namespace JLSDataModel.Models.User
         public DateTime? UpdatedOn { get; set; }
         public string Siret { get; set; }
         public string EntrepriseName { get; set; }
-        public string EntrepriseAdress { get; set; }
+
+        public long DefaultShippingAdressId { get; set; }
+        public Adress.Adress DefaultShippingAdress { get; set; }
+
+        public long FacturationAdressId { get; set; }
+        public Adress.Adress FacturationAdress { get; set; }
     }
 }

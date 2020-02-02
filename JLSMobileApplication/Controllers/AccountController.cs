@@ -33,8 +33,9 @@ namespace JLSMobileApplication.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] UserRegistrationView model)
+        [AllowAnonymous]
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Register([FromBody] UserRegistrationView model)
         {
             if (!ModelState.IsValid)
             {
@@ -49,10 +50,12 @@ namespace JLSMobileApplication.Controllers
                 }
                 return new BadRequestObjectResult(result.Errors);
             }
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(userIdentity);
+               var code = await _userManager.GenerateEmailConfirmationTokenAsync(userIdentity);
             var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = userIdentity.Id, code = code }, HttpContext.Request.Scheme);
 
-            var r = _emailService.SendEmail(userIdentity.Email, "Confirmation votre compte", callbackUrl);
+            //Email service 
+            //var r = _emailService.SendEmail(userIdentity.Email, "Confirmation votre compte", callbackUrl);
+
             //await db.Customers.AddAsync(new Customer { IdentityId = userIdentity.Id, Location = model.Location });
             //await _appDbContext.SaveChangesAsync();
 

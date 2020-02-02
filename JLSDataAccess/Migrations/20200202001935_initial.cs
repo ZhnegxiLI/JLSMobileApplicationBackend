@@ -24,37 +24,6 @@ namespace JLSDataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    UserName = table.Column<string>(maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(maxLength: 256, nullable: true),
-                    Email = table.Column<string>(maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(nullable: false),
-                    PasswordHash = table.Column<string>(nullable: true),
-                    SecurityStamp = table.Column<string>(nullable: true),
-                    ConcurrencyStamp = table.Column<string>(nullable: true),
-                    PhoneNumber = table.Column<string>(nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
-                    LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false),
-                    CreatedOn = table.Column<DateTime>(nullable: true),
-                    UpdatedOn = table.Column<DateTime>(nullable: true),
-                    Siret = table.Column<string>(nullable: true),
-                    EntrepriseName = table.Column<string>(nullable: true),
-                    EntrepriseAdress = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "DiscountActivity",
                 columns: table => new
                 {
@@ -110,6 +79,219 @@ namespace JLSDataAccess.Migrations
                         name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReferenceItem",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    CreatedBy = table.Column<long>(nullable: true),
+                    UpdatedOn = table.Column<DateTime>(nullable: true),
+                    UpdatedBy = table.Column<long>(nullable: true),
+                    Code = table.Column<string>(nullable: true),
+                    ParentId = table.Column<long>(nullable: true),
+                    Value = table.Column<string>(nullable: true),
+                    Order = table.Column<int>(nullable: true),
+                    Validity = table.Column<bool>(nullable: true),
+                    ReferenceCategoryId = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReferenceItem", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReferenceItem_ReferenceCategory_ReferenceCategoryId",
+                        column: x => x.ReferenceCategoryId,
+                        principalTable: "ReferenceCategory",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Adress",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    CreatedBy = table.Column<long>(nullable: true),
+                    UpdatedOn = table.Column<DateTime>(nullable: true),
+                    UpdatedBy = table.Column<long>(nullable: true),
+                    ContactTelephone = table.Column<string>(nullable: true),
+                    ContactFax = table.Column<string>(nullable: true),
+                    ContactLastName = table.Column<string>(nullable: true),
+                    ContactFirstName = table.Column<string>(nullable: true),
+                    PostCode = table.Column<string>(nullable: true),
+                    StreeName = table.Column<string>(nullable: true),
+                    AdressDetail = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    Provence = table.Column<string>(nullable: true),
+                    CountryId = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Adress", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Adress_ReferenceItem_CountryId",
+                        column: x => x.CountryId,
+                        principalTable: "ReferenceItem",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Product",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    CreatedBy = table.Column<long>(nullable: true),
+                    UpdatedOn = table.Column<DateTime>(nullable: true),
+                    UpdatedBy = table.Column<long>(nullable: true),
+                    Price = table.Column<float>(nullable: true),
+                    QuantityPerBox = table.Column<int>(nullable: true),
+                    MinQuantity = table.Column<int>(nullable: true),
+                    Color = table.Column<string>(nullable: true),
+                    Material = table.Column<string>(nullable: true),
+                    Size = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    ReferenceItemId = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Product", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Product_ReferenceItem_ReferenceItemId",
+                        column: x => x.ReferenceItemId,
+                        principalTable: "ReferenceItem",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReferenceLabel",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    CreatedBy = table.Column<long>(nullable: true),
+                    UpdatedOn = table.Column<DateTime>(nullable: true),
+                    UpdatedBy = table.Column<long>(nullable: true),
+                    Label = table.Column<string>(nullable: true),
+                    Lang = table.Column<string>(nullable: true),
+                    ReferenceItemId = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReferenceLabel", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReferenceLabel_ReferenceItem_ReferenceItemId",
+                        column: x => x.ReferenceItemId,
+                        principalTable: "ReferenceItem",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    UserName = table.Column<string>(maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(maxLength: 256, nullable: true),
+                    Email = table.Column<string>(maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(nullable: false),
+                    PasswordHash = table.Column<string>(nullable: true),
+                    SecurityStamp = table.Column<string>(nullable: true),
+                    ConcurrencyStamp = table.Column<string>(nullable: true),
+                    PhoneNumber = table.Column<string>(nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
+                    LockoutEnabled = table.Column<bool>(nullable: false),
+                    AccessFailedCount = table.Column<int>(nullable: false),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    UpdatedOn = table.Column<DateTime>(nullable: true),
+                    Siret = table.Column<string>(nullable: true),
+                    EntrepriseName = table.Column<string>(nullable: true),
+                    DefaultShippingAdressId = table.Column<long>(nullable: false),
+                    FacturationAdressId = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Adress_DefaultShippingAdressId",
+                        column: x => x.DefaultShippingAdressId,
+                        principalTable: "Adress",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Adress_FacturationAdressId",
+                        column: x => x.FacturationAdressId,
+                        principalTable: "Adress",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DiscountActivityProduct",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    CreatedBy = table.Column<long>(nullable: true),
+                    UpdatedOn = table.Column<DateTime>(nullable: true),
+                    UpdatedBy = table.Column<long>(nullable: true),
+                    DiscountActivityId = table.Column<long>(nullable: false),
+                    ProductId = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DiscountActivityProduct", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DiscountActivityProduct_DiscountActivity_DiscountActivityId",
+                        column: x => x.DiscountActivityId,
+                        principalTable: "DiscountActivity",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DiscountActivityProduct_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductPhotoPath",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    CreatedBy = table.Column<long>(nullable: true),
+                    UpdatedOn = table.Column<DateTime>(nullable: true),
+                    UpdatedBy = table.Column<long>(nullable: true),
+                    Path = table.Column<string>(nullable: true),
+                    ProductId = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductPhotoPath", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductPhotoPath_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -200,7 +382,7 @@ namespace JLSDataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserShippingAdress",
+                name: "OrderInfo",
                 columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
@@ -209,51 +391,38 @@ namespace JLSDataAccess.Migrations
                     CreatedBy = table.Column<long>(nullable: true),
                     UpdatedOn = table.Column<DateTime>(nullable: true),
                     UpdatedBy = table.Column<long>(nullable: true),
-                    ShippingName = table.Column<string>(nullable: true),
-                    ShippingAdress = table.Column<string>(nullable: true),
-                    ShippingTelephone = table.Column<string>(nullable: true),
-                    ShippingContact = table.Column<string>(nullable: true),
-                    Order = table.Column<int>(nullable: true),
-                    UserId1 = table.Column<int>(nullable: true),
-                    UserId = table.Column<string>(nullable: true)
+                    OrderReferenceCode = table.Column<string>(nullable: true),
+                    ContactTelephone = table.Column<string>(nullable: true),
+                    PaymentInfo = table.Column<string>(nullable: true),
+                    ClientRemark = table.Column<string>(nullable: true),
+                    AdminRemark = table.Column<string>(nullable: true),
+                    TotalPrice = table.Column<float>(nullable: true),
+                    TaxRate = table.Column<float>(nullable: true),
+                    UserId = table.Column<int>(nullable: false),
+                    StatusReferenceItemId = table.Column<long>(nullable: false),
+                    AdressId = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserShippingAdress", x => x.Id);
+                    table.PrimaryKey("PK_OrderInfo", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserShippingAdress_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ReferenceItem",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CreatedOn = table.Column<DateTime>(nullable: true),
-                    CreatedBy = table.Column<long>(nullable: true),
-                    UpdatedOn = table.Column<DateTime>(nullable: true),
-                    UpdatedBy = table.Column<long>(nullable: true),
-                    Code = table.Column<string>(nullable: true),
-                    ParentId = table.Column<long>(nullable: true),
-                    Value = table.Column<string>(nullable: true),
-                    Order = table.Column<int>(nullable: true),
-                    Validity = table.Column<bool>(nullable: true),
-                    ReferenceCategoryId = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReferenceItem", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ReferenceItem_ReferenceCategory_ReferenceCategoryId",
-                        column: x => x.ReferenceCategoryId,
-                        principalTable: "ReferenceCategory",
+                        name: "FK_OrderInfo_Adress_AdressId",
+                        column: x => x.AdressId,
+                        principalTable: "Adress",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderInfo_ReferenceItem_StatusReferenceItemId",
+                        column: x => x.StatusReferenceItemId,
+                        principalTable: "ReferenceItem",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_OrderInfo_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -288,93 +457,6 @@ namespace JLSDataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderInfo",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CreatedOn = table.Column<DateTime>(nullable: true),
-                    CreatedBy = table.Column<long>(nullable: true),
-                    UpdatedOn = table.Column<DateTime>(nullable: true),
-                    UpdatedBy = table.Column<long>(nullable: true),
-                    OrderReferenceCode = table.Column<string>(nullable: true),
-                    ContactTelephone = table.Column<string>(nullable: true),
-                    PaymentInfo = table.Column<string>(nullable: true),
-                    ClientRemark = table.Column<string>(nullable: true),
-                    AdminRemark = table.Column<string>(nullable: true),
-                    TotalPrice = table.Column<float>(nullable: true),
-                    TaxRate = table.Column<float>(nullable: true),
-                    StatusReferenceItemId = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderInfo", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrderInfo_ReferenceItem_StatusReferenceItemId",
-                        column: x => x.StatusReferenceItemId,
-                        principalTable: "ReferenceItem",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Product",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CreatedOn = table.Column<DateTime>(nullable: true),
-                    CreatedBy = table.Column<long>(nullable: true),
-                    UpdatedOn = table.Column<DateTime>(nullable: true),
-                    UpdatedBy = table.Column<long>(nullable: true),
-                    ProductReferenceCode = table.Column<string>(nullable: true),
-                    Price = table.Column<float>(nullable: true),
-                    QuantityPerBox = table.Column<int>(nullable: true),
-                    MinQuantity = table.Column<int>(nullable: true),
-                    Color = table.Column<string>(nullable: true),
-                    Material = table.Column<string>(nullable: true),
-                    Size = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
-                    Validity = table.Column<bool>(nullable: true),
-                    ReferenceItemId = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Product", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Product_ReferenceItem_ReferenceItemId",
-                        column: x => x.ReferenceItemId,
-                        principalTable: "ReferenceItem",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ReferenceLabel",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CreatedOn = table.Column<DateTime>(nullable: true),
-                    CreatedBy = table.Column<long>(nullable: true),
-                    UpdatedOn = table.Column<DateTime>(nullable: true),
-                    UpdatedBy = table.Column<long>(nullable: true),
-                    Label = table.Column<string>(nullable: true),
-                    Lang = table.Column<string>(nullable: true),
-                    ReferenceItemId = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReferenceLabel", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ReferenceLabel_ReferenceItem_ReferenceItemId",
-                        column: x => x.ReferenceItemId,
-                        principalTable: "ReferenceItem",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "OrderInfoLog",
                 columns: table => new
                 {
@@ -398,94 +480,10 @@ namespace JLSDataAccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "OrderInfoShipping",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CreatedOn = table.Column<DateTime>(nullable: true),
-                    CreatedBy = table.Column<long>(nullable: true),
-                    UpdatedOn = table.Column<DateTime>(nullable: true),
-                    UpdatedBy = table.Column<long>(nullable: true),
-                    ShippingTelephone = table.Column<string>(nullable: true),
-                    ShippingCity = table.Column<string>(nullable: true),
-                    ShippingPostCode = table.Column<string>(nullable: true),
-                    ShippingAdress = table.Column<string>(nullable: true),
-                    ShippingAdressDetail = table.Column<string>(nullable: true),
-                    CountryReferenceItemId = table.Column<long>(nullable: false),
-                    OrderInfoId = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderInfoShipping", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrderInfoShipping_ReferenceItem_CountryReferenceItemId",
-                        column: x => x.CountryReferenceItemId,
-                        principalTable: "ReferenceItem",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_OrderInfoShipping_OrderInfo_OrderInfoId",
-                        column: x => x.OrderInfoId,
-                        principalTable: "OrderInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DiscountActivityProduct",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CreatedOn = table.Column<DateTime>(nullable: true),
-                    CreatedBy = table.Column<long>(nullable: true),
-                    UpdatedOn = table.Column<DateTime>(nullable: true),
-                    UpdatedBy = table.Column<long>(nullable: true),
-                    DiscountActivityId = table.Column<long>(nullable: false),
-                    ProductId = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DiscountActivityProduct", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DiscountActivityProduct_DiscountActivity_DiscountActivityId",
-                        column: x => x.DiscountActivityId,
-                        principalTable: "DiscountActivity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DiscountActivityProduct_Product_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Product",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProductPhotoPath",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CreatedOn = table.Column<DateTime>(nullable: true),
-                    CreatedBy = table.Column<long>(nullable: true),
-                    UpdatedOn = table.Column<DateTime>(nullable: true),
-                    UpdatedBy = table.Column<long>(nullable: true),
-                    Path = table.Column<string>(nullable: true),
-                    ProductId = table.Column<long>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductPhotoPath", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ProductPhotoPath_Product_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Product",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX_Adress_CountryId",
+                table: "Adress",
+                column: "CountryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -515,6 +513,16 @@ namespace JLSDataAccess.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_DefaultShippingAdressId",
+                table: "AspNetUsers",
+                column: "DefaultShippingAdressId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_FacturationAdressId",
+                table: "AspNetUsers",
+                column: "FacturationAdressId");
+
+            migrationBuilder.CreateIndex(
                 name: "EmailIndex",
                 table: "AspNetUsers",
                 column: "NormalizedEmail");
@@ -537,23 +545,23 @@ namespace JLSDataAccess.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrderInfo_AdressId",
+                table: "OrderInfo",
+                column: "AdressId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderInfo_StatusReferenceItemId",
                 table: "OrderInfo",
                 column: "StatusReferenceItemId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrderInfo_UserId",
+                table: "OrderInfo",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderInfoLog_OrderInfoId",
                 table: "OrderInfoLog",
-                column: "OrderInfoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderInfoShipping_CountryReferenceItemId",
-                table: "OrderInfoShipping",
-                column: "CountryReferenceItemId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderInfoShipping_OrderInfoId",
-                table: "OrderInfoShipping",
                 column: "OrderInfoId");
 
             migrationBuilder.CreateIndex(
@@ -585,11 +593,6 @@ namespace JLSDataAccess.Migrations
                 name: "IX_UserPreferenceCategory_UserId1",
                 table: "UserPreferenceCategory",
                 column: "UserId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserShippingAdress_UserId1",
-                table: "UserShippingAdress",
-                column: "UserId1");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -616,9 +619,6 @@ namespace JLSDataAccess.Migrations
                 name: "OrderInfoLog");
 
             migrationBuilder.DropTable(
-                name: "OrderInfoShipping");
-
-            migrationBuilder.DropTable(
                 name: "ProductPhotoPath");
 
             migrationBuilder.DropTable(
@@ -626,9 +626,6 @@ namespace JLSDataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserPreferenceCategory");
-
-            migrationBuilder.DropTable(
-                name: "UserShippingAdress");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -644,6 +641,9 @@ namespace JLSDataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Adress");
 
             migrationBuilder.DropTable(
                 name: "ReferenceItem");
