@@ -14,6 +14,9 @@ using System;
 using JLSMobileApplication.Heplers;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using JLSMobileApplication.Services;
+using Serilog;
+using Microsoft.Extensions.Options;
+using LjWebApplication.Middleware;
 
 namespace JLSMobileApplication
 {
@@ -31,7 +34,11 @@ namespace JLSMobileApplication
         {
             services.AddAutoMapper();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddJsonOptions(options =>
+            {
+                options.SerializerSettings.DateFormatString = "yyyy-MM-dd";
+                //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            });
 
             services.AddDbContext<JlsDbContext>(
              options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"),
@@ -44,12 +51,15 @@ namespace JLSMobileApplication
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
+
+            /* Configure the log with serilog */
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(Configuration)
+                .CreateLogger();
+            Log.Information("Start logging");
+
             //配置邮件发送
             services.AddTransient<IEmailService, EmailService>();
-
-            //配置JWT 密钥
-            //var appSettings = appSettingsSection.Get<AppSettings>();
-            //var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -70,10 +80,11 @@ namespace JLSMobileApplication
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 //Email settings
-                //options.SignIn.RequireConfirmedEmail = true;
                 options.User.RequireUniqueEmail = true;
             });
 
+            //配置JWT 密钥
+            var appSettings = appSettingsSection.Get<AppSettings>();
 
             services.AddAuthentication(options =>
             {
@@ -85,15 +96,29 @@ namespace JLSMobileApplication
                  jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
                  {
                      ValidateIssuerSigningKey = true,
-                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("JWT:Secret").Value)),
-                     ValidateIssuer = true,
-                        ValidIssuer = Configuration.GetSection("JWT:Issuer").Value,
-                        ValidateAudience = true,
-                        ValidAudience = Configuration.GetSection("JWT:Audience").Value,
-                        ValidateLifetime = true, //validate the expiration and not before values in the token
-                        ClockSkew = TimeSpan.FromMinutes(5) //5 minute tolerance for the expiration date
+                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.JwtSecret)),
+                     //ValidateIssuer = true,
+                    ValidIssuer = appSettings.JwtIssuer,
+                   // ValidateAudience = true,
+                    ValidAudience = appSettings.JwtAudience,
+                    ValidateLifetime = true, //validate the expiration and not before values in the token
+                    ClockSkew = TimeSpan.FromMinutes(5) //5 minute tolerance for the expiration date
                 };
              });
+
+            // 配置跨域
+            services.AddCors(options =>
+            {
+                options.AddPolicy(appSettings.MyAllowSpecificOrigins,
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:8080", "ionic://localhost", "http://localhost", "http://localhost:8100", "http://176.176.221.117", "capacitor://localhost")
+                            .AllowAnyHeader()
+                            .WithMethods()
+                            .AllowCredentials(); ;
+                    });
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -103,16 +128,15 @@ namespace JLSMobileApplication
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
+
+            app.UseCors(Configuration.GetSection("AppSettings:MyAllowSpecificOrigins").Value);
+
+           app.UseErrorHandling();
 
             app.UseAuthentication();
-            //app.UseHttpsRedirection();
+
+           app.UseStaticFiles();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

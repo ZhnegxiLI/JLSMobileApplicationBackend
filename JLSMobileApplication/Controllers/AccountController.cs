@@ -41,25 +41,35 @@ namespace JLSMobileApplication.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var userIdentity = _mapper.Map<User>(model);// 将UserRegistrationView 映射到User(转化为User(type:User))
-            var result = await _userManager.CreateAsync(userIdentity, model.Password);
-            if (!result.Succeeded)  {
-                foreach (var error in result.Errors)
+            try
+            {
+                var userIdentity = _mapper.Map<User>(model);// 将UserRegistrationView 映射到User(转化为User(type:User))
+                var result = await _userManager.CreateAsync(userIdentity, model.Password);
+                if (!result.Succeeded)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return new BadRequestObjectResult(result.Errors);
                 }
-                return new BadRequestObjectResult(result.Errors);
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(userIdentity);
+                var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = userIdentity.Id, code = code }, HttpContext.Request.Scheme);
+
+                //Email service 
+                //var r = _emailService.SendEmail(userIdentity.Email, "Confirmation votre compte", callbackUrl);
+
+                //await db.Customers.AddAsync(new Customer { IdentityId = userIdentity.Id, Location = model.Location });
+                //await _appDbContext.SaveChangesAsync();
+
+                return new OkObjectResult(callbackUrl);
             }
-               var code = await _userManager.GenerateEmailConfirmationTokenAsync(userIdentity);
-            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = userIdentity.Id, code = code }, HttpContext.Request.Scheme);
+            catch (System.Exception exc )
+            {
 
-            //Email service 
-            //var r = _emailService.SendEmail(userIdentity.Email, "Confirmation votre compte", callbackUrl);
-
-            //await db.Customers.AddAsync(new Customer { IdentityId = userIdentity.Id, Location = model.Location });
-            //await _appDbContext.SaveChangesAsync();
-
-            return new OkObjectResult(callbackUrl);
+                throw exc;
+            }
+       
         }
 
 

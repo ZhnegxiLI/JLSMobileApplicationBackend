@@ -13,6 +13,8 @@ namespace JLSMobileApplication.Resources
 
         public string Siret { get; set; }
         public string EntrepriseName { get; set; }
-        public string EntrepriseAdress { get; set; }
+        public long DefaultShippingAdressId { get; set; }
+
+        public long FacturationAdressId { get; set; }
     }
 }
