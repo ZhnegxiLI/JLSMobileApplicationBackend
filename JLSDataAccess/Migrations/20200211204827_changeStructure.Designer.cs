@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JLSDataAccess.Migrations
 {
     [DbContext(typeof(JlsDbContext))]
-    [Migration("20200202001935_initial")]
-    partial class initial
+    [Migration("20200211204827_changeStructure")]
+    partial class changeStructure
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -346,8 +346,6 @@ namespace JLSDataAccess.Migrations
 
                     b.Property<DateTime?>("CreatedOn");
 
-                    b.Property<long>("DefaultShippingAdressId");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256);
 
@@ -385,8 +383,6 @@ namespace JLSDataAccess.Migrations
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DefaultShippingAdressId");
 
                     b.HasIndex("FacturationAdressId");
 
@@ -428,6 +424,62 @@ namespace JLSDataAccess.Migrations
                     b.HasIndex("UserId1");
 
                     b.ToTable("UserPreferenceCategory");
+                });
+
+            modelBuilder.Entity("JLSDataModel.Models.User.UserShippingAdress", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long?>("CreatedBy");
+
+                    b.Property<DateTime?>("CreatedOn");
+
+                    b.Property<long>("ShippingAdressId");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedOn");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShippingAdressId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserShippingAdress");
+                });
+
+            modelBuilder.Entity("JLSDataModel.Models.User.UserToken", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("Active");
+
+                    b.Property<long?>("CreatedBy");
+
+                    b.Property<DateTime?>("CreatedOn");
+
+                    b.Property<DateTime>("Expires");
+
+                    b.Property<string>("Token");
+
+                    b.Property<long?>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedOn");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserToken");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -623,11 +675,6 @@ namespace JLSDataAccess.Migrations
 
             modelBuilder.Entity("JLSDataModel.Models.User.User", b =>
                 {
-                    b.HasOne("JLSDataModel.Models.Adress.Adress", "DefaultShippingAdress")
-                        .WithMany()
-                        .HasForeignKey("DefaultShippingAdressId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("JLSDataModel.Models.Adress.Adress", "FacturationAdress")
                         .WithMany()
                         .HasForeignKey("FacturationAdressId")
@@ -644,6 +691,27 @@ namespace JLSDataAccess.Migrations
                     b.HasOne("JLSDataModel.Models.User.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId1");
+                });
+
+            modelBuilder.Entity("JLSDataModel.Models.User.UserShippingAdress", b =>
+                {
+                    b.HasOne("JLSDataModel.Models.Adress.Adress", "ShippingAdress")
+                        .WithMany()
+                        .HasForeignKey("ShippingAdressId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("JLSDataModel.Models.User.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("JLSDataModel.Models.User.UserToken", b =>
+                {
+                    b.HasOne("JLSDataModel.Models.User.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

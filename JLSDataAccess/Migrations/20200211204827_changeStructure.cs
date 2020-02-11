@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace JLSDataAccess.Migrations
 {
-    public partial class initial : Migration
+    public partial class changeStructure : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -222,24 +222,17 @@ namespace JLSDataAccess.Migrations
                     UpdatedOn = table.Column<DateTime>(nullable: true),
                     Siret = table.Column<string>(nullable: true),
                     EntrepriseName = table.Column<string>(nullable: true),
-                    DefaultShippingAdressId = table.Column<long>(nullable: false),
                     FacturationAdressId = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_Adress_DefaultShippingAdressId",
-                        column: x => x.DefaultShippingAdressId,
-                        principalTable: "Adress",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_AspNetUsers_Adress_FacturationAdressId",
                         column: x => x.FacturationAdressId,
                         principalTable: "Adress",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -457,6 +450,62 @@ namespace JLSDataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserShippingAdress",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    CreatedBy = table.Column<long>(nullable: true),
+                    UpdatedOn = table.Column<DateTime>(nullable: true),
+                    UpdatedBy = table.Column<long>(nullable: true),
+                    UserId = table.Column<int>(nullable: false),
+                    ShippingAdressId = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserShippingAdress", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserShippingAdress_Adress_ShippingAdressId",
+                        column: x => x.ShippingAdressId,
+                        principalTable: "Adress",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserShippingAdress_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserToken",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreatedOn = table.Column<DateTime>(nullable: true),
+                    CreatedBy = table.Column<long>(nullable: true),
+                    UpdatedOn = table.Column<DateTime>(nullable: true),
+                    UpdatedBy = table.Column<long>(nullable: true),
+                    Token = table.Column<string>(nullable: true),
+                    Expires = table.Column<DateTime>(nullable: false),
+                    Active = table.Column<bool>(nullable: false),
+                    UserId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserToken", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserToken_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OrderInfoLog",
                 columns: table => new
                 {
@@ -511,11 +560,6 @@ namespace JLSDataAccess.Migrations
                 name: "IX_AspNetUserRoles_RoleId",
                 table: "AspNetUserRoles",
                 column: "RoleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_DefaultShippingAdressId",
-                table: "AspNetUsers",
-                column: "DefaultShippingAdressId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_FacturationAdressId",
@@ -593,6 +637,21 @@ namespace JLSDataAccess.Migrations
                 name: "IX_UserPreferenceCategory_UserId1",
                 table: "UserPreferenceCategory",
                 column: "UserId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserShippingAdress_ShippingAdressId",
+                table: "UserShippingAdress",
+                column: "ShippingAdressId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserShippingAdress_UserId",
+                table: "UserShippingAdress",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserToken_UserId",
+                table: "UserToken",
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -626,6 +685,12 @@ namespace JLSDataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserPreferenceCategory");
+
+            migrationBuilder.DropTable(
+                name: "UserShippingAdress");
+
+            migrationBuilder.DropTable(
+                name: "UserToken");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

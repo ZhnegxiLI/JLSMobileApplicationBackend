@@ -17,6 +17,7 @@ using JLSMobileApplication.Services;
 using Serilog;
 using Microsoft.Extensions.Options;
 using LjWebApplication.Middleware;
+using Newtonsoft.Json.Serialization;
 
 namespace JLSMobileApplication
 {
@@ -37,7 +38,7 @@ namespace JLSMobileApplication
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddJsonOptions(options =>
             {
                 options.SerializerSettings.DateFormatString = "yyyy-MM-dd";
-                //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
             });
 
             services.AddDbContext<JlsDbContext>(

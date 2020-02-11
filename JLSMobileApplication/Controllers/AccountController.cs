@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using JLSDataAccess;
-
+using JLSDataModel.Models.Adress;
 using JLSDataModel.Models.User;
 using JLSMobileApplication.Resources;
 using JLSMobileApplication.Services;
+using LjWebApplication.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -43,26 +44,55 @@ namespace JLSMobileApplication.Controllers
             }
             try
             {
+                // Step 1: 建立新地址
+                var adress = _mapper.Map<Adress>(model);
+                await db.AddAsync(adress);
+                await db.SaveChangesAsync();
+
+                // Step2: 整理用户信息(以邮箱作用户名)
                 var userIdentity = _mapper.Map<User>(model);// 将UserRegistrationView 映射到User(转化为User(type:User))
+                userIdentity.UserName = userIdentity.Email;
+                userIdentity.FacturationAdressId = adress.Id;
                 var result = await _userManager.CreateAsync(userIdentity, model.Password);
+                
+                // Step3: 检查注册是否成功 
                 if (!result.Succeeded)
                 {
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
-                    return new BadRequestObjectResult(result.Errors);
+                   return Json(new ApiResult()
+                    {
+                        Msg = result.Errors.ToString(),
+                        Success = false
+                    });
+                    
                 }
+
+                // Step4: 检查是否将发货地址与发票地址设置为同一地址 
+                if (model.UseSameAddress == true)
+                {
+                    var userShippingAdress = new UserShippingAdress();
+                    userShippingAdress.ShippingAdressId = adress.Id;
+                    userShippingAdress.UserId = userIdentity.Id;
+
+                    await db.AddAsync(userShippingAdress);
+                    await db.SaveChangesAsync();
+                }
+
+                // Step5: 发送确认邮件
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(userIdentity);
                 var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = userIdentity.Id, code = code }, HttpContext.Request.Scheme);
 
                 //Email service 
-                //var r = _emailService.SendEmail(userIdentity.Email, "Confirmation votre compte", callbackUrl);
+                var r = _emailService.SendEmail(userIdentity.Email, "Confirmation votre compte", callbackUrl);
 
-                //await db.Customers.AddAsync(new Customer { IdentityId = userIdentity.Id, Location = model.Location });
-                //await _appDbContext.SaveChangesAsync();
-
-                return new OkObjectResult(callbackUrl);
+                return Json(new ApiResult()
+                {
+                    Msg = "OK",
+                    Success = true
+                });
             }
             catch (System.Exception exc )
             {
