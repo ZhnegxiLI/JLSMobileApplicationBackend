@@ -84,9 +84,9 @@ namespace JLSMobileApplication.Controllers
                 // Step5: 发送确认邮件
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(userIdentity);
                 var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = userIdentity.Id, code = code }, HttpContext.Request.Scheme);
-
+                string body = "Please confirm your email:" + callbackUrl;
                 //Email service 
-                var r = _emailService.SendEmail(userIdentity.Email, "Confirmation votre compte", callbackUrl);
+                var r = _emailService.SendEmail(userIdentity.Email, "Confirmation votre compte", body);
 
                 return Json(new ApiResult()
                 {

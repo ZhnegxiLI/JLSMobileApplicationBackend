@@ -45,7 +45,7 @@ namespace JLSMobileApplication.Auth
                 });
             }
 
-            var user = await _userManager.FindByNameAsync(model.Username);
+            var user = await _userManager.FindByEmailAsync(model.Email);
 
             if (await _userManager.CheckPasswordAsync(user, model.Password))
             {
@@ -53,14 +53,23 @@ namespace JLSMobileApplication.Auth
                 {
                     return Json(new ApiResult()
                     {
-                        Msg = "Your Email is not yet confirmed, please confirm your email and login again",
+                        Msg = "Your Email is not yet confirmed, please confirm your email and login again",// todo: 转变成code以获取翻译
+                        Success = false
+                    });
+                }
+                if (user.Validity==null||user.Validity==false)
+                {
+                    return Json(new ApiResult()
+                    {
+                        Msg = "Your account has been locked, please contact our administrator for more information",// todo: 转变成code以获取翻译
                         Success = false
                     });
                 }
                 var token = GenerateToken(user.Id);
                 return Json(new ApiResult()
                 {
-                    Data = token,
+                    Data = new  { Token = token,
+                                  UserId = user.Id},
                     Msg = "OK",
                     Success = true
                 });

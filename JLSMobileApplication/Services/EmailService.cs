@@ -30,7 +30,7 @@ namespace JLSMobileApplication.Services
                 var mail = new MailMessage()
                 {
                     From = new MailAddress(_appSettings.EmailAccount),
-                    Subject = "Subjet",
+                    Subject = Subjet,
                     Body = Message
                 };
                 mail.IsBodyHtml = true;
@@ -46,11 +46,11 @@ namespace JLSMobileApplication.Services
                     Credentials = credentials
                 };
                 client.Send(mail);
-                return "Email Sent Successfully!";
+                return "Email Sent Successfully!"; //todo change to code 
             }
             catch (System.Exception e)
             {
-                return e.Message;
+                return e.Message; // todo change to code 
             }
         }
     }
