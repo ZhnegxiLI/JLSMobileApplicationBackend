@@ -90,6 +90,7 @@ namespace JLSMobileApplication.Controllers
 
                 return Json(new ApiResult()
                 {
+                    Data= r,
                     Msg = "OK",
                     Success = true
                 });
