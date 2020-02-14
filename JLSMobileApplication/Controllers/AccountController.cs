@@ -67,10 +67,24 @@ namespace JLSMobileApplication.Controllers
                         Msg = result.Errors.ToString(),
                         Success = false
                     });
+                }
+                // Step3: 加入用户权限
+                var result1 = await _userManager.AddToRoleAsync(userIdentity, "Client");
+                if (!result1.Succeeded)
+                {
                     
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return Json(new ApiResult()
+                    {
+                        Msg = result.Errors.ToString(),
+                        Success = false
+                    });
                 }
 
-                // Step4: 检查是否将发货地址与发票地址设置为同一地址 
+                // Step5: 检查是否将发货地址与发票地址设置为同一地址 
                 if (model.UseSameAddress == true)
                 {
                     var userShippingAdress = new UserShippingAdress();
@@ -81,7 +95,7 @@ namespace JLSMobileApplication.Controllers
                     await db.SaveChangesAsync();
                 }
 
-                // Step5: 发送确认邮件
+                // Step6: 发送确认邮件
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(userIdentity);
                 var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = userIdentity.Id, code = code }, HttpContext.Request.Scheme);
                 string body = "Please confirm your email:" + callbackUrl;

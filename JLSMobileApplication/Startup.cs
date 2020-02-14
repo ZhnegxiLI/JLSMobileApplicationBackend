@@ -18,6 +18,8 @@ using Serilog;
 using Microsoft.Extensions.Options;
 using LjWebApplication.Middleware;
 using Newtonsoft.Json.Serialization;
+using JLSDataAccess.Interfaces;
+using JLSDataAccess.Repositories;
 
 namespace JLSMobileApplication
 {
@@ -46,6 +48,7 @@ namespace JLSMobileApplication
                  builder => builder.UseRowNumberForPaging()) // IMPORTANT : use of ef function take() Skip()
              );
             services.AddDefaultIdentity<User>()
+            .AddRoles<IdentityRole<int>>()
             .AddEntityFrameworkStores<JlsDbContext>();
 
             // Configure strongly typed settings objects
@@ -119,6 +122,8 @@ namespace JLSMobileApplication
                             .AllowCredentials(); ;
                     });
             });
+
+            services.AddScoped<IUserRepository, UserRepository>();
 
         }
 

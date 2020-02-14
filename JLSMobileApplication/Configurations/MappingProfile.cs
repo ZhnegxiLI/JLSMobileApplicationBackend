@@ -11,6 +11,7 @@ namespace JLSMobileApplication.Configurations
         {
             CreateMap<UserRegistrationView, User>();// 将UserRegistrationView 映射到  user中
             CreateMap<UserRegistrationView, Adress>();// 将UserRegistrationView 映射到  adress 中
+            CreateMap<User, Auth.Auth>();
         }
     }
 }

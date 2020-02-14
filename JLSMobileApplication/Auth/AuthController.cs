@@ -1,4 +1,6 @@
-﻿using JLSDataAccess;
+﻿using AutoMapper;
+using JLSDataAccess;
+using JLSDataAccess.Interfaces;
 using JLSDataModel.Models.User;
 using JLSMobileApplication.Heplers;
 using JLSMobileApplication.Resources;
@@ -24,12 +26,16 @@ namespace JLSMobileApplication.Auth
         private readonly UserManager<User> _userManager;
         private readonly JlsDbContext db;
         private readonly IOptions<AppSettings> _appSettings;
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        public AuthController(UserManager<User> userManager, JlsDbContext dbContext, IOptions<AppSettings> appSettings)
+        public AuthController(IUserRepository userRepository, UserManager<User> userManager, IMapper mapper, JlsDbContext dbContext, IOptions<AppSettings> appSettings)
         {
             _userManager = userManager;
             db = dbContext;
             _appSettings = appSettings;
+            _userRepository = userRepository;
+            _mapper = mapper;
         }
 
         [HttpPost]
@@ -65,11 +71,21 @@ namespace JLSMobileApplication.Auth
                         Success = false
                     });
                 }
+                var roles = await _userManager.GetRolesAsync(user);
                 var token = GenerateToken(user.Id);
+                var auth = _mapper.Map<Auth>(user);
+                auth.Roles = await _userManager.GetRolesAsync(user);
+                auth.ShippingAdressList = await _userRepository.GetUserShippingAdress(user.Id);
+                auth.FacturationAdress = await _userRepository.GetUserFacturationAdress(user.Id);
+                auth.UserId = user.Id;
                 return Json(new ApiResult()
                 {
-                    Data = new  { Token = token,
-                                  UserId = user.Id},
+                    Data = new
+                    {
+                        Token = token,
+                        User = auth,
+                        UserId = user.Id
+                    },
                     Msg = "OK",
                     Success = true
                 });
