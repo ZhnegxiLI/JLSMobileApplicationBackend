@@ -16,6 +16,8 @@ namespace JLSMobileApplication.Resources
 
         public string SecondLineAddress { get; set; }
 
+        public string PhoneNumber { get; set; }
+
         public string  Country { get; set; }
 
         public string ZipCode { get; set; }

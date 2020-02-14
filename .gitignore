@@ -8,3 +8,5 @@
 /JLSDataAccess/bin
 Properties
 /JLSMobileApplication/web.config
+/JLSMobileApplication/appsettings.Development.json
+/JLSMobileApplication/appsettings.json
