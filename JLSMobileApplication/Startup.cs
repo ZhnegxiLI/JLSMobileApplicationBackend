@@ -123,8 +123,10 @@ namespace JLSMobileApplication
                     });
             });
 
+            /* 注入数据操作类 */
             services.AddScoped<IUserRepository, UserRepository>();
-
+            services.AddScoped<IProductRepository, ProductRepository>();
+         
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

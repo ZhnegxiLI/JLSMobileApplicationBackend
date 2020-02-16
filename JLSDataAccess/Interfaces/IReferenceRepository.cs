@@ -1,4 +1,5 @@
 ﻿using JLSDataModel.Models;
+using JLSMobileApplication.Resources;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +9,7 @@ namespace JLSDataAccess.Interfaces
 {
     public interface IReferenceRepository
     {
-        Task<List<dynamic>> GetReferenceItemsByCategoryLabels(string shortLabel, string lang);
+        Task<List<ReferenceItemViewModel>> GetReferenceItemsByCategoryLabels(string shortLabel, string lang);
 
         Task<List<ReferenceItem>> GetReferenceItemsByCategoryIds(string categoryIds, string lang);
 
