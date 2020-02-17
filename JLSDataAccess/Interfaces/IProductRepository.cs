@@ -10,6 +10,6 @@ namespace JLSDataAccess.Interfaces
 
         Task<List<ProductCategoryViewModel>> GetProductSecondCategory(long MainCategoryReferenceId, string Lang);
 
-        Task<List<dynamic>> GetProduct(long SecondCategoryReferenceId, string Lang);// todo : change class
+        Task<ProductListViewModel> GetProductListBySecondCategory(long SecondCategoryReferenceId, string Lang, int begin, int step);
     }
 }

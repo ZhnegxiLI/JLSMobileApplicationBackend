@@ -1,5 +1,6 @@
 ﻿using JLSDataModel.Models;
 using JLSDataModel.Models.Adress;
+using JLSDataModel.Models.Audit;
 using JLSDataModel.Models.Order;
 using JLSDataModel.Models.Product;
 using JLSDataModel.Models.User;
@@ -39,5 +40,8 @@ namespace JLSDataAccess
 
         public virtual DbSet<UserToken> UserToken { get; set; }
         public virtual DbSet<UserShippingAdress> UserShippingAdress { get; set; }
+
+        public virtual DbSet<Audit> Audit { get; set; }
+        public virtual DbSet<AuditData> AuditData { get; set; }
     }
 }

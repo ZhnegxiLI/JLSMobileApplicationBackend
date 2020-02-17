@@ -1,5 +1,4 @@
 ﻿using JLSDataAccess.Interfaces;
-using JLSMobileApplication.Resources;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,9 +17,36 @@ namespace JLSDataAccess.Repositories
             db = context;
         }
 
-        public Task<List<dynamic>> GetProduct(long SecondCategoryReferenceId, string Lang)
+        public async Task<ProductListViewModel> GetProductListBySecondCategory(long SecondCategoryReferenceId, string Lang, int begin, int step)
         {
-            throw new NotImplementedException();
+            var result = (from ri in db.ReferenceItem
+                                join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                                join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
+                                join product in db.Product on ri.Id equals product.ReferenceItemId
+                                where rc.ShortLabel == "Product" && ri.Validity == true && rl.Lang == Lang &&       ri.ParentId == SecondCategoryReferenceId
+                                select new ProductListData()
+                                {
+                                    ProductId = product.Id,
+                                    ReferenceId = ri.Id,
+                                    Code = ri.Code,
+                                    ParentId = ri.ParentId,
+                                    Value = ri.Value,
+                                    Order = ri.Order,
+                                    Label = rl.Label,
+                                    Price = product.Price,
+                                    QuantityPerBox = product.QuantityPerBox,
+                                    MinQuantity = product.MinQuantity,
+                                    PhotoPath = (from path in db.ProductPhotoPath
+                                                    where path.ProductId == product.Id
+                                                    select new ProductListPhotoPath() { Path = path.Path }).ToList()
+                                });
+            var totalCount = result.Count();
+            var productList = await result.Skip(begin * step).Take(step).ToListAsync();
+            return new ProductListViewModel()
+            {
+                ProductListData = productList,
+                TotalCount = totalCount
+            }; 
         }
 
         public async Task<List<ProductCategoryViewModel>> GetProductMainCategory(string Lang)
@@ -29,7 +55,7 @@ namespace JLSDataAccess.Repositories
                           join rip in db.ReferenceItem on ri.ParentId equals rip.Id
                           join rlp in db.ReferenceLabel on rip.Id equals rlp.ReferenceItemId
                           join rcp in db.ReferenceCategory on rip.ReferenceCategoryId equals rcp.Id
-                          where rcp.ShortLabel == "MainCategory" && rlp.Lang == Lang
+                          where rcp.ShortLabel == "MainCategory" && rlp.Lang == Lang && rip.Validity == true
                           group rip by new { rip.Id,rip.Code, rlp.Label} into g
                           select new ProductCategoryViewModel()
                           {
@@ -51,7 +77,7 @@ namespace JLSDataAccess.Repositories
                                 join rip in db.ReferenceItem on ri.ParentId equals rip.Id
                                 join rlp in db.ReferenceLabel on rip.Id equals rlp.ReferenceItemId
                                 join rcp in db.ReferenceCategory on rip.ReferenceCategoryId equals rcp.Id
-                                where rcp.ShortLabel == "SecondCategory" && rip.ParentId ==       MainCategoryReferenceId && rlp.Lang == Lang
+                                where rcp.ShortLabel == "SecondCategory" && rip.ParentId ==       MainCategoryReferenceId && rlp.Lang == Lang && rip.Validity == true
                                 group rip by new { rip.Id, rip.Code, rlp.Label } into g
                                 select new ProductCategoryViewModel()
                                 {
@@ -64,7 +90,6 @@ namespace JLSDataAccess.Repositories
                                         Code = g.Key.Code
                                     }
                                 }).ToListAsync();
-
             return result;
         }
     }
