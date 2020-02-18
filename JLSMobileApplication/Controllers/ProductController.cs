@@ -66,7 +66,7 @@ namespace JLSMobileApplication.Controllers
             try
             {
                 var productList = await _productRepository.GetProductListBySecondCategory(SecondCategoryReferenceId, Lang, Begin, Step);
-                var result = _mapper.Map<List<ProductListViewModelWithoutAuth>>(productList.ProductListData);
+                var result = _mapper.Map<List<ProductListViewModelWithAuth>>(productList.ProductListData);//ProductListViewModelWithoutAuth // todo: only for test
                 return Json(new ApiResult()
                 {
                     Data = new

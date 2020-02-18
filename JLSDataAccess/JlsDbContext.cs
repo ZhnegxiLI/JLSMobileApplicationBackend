@@ -43,5 +43,8 @@ namespace JLSDataAccess
 
         public virtual DbSet<Audit> Audit { get; set; }
         public virtual DbSet<AuditData> AuditData { get; set; }
+
+        public virtual DbSet<DeletedRecords> DeletedRecords { get; set; }
+        
     }
 }
