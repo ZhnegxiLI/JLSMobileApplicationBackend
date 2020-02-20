@@ -41,6 +41,7 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
+
         [HttpGet]
         public async Task<JsonResult> GetProductSecondCategory(long MainCategoryReferenceId, string Lang)
         {
@@ -48,7 +49,7 @@ namespace JLSMobileApplication.Controllers
             {
                 return Json(new ApiResult()
                 {
-                    Data = await _productRepository.GetProductSecondCategory(MainCategoryReferenceId,Lang),
+                    Data = await _productRepository.GetProductSecondCategory(MainCategoryReferenceId, Lang),
                     Msg = "OK",
                     Success = true
                 });
@@ -61,7 +62,7 @@ namespace JLSMobileApplication.Controllers
 
 
         [HttpGet]
-        public async Task<JsonResult> GetProductListBySecondCategory(long SecondCategoryReferenceId, string Lang,int Begin, int Step)
+        public async Task<JsonResult> GetProductListBySecondCategory(long SecondCategoryReferenceId, string Lang, int Begin, int Step)
         {
             try
             {
@@ -95,9 +96,36 @@ namespace JLSMobileApplication.Controllers
                 var result = _mapper.Map<ProductListViewModelWithAuth>(productList.ProductListData);
                 return Json(new ApiResult()
                 {
-                    Data = new { ProductList =result,
-                                 TotalCount = productList.TotalCount
+                    Data = new { ProductList = result,
+                        TotalCount = productList.TotalCount
                     },
+                    Msg = "OK",
+                    Success = true
+                });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+
+        public class GetProductInfoByReferenceIdsCriteria {
+            public GetProductInfoByReferenceIdsCriteria()
+            {
+                this.ReferenceIds = new List<long>();
+            }
+            public List<long> ReferenceIds { get; set; }
+            public string Lang { get; set; }
+        }
+   
+        [HttpPost]
+        public async Task<JsonResult> GetProductInfoByReferenceIds([FromBody] GetProductInfoByReferenceIdsCriteria criteria)
+        {
+            try
+            {
+                return Json(new ApiResult()
+                {
+                    Data = await _productRepository.GetProductInfoByReferenceIds(criteria.ReferenceIds, criteria.Lang),
                     Msg = "OK",
                     Success = true
                 });

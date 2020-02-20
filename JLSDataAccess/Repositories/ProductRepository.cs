@@ -17,6 +17,32 @@ namespace JLSDataAccess.Repositories
             db = context;
         }
 
+        public async Task<List<ProductListData>> GetProductInfoByReferenceIds(List<long> ReferenceIds, string Lang)
+        {
+            var result = (from ri in db.ReferenceItem
+                            join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                            join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
+                            join product in db.Product on ri.Id equals product.ReferenceItemId
+                            where rc.ShortLabel == "Product" && ri.Validity == true && rl.Lang == Lang && ReferenceIds.Contains(ri.Id)
+                            select new ProductListData()
+                            {
+                                ProductId = product.Id,
+                                ReferenceId = ri.Id,
+                                Code = ri.Code,
+                                ParentId = ri.ParentId,
+                                Value = ri.Value,
+                                Order = ri.Order,
+                                Label = rl.Label,
+                                Price = product.Price,
+                                QuantityPerBox = product.QuantityPerBox,
+                                MinQuantity = product.MinQuantity,
+                                PhotoPath = (from path in db.ProductPhotoPath
+                                            where path.ProductId == product.Id
+                                            select new ProductListPhotoPath() { Path = path.Path }).ToList()
+                            });
+            return await result.ToListAsync();
+        }
+
         public async Task<ProductListViewModel> GetProductListBySecondCategory(long SecondCategoryReferenceId, string Lang, int begin, int step)
         {
             var result = (from ri in db.ReferenceItem

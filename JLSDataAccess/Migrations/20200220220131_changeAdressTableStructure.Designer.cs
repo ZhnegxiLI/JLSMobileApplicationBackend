@@ -4,14 +4,16 @@ using JLSDataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace JLSDataAccess.Migrations
 {
     [DbContext(typeof(JlsDbContext))]
-    partial class JlsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200220220131_changeAdressTableStructure")]
+    partial class changeAdressTableStructure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -225,9 +227,9 @@ namespace JLSDataAccess.Migrations
 
                     b.Property<long?>("OrderInfoId");
 
-                    b.Property<int>("Quantity");
+                    b.Property<long>("ProductId");
 
-                    b.Property<long>("ReferenceId");
+                    b.Property<int>("Quantity");
 
                     b.Property<long?>("UpdatedBy");
 
@@ -237,7 +239,7 @@ namespace JLSDataAccess.Migrations
 
                     b.HasIndex("OrderInfoId");
 
-                    b.HasIndex("ReferenceId");
+                    b.HasIndex("ProductId");
 
                     b.ToTable("OrderProduct");
                 });
@@ -751,9 +753,9 @@ namespace JLSDataAccess.Migrations
                         .WithMany()
                         .HasForeignKey("OrderInfoId");
 
-                    b.HasOne("JLSDataModel.Models.ReferenceItem", "Reference")
+                    b.HasOne("JLSDataModel.Models.Product.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("ReferenceId")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

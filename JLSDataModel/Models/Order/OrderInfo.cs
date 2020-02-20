@@ -8,8 +8,6 @@ namespace JLSDataModel.Models.Order
     {
         public string OrderReferenceCode { get; set; }
 
-
-        public string ContactTelephone { get; set; }
         public string PaymentInfo { get; set; }
 
         public string ClientRemark { get; set; }
@@ -20,14 +18,17 @@ namespace JLSDataModel.Models.Order
 
         public float? TaxRate { get; set; }
 
-        // 外键: 客户
+        // Foreign key 
         public int UserId { get; set; }
         public User.User User { get; set; }
 
         public long StatusReferenceItemId { get; set; }
         public ReferenceItem StatusReferenceItem { get; set; }
 
-        public long AdressId { get; set; }
-        public Adress.Adress Adress { get; set; }
+        public long ShippingAdressId { get; set; }
+        public Adress.Adress ShippingAdress { get; set; }
+
+        public long FacturationAdressId { get; set; }
+        public Adress.Adress FacturationAdress { get; set; }
     }
 }

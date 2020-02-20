@@ -31,6 +31,7 @@ namespace JLSDataAccess.Repositories
             var result = (from a in db.Adress
                           join ua in db.UserShippingAdress on a.Id equals ua.ShippingAdressId
                           join u in db.Users on ua.UserId equals u.Id
+                          where ua.UserId == userId
                           select a);
             return await result.ToListAsync();
         }
