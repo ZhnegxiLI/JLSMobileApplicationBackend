@@ -41,6 +41,41 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<JsonResult> GetProductListBySalesPerformance(string Lang, int Begin, int Step)
+        {
+            try
+            {
+                return Json(new ApiResult()
+                {
+                    Data = await _productRepository.GetProductListBySalesPerformance(Lang, Begin, Step),
+                    Msg = "OK",
+                    Success = true
+                });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetProductListByPublishDate(string Lang, int Begin, int Step)
+        {
+            try
+            {
+                return Json(new ApiResult()
+                {
+                    Data = await _productRepository.GetProductListByPublishDate(Lang, Begin, Step),
+                    Msg = "OK",
+                    Success = true
+                });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
 
         [HttpGet]
         public async Task<JsonResult> GetProductSecondCategory(long MainCategoryReferenceId, string Lang)
@@ -72,7 +107,7 @@ namespace JLSMobileApplication.Controllers
                 {
                     Data = new
                     {
-                        ProductList = result,
+                        ProductListData = result,
                         TotalCount = productList.TotalCount
                     },
                     Msg = "OK",
@@ -96,7 +131,8 @@ namespace JLSMobileApplication.Controllers
                 var result = _mapper.Map<ProductListViewModelWithAuth>(productList.ProductListData);
                 return Json(new ApiResult()
                 {
-                    Data = new { ProductList = result,
+                    Data = new {
+                        ProductListData = result,
                         TotalCount = productList.TotalCount
                     },
                     Msg = "OK",

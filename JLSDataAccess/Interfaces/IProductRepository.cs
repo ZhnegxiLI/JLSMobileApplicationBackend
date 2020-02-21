@@ -13,5 +13,9 @@ namespace JLSDataAccess.Interfaces
         Task<ProductListViewModel> GetProductListBySecondCategory(long SecondCategoryReferenceId, string Lang, int begin, int step);
 
         Task<List<ProductListData>> GetProductInfoByReferenceIds(List<long> ReferenceIds, string Lang);
+
+        Task<ProductListViewModel> GetProductListBySalesPerformance(string Lang, int begin, int step);
+
+        Task<ProductListViewModel> GetProductListByPublishDate(string Lang, int begin, int step);
     }
 }
