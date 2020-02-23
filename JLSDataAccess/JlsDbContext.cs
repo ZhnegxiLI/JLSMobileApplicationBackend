@@ -37,7 +37,7 @@ namespace JLSDataAccess
         public virtual DbSet<UserPreferenceCategory> UserPreferenceCategory { get; set; }
 
         public virtual DbSet<Adress> Adress { get; set; }
-
+        
         public virtual DbSet<UserToken> UserToken { get; set; }
         public virtual DbSet<UserShippingAdress> UserShippingAdress { get; set; }
 
@@ -46,7 +46,8 @@ namespace JLSDataAccess
 
         public virtual DbSet<DeletedRecords> DeletedRecords { get; set; }
         public virtual DbSet<OrderProduct> OrderProduct { get; set; }
-
+        
+        public virtual DbSet<ProductComment> ProductComment { get; set; }
 
     }
 }

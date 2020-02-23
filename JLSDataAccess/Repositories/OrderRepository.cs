@@ -56,6 +56,23 @@ namespace JLSDataAccess.Repositories
             return Order.Id;
         }
 
+        public async Task<List<OrderListViewModelMobile>> GetOrdersListByUserId(int UserId)
+        {
+            var result = await (from o in db.OrderInfo
+                          where o.UserId == UserId
+                          select new OrderListViewModelMobile()
+                          {
+                              Id = o.Id,
+                              CreatedOn = o.CreatedOn,
+                              TotalPrice = o.TotalPrice,
+                              ShippingAdressId = o.ShippingAdressId,
+                              ShippingAdress = (from a in db.Adress
+                                                where a.Id == o.ShippingAdressId
+                                                select a).FirstOrDefault()
+                          }).ToListAsync();
+            return result;
+        }
+
 
         /*
          * Admin Zoom 
@@ -139,7 +156,7 @@ namespace JLSDataAccess.Repositories
                                 join user in db.Users on order.UserId equals user.Id
                                 join ris in db.ReferenceItem on order.StatusReferenceItemId equals ris.Id
                                 from rls in db.ReferenceLabel.Where(rls => rls.ReferenceItemId == ris.Id
-                                && rls.Lang == lang).Take(1).DefaultIfEmpty()
+                                && rls.Lang == lang).DefaultIfEmpty()
                                 select new OrderViewModel
                                 {
                                     OrderReferenceCode = order.OrderReferenceCode,

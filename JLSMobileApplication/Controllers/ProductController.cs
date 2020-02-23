@@ -120,6 +120,8 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
+
+
         /******************************** ZOOM Service with authentification *******************************/
         [Authorize]
         [HttpGet]
