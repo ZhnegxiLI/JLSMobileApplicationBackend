@@ -18,12 +18,12 @@ namespace JLSDataAccess.Repositories
     public class ProductRepository : IProductRepository
     {
         private readonly JlsDbContext db;
-        private readonly IReferenceRepository _referencRepository;
+     //   private readonly IReferenceRepository _referencRepository;
 
-        public ProductRepository(JlsDbContext context, IReferenceRepository Reference)
+        public ProductRepository(JlsDbContext context)
         {
             db = context;
-            _referencRepository = Reference; // todo change
+          //  _referencRepository = Reference; // todo change
         }
 
         /*
@@ -210,70 +210,70 @@ namespace JLSDataAccess.Repositories
          */
 
          // TODO change: send from font-end OR from controller
-        public async Task<List<ReferenceItemViewModel>> GetProductCategory(string lang)
-        {
-            var result = await _referencRepository.GetReferenceItemsByCategoryLabelsAdmin("MainCategory;SecondCategory", lang);
-            return result;
-        }
+        //public async Task<List<ReferenceItemViewModel>> GetProductCategory(string lang)
+        //{
+        //    var result = await _referencRepository.GetReferenceItemsByCategoryLabelsAdmin("MainCategory;SecondCategory", lang);
+        //    return result;
+        //}
 
-        // TODO change: send from font-end OR from controller
-        public async Task<List<ReferenceItemViewModel>> GetTaxRate()
-        {
-            var result = await _referencRepository.GetReferenceItemsByCategoryLabelsAdmin("TaxRate", null);
-            return result;
-        }
+        //// TODO change: send from font-end OR from controller
+        //public async Task<List<ReferenceItemViewModel>> GetTaxRate()
+        //{
+        //    var result = await _referencRepository.GetReferenceItemsByCategoryLabelsAdmin("TaxRate", null);
+        //    return result;
+        //}
 
-        public async Task<int> SaveProduct(Product product, List<IFormFile> images, List<ReferenceLabel> labels)
-        {
-            string imagesPath = "images/" + product.ReferenceItem.Code + "/";
+        //public async Task<int> SaveProduct(Product product, List<IFormFile> images, List<ReferenceLabel> labels)
+        //{
+        //    string imagesPath = "images/" + product.ReferenceItem.Code + "/";
 
-            if (!Directory.Exists(imagesPath))
-            {
-                Directory.CreateDirectory(imagesPath);
-            }
+        //    if (!Directory.Exists(imagesPath))
+        //    {
+        //        Directory.CreateDirectory(imagesPath);
+        //    }
 
-            if (product.Id == 0)
-            {
-                db.ReferenceItem.Add(product.ReferenceItem);
-                await db.SaveChangesAsync();
-                product.ReferenceItemId = product.ReferenceItem.Id;
-                db.Product.Add(product);
-                await db.SaveChangesAsync();
+        //    if (product.Id == 0)
+        //    {
+        //        db.ReferenceItem.Add(product.ReferenceItem);
+        //        await db.SaveChangesAsync();
+        //        product.ReferenceItemId = product.ReferenceItem.Id;
+        //        db.Product.Add(product);
+        //        await db.SaveChangesAsync();
 
-                labels = _referencRepository.CheckLabels(labels, product.ReferenceItemId);
-                foreach (ReferenceLabel label in labels)
-                {
-                    db.ReferenceLabel.Add(label);
-                }
-            }
-            else
-            {
-                db.Product.Update(product);
+        //        labels = _referencRepository.CheckLabels(labels, product.ReferenceItemId);
+        //        foreach (ReferenceLabel label in labels)
+        //        {
+        //            db.ReferenceLabel.Add(label);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        db.Product.Update(product);
 
-                labels = _referencRepository.CheckLabels(labels, product.ReferenceItemId);
-                foreach (ReferenceLabel label in labels)
-                {
-                    db.ReferenceLabel.Update(label);
-                }
+        //        labels = _referencRepository.CheckLabels(labels, product.ReferenceItemId);
+        //        foreach (ReferenceLabel label in labels)
+        //        {
+        //            db.ReferenceLabel.Update(label);
+        //        }
 
-            }
+        //    }
 
-            foreach (IFormFile image in images)
-            {
-                if (await SaveImage(image, imagesPath))
-                {
-                    db.ProductPhotoPath.Add(
-                        new ProductPhotoPath
-                        {
-                            Path = product.ReferenceItem.Code + "/" + image.FileName,
-                            ProductId = product.Id
-                        }
-                    );
-                }
-            }
-            await db.SaveChangesAsync();
-            return 1;
-        }
+        //    foreach (IFormFile image in images)
+        //    {
+        //        if (await SaveImage(image, imagesPath))
+        //        {
+        //            db.ProductPhotoPath.Add(
+        //                new ProductPhotoPath
+        //                {
+        //                    Path = product.ReferenceItem.Code + "/" + image.FileName,
+        //                    ProductId = product.Id
+        //                }
+        //            );
+        //        }
+        //    }
+        //    await db.SaveChangesAsync();
+        //    return 1;
+        //}
 
         private async Task<Boolean> SaveImage(IFormFile image, string path)
         {

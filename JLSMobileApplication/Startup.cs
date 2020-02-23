@@ -127,7 +127,7 @@ namespace JLSMobileApplication
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
-            services.AddScoped<IReferenceRepository, ReferenceRepository>();
+           // services.AddScoped<IReferenceRepository, ReferenceRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
