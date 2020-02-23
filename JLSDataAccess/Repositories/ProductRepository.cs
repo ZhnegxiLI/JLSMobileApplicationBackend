@@ -6,17 +6,29 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using JLSDataModel.ViewModels;
+using JLSDataModel.Models.Product;
+using Microsoft.AspNetCore.Http;
+using JLSDataModel.Models;
+using System.IO;
+using System.Linq.Expressions;
+using LinqKit;
 
 namespace JLSDataAccess.Repositories
 {
     public class ProductRepository : IProductRepository
     {
         private readonly JlsDbContext db;
-        public ProductRepository(JlsDbContext context)
+        private readonly IReferenceRepository _referencRepository;
+
+        public ProductRepository(JlsDbContext context, IReferenceRepository Reference)
         {
             db = context;
+            _referencRepository = Reference; // todo change
         }
 
+        /*
+         * Mobile Zoom
+         */
         public async Task<List<ProductListData>> GetProductInfoByReferenceIds(List<long> ReferenceIds, string Lang)
         {
             var result = (from ri in db.ReferenceItem
@@ -190,5 +202,266 @@ namespace JLSDataAccess.Repositories
                                 }).ToListAsync();
             return result;
         }
+
+
+
+        /*
+         * Admin Zoom
+         */
+
+         // TODO change: send from font-end OR from controller
+        public async Task<List<ReferenceItemViewModel>> GetProductCategory(string lang)
+        {
+            var result = await _referencRepository.GetReferenceItemsByCategoryLabelsAdmin("MainCategory;SecondCategory", lang);
+            return result;
+        }
+
+        // TODO change: send from font-end OR from controller
+        public async Task<List<ReferenceItemViewModel>> GetTaxRate()
+        {
+            var result = await _referencRepository.GetReferenceItemsByCategoryLabelsAdmin("TaxRate", null);
+            return result;
+        }
+
+        public async Task<int> SaveProduct(Product product, List<IFormFile> images, List<ReferenceLabel> labels)
+        {
+            string imagesPath = "images/" + product.ReferenceItem.Code + "/";
+
+            if (!Directory.Exists(imagesPath))
+            {
+                Directory.CreateDirectory(imagesPath);
+            }
+
+            if (product.Id == 0)
+            {
+                db.ReferenceItem.Add(product.ReferenceItem);
+                await db.SaveChangesAsync();
+                product.ReferenceItemId = product.ReferenceItem.Id;
+                db.Product.Add(product);
+                await db.SaveChangesAsync();
+
+                labels = _referencRepository.CheckLabels(labels, product.ReferenceItemId);
+                foreach (ReferenceLabel label in labels)
+                {
+                    db.ReferenceLabel.Add(label);
+                }
+            }
+            else
+            {
+                db.Product.Update(product);
+
+                labels = _referencRepository.CheckLabels(labels, product.ReferenceItemId);
+                foreach (ReferenceLabel label in labels)
+                {
+                    db.ReferenceLabel.Update(label);
+                }
+
+            }
+
+            foreach (IFormFile image in images)
+            {
+                if (await SaveImage(image, imagesPath))
+                {
+                    db.ProductPhotoPath.Add(
+                        new ProductPhotoPath
+                        {
+                            Path = product.ReferenceItem.Code + "/" + image.FileName,
+                            ProductId = product.Id
+                        }
+                    );
+                }
+            }
+            await db.SaveChangesAsync();
+            return 1;
+        }
+
+        private async Task<Boolean> SaveImage(IFormFile image, string path)
+        {
+            try
+            {
+                var imagePath = Path.Combine(path, image.FileName);
+
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+
+                using (FileStream fs = File.Create(imagePath))
+                {
+                    // 复制文件
+                    await image.CopyToAsync(fs);
+                    // 清空缓冲区数据
+                    fs.Flush();
+                }
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+
+            return true;
+        }
+
+        public async Task<List<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection)
+        {
+            var request = (from ri in db.ReferenceItem
+                           join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                           from rl in db.ReferenceLabel.Where(p => p.ReferenceItemId == ri.Id && p.Lang == lang).DefaultIfEmpty()
+                           where rc.ShortLabel.Equals("Product")
+                           join p in db.Product on ri.Id equals p.ReferenceItemId
+                           from img in db.ProductPhotoPath.Where(img => p.Id == img.ProductId).Take(1).DefaultIfEmpty()
+                           select new ProductsListViewModel
+                           {
+                               Id = p.Id,
+                               Name = rl.Label,
+                               Category = (from rlp in db.ReferenceLabel
+                                           where rlp.ReferenceItemId == ri.ParentId
+                                           select rlp.Label).FirstOrDefault(),
+                               Image = img.Path,
+                               Price = p.Price,
+                               ReferenceCode = ri.Code,
+                               Validity = ri.Validity,
+                           });
+
+            if (orderActive == "null" || orderActive == "undefined" || orderDirection == "null")
+            {
+                return await request.Skip(intervalCount * size).Take(size).ToListAsync();
+            }
+
+            Expression<Func<ProductsListViewModel, object>> funcOrder;// TODO :change
+
+            switch (orderActive)
+            {
+                case "reference":
+                    funcOrder = p => p.ReferenceCode;
+                    break;
+                case "name":
+                    funcOrder = p => p.Name;
+                    break;
+                case "categories":
+                    funcOrder = p => p.Category;
+                    break;
+                case "price":
+                    funcOrder = p => p.Price;
+                    break;
+                case "active":
+                    funcOrder = p => p.Validity;
+                    break;
+                default:
+                    funcOrder = p => p.Id;
+                    break;
+            }
+
+            if (orderDirection == "asc")
+            {
+                request = request.OrderBy(funcOrder);
+            }
+            else
+            {
+                request = request.OrderByDescending(funcOrder);
+            }
+
+            var result = await request.Skip(intervalCount * size).Take(size).ToListAsync();
+
+
+            return result;
+        }
+
+        public async Task<ProductViewModel> GetProductById(long id)
+        {
+            var result = await (from ri in db.ReferenceItem
+                                from rl in db.ReferenceLabel.Where(p => p.ReferenceItemId == ri.Id).DefaultIfEmpty()
+                                join p in db.Product on ri.Id equals p.ReferenceItemId
+                                where p.Id == id
+                                select new ProductViewModel
+                                {
+                                    Id = p.Id,
+                                    Category = ri.ParentId,
+                                    ReferenceCode = ri.Code,
+                                    Color = p.Color,
+                                    Description = p.Description,
+                                    Material = p.Material,
+                                    Size = p.Size,
+                                    MinQuantity = p.MinQuantity,
+                                    Price = p.Price,
+                                    QuantityPerBox = p.QuantityPerBox,
+                                    ReferenceItemId = ri.Id,
+                                }).FirstOrDefaultAsync();
+
+            if (result == null)
+            {
+                return null;
+            }
+            result.Label = await (from rl in db.ReferenceLabel
+                                  where rl.ReferenceItemId == result.ReferenceItemId
+                                  select rl).ToListAsync();
+
+            result.Images = await (from img in db.ProductPhotoPath
+                                   where img.ProductId == result.Id
+                                   select img).ToListAsync();
+            return result;
+        }
+
+        public async Task<int> RemoveImageById(long id)
+        {
+            ProductPhotoPath image = await db.ProductPhotoPath.FindAsync(id);
+
+            if (image == null)
+            {
+                return 0;
+            }
+
+            string imagePath = "images/" + image.Path;
+
+            try
+            {
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+
+                db.ProductPhotoPath.Remove(image);
+
+                await db.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                return 0;
+            }
+            return 1;
+        }
+
+        // TODO change
+
+        public async Task<List<ProductsListViewModel>> SearchProducts(string lang, string filter)
+        {
+            var predicate = PredicateBuilder.New<ProductsListViewModel>();
+            predicate.Or(p => p.ReferenceCode.Contains(filter));
+            predicate.Or(p => p.Name.Contains(filter));
+            predicate.Or(p => p.Category.Contains(filter));
+
+            var result = await (from ri in db.ReferenceItem
+                                where ri.Code.Contains(filter)
+                                join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                                from rl in db.ReferenceLabel.Where(p => p.ReferenceItemId == ri.Id && p.Lang == lang).DefaultIfEmpty()
+                                where rc.ShortLabel.Equals("Product") // TODO change
+                                join p in db.Product on ri.Id equals p.ReferenceItemId
+                                from img in db.ProductPhotoPath.Where(img => p.Id == img.ProductId).Take(1).DefaultIfEmpty()
+                                select new ProductsListViewModel
+                                {
+                                    Id = p.Id,
+                                    Name = rl.Label,
+                                    Category = (from rlp in db.ReferenceLabel
+                                                where rlp.ReferenceItemId == ri.ParentId
+                                                select rlp.Label).FirstOrDefault(),
+                                    Image = img.Path,
+                                    Price = p.Price,
+                                    ReferenceCode = ri.Code,
+                                    Validity = ri.Validity,
+                                }).Where(predicate).Take(10).ToListAsync();
+            return result;
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using JLSDataModel.Models;
+using JLSDataModel.ViewModels;
 using JLSMobileApplication.Resources;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,30 @@ namespace JLSDataAccess.Interfaces
 {
     public interface IReferenceRepository
     {
-        Task<List<ReferenceItemViewModel>> GetReferenceItemsByCategoryLabels(string shortLabel, string lang);
+        Task<List<ReferenceItemViewModelMobile>> GetReferenceItemsByCategoryLabels(string shortLabel, string lang);
 
         Task<List<ReferenceItem>> GetReferenceItemsByCategoryIds(string categoryIds, string lang);
 
         Task<List<ReferenceItem>> GetReferenceItemsById(long referenceId, string lang);
 
         Task<List<ReferenceItem>> GetReferenceItemsByCode(string referencecode, string lang);
+
+
+        /*
+         * Admin zoom
+         */
+        Task<List<ReferenceItemViewModel>> GetReferenceItemsByCategoryLabelsAdmin(string shortLabels, string lang);
+        Task<List<ReferenceItemViewModel>> GetReferenceItemWithInterval(int intervalCount, int size, string orderActive, string orderDirection, string filter);
+
+        Task<int> GetReferenceItemsCount();
+
+        Task<List<ReferenceCategory>> GetAllReferenceCategory();
+
+        Task<List<ReferenceCategory>> GetAllValidityReferenceCategory();
+
+        Task<int> CreatorUpdateItem(ReferenceItem item, List<ReferenceLabel> labels);
+
+        Task<int> CreatorUpdateCategory(ReferenceCategory category);
+        List<ReferenceLabel> CheckLabels(List<ReferenceLabel> labels, long referenceItemId);
     }
 }

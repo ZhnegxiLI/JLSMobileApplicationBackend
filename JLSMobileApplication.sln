@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLSMobileApplication", "JLSMobileApplication\JLSMobileApplication.csproj", "{8FEEEFF3-EFCF-4364-A298-CB09AB63CBEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLSMobileApplication", "JLSMobileApplication\JLSMobileApplication.csproj", "{8FEEEFF3-EFCF-4364-A298-CB09AB63CBEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLSDataModel", "JLSDataModel\JLSDataModel.csproj", "{D0FA1837-47D4-41A2-8488-696F2F83AE6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLSDataModel", "JLSDataModel\JLSDataModel.csproj", "{D0FA1837-47D4-41A2-8488-696F2F83AE6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLSDataAccess", "JLSDataAccess\JLSDataAccess.csproj", "{81A19ECC-D2B9-44DC-8742-0825A8657B93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLSDataAccess", "JLSDataAccess\JLSDataAccess.csproj", "{81A19ECC-D2B9-44DC-8742-0825A8657B93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLSConsoleApplication", "JLSConsoleApplication\JLSConsoleApplication.csproj", "{6D044B95-EF0D-4482-8DCC-39A0C47A1863}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{81A19ECC-D2B9-44DC-8742-0825A8657B93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81A19ECC-D2B9-44DC-8742-0825A8657B93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81A19ECC-D2B9-44DC-8742-0825A8657B93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D044B95-EF0D-4482-8DCC-39A0C47A1863}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D044B95-EF0D-4482-8DCC-39A0C47A1863}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D044B95-EF0D-4482-8DCC-39A0C47A1863}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D044B95-EF0D-4482-8DCC-39A0C47A1863}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

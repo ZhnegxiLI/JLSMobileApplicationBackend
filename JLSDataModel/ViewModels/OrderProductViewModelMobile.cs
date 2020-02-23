@@ -4,7 +4,7 @@ using System.Text;
 
 namespace JLSDataModel.ViewModels
 {
-    public class OrderProductViewModel
+    public class OrderProductViewModelMobile
     {
         public long ReferenceId { get; set; }
         public int Quantity { get; set; }

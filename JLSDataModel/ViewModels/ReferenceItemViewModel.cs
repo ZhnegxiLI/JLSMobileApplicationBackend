@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Resources
 {
-    public class ReferenceItemViewModel
+    public class ReferenceItemViewModelMobile
     {
-        public ReferenceItemViewModel()
+        public ReferenceItemViewModelMobile()
         {
-            this.ReferenceParent = new ReferenceItemViewModel();
+            this.ReferenceParent = new ReferenceItemViewModelMobile();
         }
 
         public long Id { get; set; }
@@ -22,7 +22,7 @@ namespace JLSMobileApplication.Resources
         public string ReferenceCategoryLongLabel { get; set; }
         public string Label { get; set; }
 
-        public ReferenceItemViewModel ReferenceParent { get; set; }
+        public ReferenceItemViewModelMobile ReferenceParent { get; set; }
         public bool? Validity { get; set; }
     }
 }

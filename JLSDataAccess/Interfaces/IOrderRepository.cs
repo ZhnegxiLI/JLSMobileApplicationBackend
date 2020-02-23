@@ -8,6 +8,9 @@ namespace JLSDataAccess.Interfaces
 {
     public interface IOrderRepository
     {
-        Task<long> SaveOrder(List<OrderProductViewModel> References, long ShippingAdressId, long FacturationAdressId, int UserId);
+        Task<long> SaveOrder(List<OrderProductViewModelMobile> References, long ShippingAdressId, long FacturationAdressId, int UserId);
+
+        Task<List<OrdersListViewModel>> GetAllOrdersWithInterval(string lang, int intervalCount, int size, string orderActive, string orderDirection);
+        Task<OrderViewModel> GetOrderById(long id, string lang);
     }
 }

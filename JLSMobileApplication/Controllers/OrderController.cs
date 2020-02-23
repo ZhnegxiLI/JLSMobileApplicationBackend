@@ -26,12 +26,12 @@ namespace JLSMobileApplication.Controllers
         public class SaveOrderCriteria{
             public SaveOrderCriteria()
             {
-                this.References = new List<OrderProductViewModel>();
+                this.References = new List<OrderProductViewModelMobile>();
             }
             public long ShippingAdressId { get; set; }
             public long FacturationAdressId { get; set; }
             public int UserId { get; set; }
-            public List<OrderProductViewModel> References { get; set; }
+            public List<OrderProductViewModelMobile> References { get; set; }
 
         }
 

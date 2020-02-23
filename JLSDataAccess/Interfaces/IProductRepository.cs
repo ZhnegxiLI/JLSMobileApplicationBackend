@@ -1,4 +1,7 @@
-﻿using JLSDataModel.ViewModels;
+﻿using JLSDataModel.Models;
+using JLSDataModel.Models.Product;
+using JLSDataModel.ViewModels;
+using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,5 +20,19 @@ namespace JLSDataAccess.Interfaces
         Task<ProductListViewModel> GetProductListBySalesPerformance(string Lang, int begin, int step);
 
         Task<ProductListViewModel> GetProductListByPublishDate(string Lang, int begin, int step);
+
+        /*
+         *  Admin zoom
+         */
+
+        Task<List<ReferenceItemViewModel>> GetProductCategory(string lang);
+        Task<List<ReferenceItemViewModel>> GetTaxRate();
+
+        Task<int> SaveProduct(Product product, List<IFormFile> images, List<ReferenceLabel> labels);
+        Task<List<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection);
+        Task<ProductViewModel> GetProductById(long id);
+        Task<int> RemoveImageById(long id);
+        Task<List<ProductsListViewModel>> SearchProducts(string lang, string filter);
+
     }
 }
