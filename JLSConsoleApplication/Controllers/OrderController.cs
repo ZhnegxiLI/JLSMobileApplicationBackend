@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace JLSConsoleApplication.Controllers
 {
     // TODO: 不能把内部错误信息传到前端显示
-    [Route("api/[controller]/{action}/{id?}")]
+    [Route("api/[controller]/{action}")]
     [ApiController]
     public class OrderController : Controller
     {

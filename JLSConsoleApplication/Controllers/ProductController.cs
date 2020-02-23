@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using JLSConsoleApplication.Resources;
 using JLSDataAccess.Interfaces;
+using JLSDataModel.AdminViewModel;
 using JLSDataModel.Models;
 using JLSDataModel.Models.Product;
 using JLSDataModel.ViewModels;
@@ -112,7 +113,7 @@ namespace JLSMobileApplication.Controllers
             ApiResult result;
             try
             {
-                List<ProductsListViewModel> data = await _productRepository.GetAllProduct(lang, intervalCount, size, orderActive, orderDirection, filter);
+                ListViewModelWithCount<ProductsListViewModel> data = await _productRepository.GetAllProduct(lang, intervalCount, size, orderActive, orderDirection, filter);
                 result = new ApiResult() { Success = true, Msg = "OK", Type = "200", Data = data };
             }
             catch (Exception e)

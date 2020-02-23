@@ -11,6 +11,7 @@ using System.Linq.Expressions;
 using JLSDataModel.ViewModels;
 using LinqKit;
 using Microsoft.Extensions.Configuration;
+using JLSDataModel.AdminViewModel;
 
 namespace JLSDataAccess.Repositories
 {
@@ -107,7 +108,7 @@ namespace JLSDataAccess.Repositories
                           });
             return await result.ToListAsync<ReferenceItemViewModel>();
         }
-        public async Task<List<ReferenceItemViewModel>> GetReferenceItemWithInterval(int intervalCount, int size, string orderActive, string orderDirection, string filter)
+        public async Task<ListViewModelWithCount<ReferenceItemViewModel>> GetReferenceItemWithInterval(int intervalCount, int size, string orderActive, string orderDirection, string filter)
         {
             if (filter == null)
             {
@@ -134,9 +135,15 @@ namespace JLSDataAccess.Repositories
                                          select rl).ToList(),
                            }).Where(predicate);
 
+            var count = await request.CountAsync();
+
             if (orderActive == "null" || orderActive == "undefined" || orderDirection == "null")
             {
-                return await request.Skip(intervalCount * size).Take(size).ToListAsync();
+                return new ListViewModelWithCount<ReferenceItemViewModel>
+                {
+                    Content = await request.Skip(intervalCount * size).Take(size).ToListAsync(),
+                    Count = count
+                };
             }
 
             Expression<Func<ReferenceItemViewModel, object>> funcOrder; // todo check 
@@ -179,16 +186,11 @@ namespace JLSDataAccess.Repositories
                 request = request.OrderByDescending(funcOrder);
             }
 
-            var result = await request.Skip(intervalCount * size).Take(size).ToListAsync();
-
-
-            return result;
-        }
-
-        public async Task<int> GetReferenceItemsCount()
-        {
-            var result = await db.ReferenceItem.CountAsync();
-            return result;
+            return new ListViewModelWithCount<ReferenceItemViewModel>
+            {
+                Content = await request.Skip(intervalCount * size).Take(size).ToListAsync(),
+                Count = count
+            };
         }
 
         public async Task<List<ReferenceCategory>> GetAllReferenceCategory()

@@ -1,4 +1,5 @@
-﻿using JLSDataModel.Models;
+﻿using JLSDataModel.AdminViewModel;
+using JLSDataModel.Models;
 using JLSDataModel.Models.Product;
 using JLSDataModel.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -29,7 +30,7 @@ namespace JLSDataAccess.Interfaces
         Task<List<ReferenceItemViewModel>> GetTaxRate();
 
         Task<int> SaveProduct(Product product, List<IFormFile> images, List<ReferenceLabel> labels);
-        Task<List<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection, string filter);
+        Task<ListViewModelWithCount<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection, string filter);
         Task<ProductViewModel> GetProductById(long id);
         Task<int> RemoveImageById(long id);
         Task<List<ProductsListViewModel>> SearchProducts(string lang, string filter);
