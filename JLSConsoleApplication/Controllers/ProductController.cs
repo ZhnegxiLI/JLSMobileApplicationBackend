@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using JLSConsoleApplication.Resources;
 using JLSDataAccess.Interfaces;
+using JLSDataModel.AdminViewModel;
 using JLSDataModel.Models;
 using JLSDataModel.Models.Product;
 using JLSDataModel.ViewModels;
@@ -15,7 +16,7 @@ using Newtonsoft.Json;
 
 namespace JLSMobileApplication.Controllers
 {
-    [Route("api/[controller]/{action}/{id?}")]
+    [Route("api/[controller]/{action}")]
     [ApiController]
     public class ProductController : Controller
     {
@@ -107,12 +108,12 @@ namespace JLSMobileApplication.Controllers
         //}
 
         [HttpGet]
-        public async Task<JsonResult> GetAllProducts(string lang, int intervalCount, int size, string orderActive, string orderDirection)
+        public async Task<JsonResult> GetAllProducts(string lang, int intervalCount, int size, string orderActive, string orderDirection, string filter)
         {
             ApiResult result;
             try
             {
-                List<ProductsListViewModel> data = await _productRepository.GetAllProduct(lang, intervalCount, size, orderActive, orderDirection);
+                ListViewModelWithCount<ProductsListViewModel> data = await _productRepository.GetAllProduct(lang, intervalCount, size, orderActive, orderDirection, filter);
                 result = new ApiResult() { Success = true, Msg = "OK", Type = "200", Data = data };
             }
             catch (Exception e)

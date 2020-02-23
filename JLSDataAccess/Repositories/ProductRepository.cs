@@ -12,6 +12,7 @@ using JLSDataModel.Models;
 using System.IO;
 using System.Linq.Expressions;
 using LinqKit;
+using JLSDataModel.AdminViewModel;
 
 namespace JLSDataAccess.Repositories
 {
@@ -292,9 +293,16 @@ namespace JLSDataAccess.Repositories
             }
             else
             {
+                var referenceItemId = db.Product.Where(p => p.Id == product.Id).Select(p => p.ReferenceItemId).FirstOrDefault();
+
+                product.ReferenceItem.Id = referenceItemId;
+
+                db.ReferenceItem.Update(product.ReferenceItem);
+
                 db.Product.Update(product);
 
                 labels = _referencRepository.CheckLabels(labels, product.ReferenceItemId);
+
                 foreach (ReferenceLabel label in labels)
                 {
                     db.ReferenceLabel.Update(label);
@@ -347,8 +355,18 @@ namespace JLSDataAccess.Repositories
             return true;
         }
 
-        public async Task<List<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection)
+
+        public async Task<ListViewModelWithCount<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection,string filter)
         {
+            if(filter == null)
+            {
+                filter = "";
+            }
+            var predicate = PredicateBuilder.New<ProductsListViewModel>();
+            predicate.Or(p => p.ReferenceCode.Contains(filter));
+            predicate.Or(p => p.Name.Contains(filter));
+            predicate.Or(p => p.Category.Contains(filter));
+
             var request = (from ri in db.ReferenceItem
                            join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
                            from rl in db.ReferenceLabel.Where(p => p.ReferenceItemId == ri.Id && p.Lang == lang).DefaultIfEmpty()
@@ -366,11 +384,22 @@ namespace JLSDataAccess.Repositories
                                Price = p.Price,
                                ReferenceCode = ri.Code,
                                Validity = ri.Validity,
-                           });
+                           }).Where(predicate);
+
+            var count = await request.CountAsync();
 
             if (orderActive == "null" || orderActive == "undefined" || orderDirection == "null")
             {
-                return await request.Skip(intervalCount * size).Take(size).ToListAsync();
+                new ListViewModelWithCount<ProductsListViewModel>
+                {
+                    Count = count,
+                    Content = await request.Skip(intervalCount * size).Take(size).ToListAsync()
+                };
+                return new ListViewModelWithCount<ProductsListViewModel>
+                        {
+                            Count = count,
+                            Content = await request.Skip(intervalCount * size).Take(size).ToListAsync()
+                        };
             }
 
             Expression<Func<ProductsListViewModel, object>> funcOrder;// TODO :change
@@ -409,7 +438,11 @@ namespace JLSDataAccess.Repositories
             var result = await request.Skip(intervalCount * size).Take(size).ToListAsync();
 
 
-            return result;
+            return new ListViewModelWithCount<ProductsListViewModel>
+                    {
+                        Count = count,
+                        Content = await request.Skip(intervalCount * size).Take(size).ToListAsync()
+                    }; 
         }
 
         public async Task<ProductViewModel> GetProductById(long id)

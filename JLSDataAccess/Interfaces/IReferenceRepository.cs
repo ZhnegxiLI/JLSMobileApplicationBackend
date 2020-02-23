@@ -1,4 +1,5 @@
-﻿using JLSDataModel.Models;
+﻿using JLSDataModel.AdminViewModel;
+using JLSDataModel.Models;
 using JLSDataModel.ViewModels;
 using JLSMobileApplication.Resources;
 using System;
@@ -23,9 +24,8 @@ namespace JLSDataAccess.Interfaces
          * Admin zoom
          */
         Task<List<ReferenceItemViewModel>> GetReferenceItemsByCategoryLabelsAdmin(string shortLabels, string lang);
-        Task<List<ReferenceItemViewModel>> GetReferenceItemWithInterval(int intervalCount, int size, string orderActive, string orderDirection, string filter);
+        Task<ListViewModelWithCount<ReferenceItemViewModel>> GetReferenceItemWithInterval(int intervalCount, int size, string orderActive, string orderDirection, string filter);
 
-        Task<int> GetReferenceItemsCount();
 
         Task<List<ReferenceCategory>> GetAllReferenceCategory();
 

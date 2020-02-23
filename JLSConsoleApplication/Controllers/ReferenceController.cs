@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JLSDataAccess.Interfaces;
+using JLSDataModel.AdminViewModel;
 using JLSDataModel.Models;
 using JLSDataModel.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -28,7 +29,7 @@ namespace JLSConsoleApplication.Controllers
             ApiResult result;
             try
             {
-                List<ReferenceItemViewModel> data = await _referenceRepository.GetReferenceItemWithInterval(intervalCount, size, orderActive, orderDirection, filter);
+                ListViewModelWithCount<ReferenceItemViewModel> data = await _referenceRepository.GetReferenceItemWithInterval(intervalCount, size, orderActive, orderDirection, filter);
                 result = new ApiResult() { Success = true, Msg = "OK", Type = "200", Data = data  };
             }
             catch (Exception e)
@@ -63,23 +64,6 @@ namespace JLSConsoleApplication.Controllers
             try
             {
                 List<ReferenceCategory> data = await _referenceRepository.GetAllValidityReferenceCategory();
-                result = new ApiResult() { Success = true, Msg = "OK", Type = "200", Data = data };
-            }
-            catch (Exception e)
-            {
-                result = new ApiResult() { Success = false, Msg = e.Message, Type = "500" };
-            }
-
-            return Json(result);
-        }
-
-        [HttpGet]
-        public async Task<JsonResult> GetReferenceItemsCount()
-        {
-            ApiResult result;
-            try
-            {
-                int data = await _referenceRepository.GetReferenceItemsCount();
                 result = new ApiResult() { Success = true, Msg = "OK", Type = "200", Data = data };
             }
             catch (Exception e)
