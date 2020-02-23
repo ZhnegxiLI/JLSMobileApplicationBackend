@@ -303,8 +303,17 @@ namespace JLSDataAccess.Repositories
             return true;
         }
 
-        public async Task<List<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection)
+        public async Task<List<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection,string filter)
         {
+            if(filter == null)
+            {
+                filter = "";
+            }
+            var predicate = PredicateBuilder.New<ProductsListViewModel>();
+            predicate.Or(p => p.ReferenceCode.Contains(filter));
+            predicate.Or(p => p.Name.Contains(filter));
+            predicate.Or(p => p.Category.Contains(filter));
+
             var request = (from ri in db.ReferenceItem
                            join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
                            from rl in db.ReferenceLabel.Where(p => p.ReferenceItemId == ri.Id && p.Lang == lang).DefaultIfEmpty()
@@ -322,7 +331,7 @@ namespace JLSDataAccess.Repositories
                                Price = p.Price,
                                ReferenceCode = ri.Code,
                                Validity = ri.Validity,
-                           });
+                           }).Where(predicate);
 
             if (orderActive == "null" || orderActive == "undefined" || orderDirection == "null")
             {
