@@ -203,13 +203,57 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
+        public async Task<long> SaveProductComment(long ProductId, string Title, string Body, int Level, int UserId)
+        {
+            var ProductComment = new ProductComment();
+            ProductComment.Title = Title;
+            ProductComment.Body = Body;
+            ProductComment.ProductId = ProductId;
+            ProductComment.Level = Level;
+            ProductComment.CreatedOn = DateTime.Now;
+            ProductComment.CreatedBy = UserId;
+
+            await db.ProductComment.AddAsync(ProductComment);
+            await db.SaveChangesAsync();
+
+            return ProductComment.Id;
+        }
+
+        public async Task<List<ProductComment>> GetProductCommentList()
+        {
+            var result = await (from pc in db.ProductComment
+                          orderby pc.CreatedOn
+                          select pc).ToListAsync();
+            return result;
+        }
+
+        public async Task<List<ProductComment>> GetProductCommentListByProductId(long ProductId)
+        {
+            var result = await (from pc in db.ProductComment
+                                where pc.ProductId == ProductId
+                                orderby pc.CreatedOn
+                                select pc).ToListAsync();
+            return result;
+        }
+
+        public async Task<List<ProductComment>> GetProductCommentListByUserId(int UserId)
+        {
+            var result = await (from pc in db.ProductComment
+                                where pc.UserId == UserId
+                                orderby pc.CreatedOn
+                                select pc).ToListAsync();
+            return result;
+        }
+
+
+
 
 
         /*
          * Admin Zoom
          */
 
-         // TODO change: send from font-end OR from controller
+        // TODO change: send from font-end OR from controller
         public async Task<List<ReferenceItemViewModel>> GetProductCategory(string lang)
         {
             var result = await _referencRepository.GetReferenceItemsByCategoryLabelsAdmin("MainCategory;SecondCategory", lang);
