@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using JLSMobileApplication.Resources;
 using System.Linq.Expressions;
 using JLSDataModel.ViewModels;
-using LinqKit;
 using Microsoft.Extensions.Configuration;
 using JLSDataModel.AdminViewModel;
 
@@ -108,91 +107,6 @@ namespace JLSDataAccess.Repositories
                           });
             return await result.ToListAsync<ReferenceItemViewModel>();
         }
-        public async Task<ListViewModelWithCount<ReferenceItemViewModel>> GetReferenceItemWithInterval(int intervalCount, int size, string orderActive, string orderDirection, string filter)
-        {
-            if (filter == null)
-            {
-                filter = "";
-            }
-            var predicate = PredicateBuilder.New<ReferenceItemViewModel>();
-            predicate.Or(ri => ri.Code.Contains(filter));
-            predicate.Or(ri => ri.Category.Contains(filter));
-
-            var request = (from ri in db.ReferenceItem
-                           join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
-                           select new ReferenceItemViewModel
-                           {
-                               Id = ri.Id,
-                               Code = ri.Code,
-                               Value = ri.Value,
-                               Order = ri.Order,
-                               ParentId = ri.ParentId,
-                               Category = rc.ShortLabel,
-                               ReferenceCategoryId = rc.Id,
-                               Validity = ri.Validity,
-                               Labels = (from rl in db.ReferenceLabel
-                                         where rl.ReferenceItemId == ri.Id
-                                         select rl).ToList(),
-                           }).Where(predicate);
-
-            var count = await request.CountAsync();
-
-            if (orderActive == "null" || orderActive == "undefined" || orderDirection == "null")
-            {
-                return new ListViewModelWithCount<ReferenceItemViewModel>
-                {
-                    Content = await request.Skip(intervalCount * size).Take(size).ToListAsync(),
-                    Count = count
-                };
-            }
-
-            Expression<Func<ReferenceItemViewModel, object>> funcOrder; // todo check 
-
-            switch (orderActive)
-            {
-                case "id":
-                    funcOrder = rm => rm.Id;
-                    break;
-                case "active":
-                    funcOrder = rm => rm.Validity;
-                    break;
-                case "code":
-                    funcOrder = rm => rm.Code;
-                    break;
-                case "parentId":
-                    funcOrder = rm => rm.ParentId;
-                    break;
-                case "value":
-                    funcOrder = rm => rm.Value;
-                    break;
-                case "order":
-                    funcOrder = rm => rm.Order;
-                    break;
-                case "category":
-                    funcOrder = rm => rm.Category;
-                    break;
-                default:
-                    funcOrder = rm => rm.Id;
-                    break;
-            }
-
-            //IEnumerable<ReferenceItemViewModel> requestWithOrder;
-            if (orderDirection == "asc")
-            {
-                request = request.OrderBy(funcOrder);
-            }
-            else
-            {
-                request = request.OrderByDescending(funcOrder);
-            }
-
-            return new ListViewModelWithCount<ReferenceItemViewModel>
-            {
-                Content = await request.Skip(intervalCount * size).Take(size).ToListAsync(),
-                Count = count
-            };
-        }
-
         public async Task<List<ReferenceCategory>> GetAllReferenceCategory()
         {
             var result = await (from rc in db.ReferenceCategory
@@ -269,6 +183,11 @@ namespace JLSDataAccess.Repositories
                 label.ReferenceItemId = referenceItemId;
             }
             return labels;
+        }
+
+        public Task<ListViewModelWithCount<ReferenceItemViewModel>> GetReferenceItemWithInterval(int intervalCount, int size, string orderActive, string orderDirection, string filter)
+        {
+            throw new NotImplementedException();
         }
     }
 }

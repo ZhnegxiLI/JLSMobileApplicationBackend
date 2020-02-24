@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Http;
 using JLSDataModel.Models;
 using System.IO;
 using System.Linq.Expressions;
-using LinqKit;
 using JLSDataModel.AdminViewModel;
 
 namespace JLSDataAccess.Repositories
@@ -282,95 +281,6 @@ namespace JLSDataAccess.Repositories
         }
 
 
-        public async Task<ListViewModelWithCount<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection,string filter)
-        {
-            if(filter == null)
-            {
-                filter = "";
-            }
-            var predicate = PredicateBuilder.New<ProductsListViewModel>();
-            predicate.Or(p => p.ReferenceCode.Contains(filter));
-            predicate.Or(p => p.Name.Contains(filter));
-            predicate.Or(p => p.Category.Contains(filter));
-
-            var request = (from ri in db.ReferenceItem
-                           join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
-                           from rl in db.ReferenceLabel.Where(p => p.ReferenceItemId == ri.Id && p.Lang == lang).DefaultIfEmpty()
-                           where rc.ShortLabel.Equals("Product")
-                           join p in db.Product on ri.Id equals p.ReferenceItemId
-                           from img in db.ProductPhotoPath.Where(img => p.Id == img.ProductId).Take(1).DefaultIfEmpty()
-                           select new ProductsListViewModel
-                           {
-                               Id = p.Id,
-                               Name = rl.Label,
-                               Category = (from rlp in db.ReferenceLabel
-                                           where rlp.ReferenceItemId == ri.ParentId
-                                           select rlp.Label).FirstOrDefault(),
-                               Image = img.Path,
-                               Price = p.Price,
-                               ReferenceCode = ri.Code,
-                               Validity = ri.Validity,
-                           }).Where(predicate);
-
-            var count = await request.CountAsync();
-
-            if (orderActive == "null" || orderActive == "undefined" || orderDirection == "null")
-            {
-                new ListViewModelWithCount<ProductsListViewModel>
-                {
-                    Count = count,
-                    Content = await request.Skip(intervalCount * size).Take(size).ToListAsync()
-                };
-                return new ListViewModelWithCount<ProductsListViewModel>
-                        {
-                            Count = count,
-                            Content = await request.Skip(intervalCount * size).Take(size).ToListAsync()
-                        };
-            }
-
-            Expression<Func<ProductsListViewModel, object>> funcOrder;// TODO :change
-
-            switch (orderActive)
-            {
-                case "reference":
-                    funcOrder = p => p.ReferenceCode;
-                    break;
-                case "name":
-                    funcOrder = p => p.Name;
-                    break;
-                case "categories":
-                    funcOrder = p => p.Category;
-                    break;
-                case "price":
-                    funcOrder = p => p.Price;
-                    break;
-                case "active":
-                    funcOrder = p => p.Validity;
-                    break;
-                default:
-                    funcOrder = p => p.Id;
-                    break;
-            }
-
-            if (orderDirection == "asc")
-            {
-                request = request.OrderBy(funcOrder);
-            }
-            else
-            {
-                request = request.OrderByDescending(funcOrder);
-            }
-
-            var result = await request.Skip(intervalCount * size).Take(size).ToListAsync();
-
-
-            return new ListViewModelWithCount<ProductsListViewModel>
-                    {
-                        Count = count,
-                        Content = await request.Skip(intervalCount * size).Take(size).ToListAsync()
-                    }; 
-        }
-
         public async Task<ProductViewModel> GetProductById(long id)
         {
             var result = await (from ri in db.ReferenceItem
@@ -437,34 +347,14 @@ namespace JLSDataAccess.Repositories
 
         // TODO change
 
-        public async Task<List<ProductsListViewModel>> SearchProducts(string lang, string filter)
+        public Task<ListViewModelWithCount<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection, string filter)
         {
-            var predicate = PredicateBuilder.New<ProductsListViewModel>();
-            predicate.Or(p => p.ReferenceCode.Contains(filter));
-            predicate.Or(p => p.Name.Contains(filter));
-            predicate.Or(p => p.Category.Contains(filter));
-
-            var result = await (from ri in db.ReferenceItem
-                                where ri.Code.Contains(filter)
-                                join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
-                                from rl in db.ReferenceLabel.Where(p => p.ReferenceItemId == ri.Id && p.Lang == lang).DefaultIfEmpty()
-                                where rc.ShortLabel.Equals("Product") // TODO change
-                                join p in db.Product on ri.Id equals p.ReferenceItemId
-                                from img in db.ProductPhotoPath.Where(img => p.Id == img.ProductId).Take(1).DefaultIfEmpty()
-                                select new ProductsListViewModel
-                                {
-                                    Id = p.Id,
-                                    Name = rl.Label,
-                                    Category = (from rlp in db.ReferenceLabel
-                                                where rlp.ReferenceItemId == ri.ParentId
-                                                select rlp.Label).FirstOrDefault(),
-                                    Image = img.Path,
-                                    Price = p.Price,
-                                    ReferenceCode = ri.Code,
-                                    Validity = ri.Validity,
-                                }).Where(predicate).Take(10).ToListAsync();
-            return result;
+            throw new NotImplementedException();
         }
 
+        public Task<List<ProductsListViewModel>> SearchProducts(string lang, string filter)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

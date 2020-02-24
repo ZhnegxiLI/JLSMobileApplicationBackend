@@ -28,15 +28,6 @@
           "lib/netstandard2.0/AutoMapper.Extensions.Microsoft.DependencyInjection.dll": {}
         }
       },
-      "LinqKit.Core/1.1.16": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/LinqKit.Core.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.0/LinqKit.Core.dll": {}
-        }
-      },
       "Microsoft.AspNet.WebApi.Client/5.2.6": {
         "type": "package",
         "dependencies": {
@@ -4593,7 +4584,6 @@
         "framework": ".NETCoreApp,Version=v2.2",
         "dependencies": {
           "JLSDataModel": "1.0.0",
-          "LINQKit.Core": "1.1.16",
           "Microsoft.EntityFrameworkCore.SqlServer": "2.2.0"
         },
         "compile": {
@@ -4649,34 +4639,6 @@
         "automapper.extensions.microsoft.dependencyinjection.nuspec",
         "lib/netstandard2.0/AutoMapper.Extensions.Microsoft.DependencyInjection.dll",
         "lib/netstandard2.0/AutoMapper.Extensions.Microsoft.DependencyInjection.pdb"
-      ]
-    },
-    "LinqKit.Core/1.1.16": {
-      "sha512": "AVBdEpMFi94Bs+WzQWnFxuwxUCEnt2s4OiWw9xf/jC+fnMCXPkpRQP+uJMXuOpZIQYV91wj1JbEsU01m6sMDVA==",
-      "type": "package",
-      "path": "linqkit.core/1.1.16",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/net35/LinqKit.Core.dll",
-        "lib/net35/LinqKit.Core.xml",
-        "lib/net40/LinqKit.Core.dll",
-        "lib/net40/LinqKit.Core.xml",
-        "lib/net45/LinqKit.Core.dll",
-        "lib/net45/LinqKit.Core.xml",
-        "lib/netstandard1.3/LinqKit.Core.dll",
-        "lib/netstandard1.3/LinqKit.Core.xml",
-        "lib/netstandard2.0/LinqKit.Core.dll",
-        "lib/netstandard2.0/LinqKit.Core.xml",
-        "lib/portable-net40+sl5+win8+wp8+wpa81/LinqKit.Core.dll",
-        "lib/portable-net40+sl5+win8+wp8+wpa81/LinqKit.Core.xml",
-        "lib/portable-net45+win8+wp8+wpa81/LinqKit.Core.dll",
-        "lib/portable-net45+win8+wp8+wpa81/LinqKit.Core.xml",
-        "lib/uap10.0/LinqKit.Core.dll",
-        "lib/uap10.0/LinqKit.Core.pri",
-        "lib/uap10.0/LinqKit.Core.xml",
-        "linqkit.core.1.1.16.nupkg.sha512",
-        "linqkit.core.nuspec"
       ]
     },
     "Microsoft.AspNet.WebApi.Client/5.2.6": {
