@@ -30,10 +30,6 @@ namespace JLSDataAccess.Interfaces
          *  Admin zoom
          */
 
-        Task<List<ReferenceItemViewModel>> GetProductCategory(string lang);
-        Task<List<ReferenceItemViewModel>> GetTaxRate();
-
-        Task<int> SaveProduct(Product product, List<IFormFile> images, List<ReferenceLabel> labels);
         Task<ListViewModelWithCount<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection, string filter);
         Task<ProductViewModel> GetProductById(long id);
         Task<int> RemoveImageById(long id);

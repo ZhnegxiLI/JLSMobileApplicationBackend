@@ -28,35 +28,6 @@ namespace JLSMobileApplication.Controllers
             _mapper = mapper;
         }
 
-        //[HttpPost]
-        //public async Task<JsonResult> SaveProduct([FromForm]IFormCollection productData)
-        //{
-        //    StringValues productInfo;
-        //    StringValues langLabelInfo;
-        //    List<IFormFile> images = (List<IFormFile>) productData.Files;
-           
-        //    productData.TryGetValue("product", out productInfo);
-        //    productData.TryGetValue("langLabel", out langLabelInfo);
-
-        //    ProductRegistrationView productParam = JsonConvert.DeserializeObject<ProductRegistrationView>(productInfo);
-        //    List<ReferenceLabel> langLabels = JsonConvert.DeserializeObject<List<ReferenceLabel>>(langLabelInfo);
-            
-        //    Product product = _mapper.Map<Product>(productParam);
-
-        //    product.ReferenceItem = new ReferenceItem
-        //    {
-        //        Code = productParam.ProductReferenceCode,
-        //        Value = productParam.Name,
-        //        ParentId = productParam.Category,
-        //        ReferenceCategoryId = 3,
-        //        Validity = true
-        //    };
-
-        //    int res = await this._productRepository.SaveProduct(product, images, langLabels);
-        //    ApiResult result = new ApiResult() { Success = true, Msg = "OK", Type = "200" };
-        //    return Json(result);
-        //}
-
         [HttpPost]
         public async Task<JsonResult> RemoveImageById([FromBody]long id)
         {
@@ -74,38 +45,6 @@ namespace JLSMobileApplication.Controllers
             return Json(result);
         }
 
-        //[HttpGet]
-        //public async Task<JsonResult> GetProductCategory(string lang)
-        //{
-        //    ApiResult result;
-        //    try
-        //    {
-        //        List<ReferenceItemViewModel> data = await _productRepository.GetProductCategory(lang);
-        //        result = new ApiResult() { Success = true, Msg = "OK", Type = "200", Data = data};
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        result = new ApiResult() { Success = false, Msg = e.Message, Type = "500"};
-        //    }
-
-        //    return Json(result);
-        //}
-
-        //[HttpGet]
-        //public async Task<JsonResult> GetTaxRate()
-        //{
-        //    ApiResult result;
-        //    try
-        //    {
-        //        List<ReferenceItemViewModel> data = await _productRepository.GetTaxRate();
-        //        result = new ApiResult() { Success = true, Msg = "OK", Type = "200", Data = data };
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        result = new ApiResult() { Success = false, Msg = e.Message, Type = "500" };
-        //    }
-        //    return Json(result);
-        //}
 
         [HttpGet]
         public async Task<JsonResult> GetAllProducts(string lang, int intervalCount, int size, string orderActive, string orderDirection, string filter)
