@@ -24,5 +24,6 @@ namespace JLSDataModel.Models.Adress
 
         public string Country { get; set; }
         public string EntrepriseName { get; set; }
+        public bool? IsDefaultAdress { get; set; }
     }
 }

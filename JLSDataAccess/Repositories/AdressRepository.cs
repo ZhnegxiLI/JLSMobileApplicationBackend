@@ -33,7 +33,7 @@ namespace JLSDataAccess.Repositories
             return adress.Id;
         }
 
-        public async Task<long> CreateOrUpdateUserShippingAdress(long adressId,int userId)
+        public async Task<long> CreateUserShippingAdress(long adressId,int userId)
         {
             var userShippingAdress = await db.UserShippingAdress.Where(p => p.ShippingAdressId == adressId && p.UserId == userId).FirstOrDefaultAsync();
             if (userShippingAdress == null)
@@ -50,6 +50,27 @@ namespace JLSDataAccess.Repositories
             {
                 return userShippingAdress.Id;
             }
+        }
+
+        public async Task<long> CreateFacturationAdress(long adressId, int userId)
+        {
+            var User = await db.Users.Where(p =>  p.Id == userId).FirstOrDefaultAsync();
+            if (User!=null)
+            {
+                if (User.FacturationAdressId != adressId)
+                {
+                    User.FacturationAdressId = adressId;
+                    db.Update(User);
+                    await db.SaveChangesAsync();
+
+                }
+                return User.FacturationAdressId;
+            }
+            else
+            {
+                return 0;
+            }
+           
         }
 
         public async Task<Adress> GetAdressByIdAsync(long Id)
@@ -75,6 +96,16 @@ namespace JLSDataAccess.Repositories
                           where ua.UserId == userId
                           select a);
             return await result.ToListAsync();
+        }
+
+        public async Task<Adress> GetUserDefaultShippingAdress(int userId)
+        {
+            var result = (from a in db.Adress
+                          join ua in db.UserShippingAdress on a.Id equals ua.ShippingAdressId
+                          join u in db.Users on ua.UserId equals u.Id
+                          where ua.UserId == userId && a.IsDefaultAdress == true
+                          select a);
+            return await result.FirstOrDefaultAsync();
         }
     }
 }

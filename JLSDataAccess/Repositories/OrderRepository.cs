@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using JLSDataModel.ViewModels;
 using JLSDataModel.Models.Order;
 using System.Linq.Expressions;
+using JLSDataModel.Models.Adress;
 
 namespace JLSDataAccess.Repositories
 {
@@ -22,7 +23,7 @@ namespace JLSDataAccess.Repositories
         /*
          * Mobile Zoom 
          */
-        public async Task<long> SaveOrder(List<OrderProductViewModelMobile> References, long ShippingAdressId, long FacturationAdressId, int UserId)
+        public async Task<long> SaveOrder(List<OrderProductViewModelMobile> References, Adress adress, long FacturationAdressId, int UserId)
         {
             /* Step1: get progressing status ri */
             var status = await (from ri in db.ReferenceItem
@@ -30,11 +31,28 @@ namespace JLSDataAccess.Repositories
                           where rc.ShortLabel == "OrderStatus" && ri.Code == "OrderStatus_Progressing"
                           select ri).FirstOrDefaultAsync();
 
+            /* Copy the shipping address from usershipping adress*/
+            Adress adressToShipping = new Adress();
+            adressToShipping.FirstLineAddress = adress.ContactTelephone;
+            adressToShipping.ContactFax = adress.ContactFax;
+            adressToShipping.ContactLastName = adress.ContactLastName;
+            adressToShipping.ContactFirstName = adress.ContactFirstName;
+            adressToShipping.ZipCode = adress.ZipCode;
+            adressToShipping.FirstLineAddress = adress.FirstLineAddress;
+            adressToShipping.SecondLineAddress = adress.SecondLineAddress;
+            adressToShipping.City = adress.City;
+            adressToShipping.Provence = adress.Provence;
+
+            adressToShipping.Country = adress.Country;
+            adressToShipping.EntrepriseName = adress.EntrepriseName;
+            await db.AddAsync(adressToShipping);
+            await db.SaveChangesAsync();
+
             // TODO :change
             /* Step2: construct the orderInfo object */
             var Order = new OrderInfo();
             Order.FacturationAdressId = FacturationAdressId;
-            Order.ShippingAdressId = ShippingAdressId;
+            Order.ShippingAdressId = adressToShipping.Id;
             Order.UserId = UserId;
             Order.StatusReferenceItemId = status.Id;
             await db.AddAsync(Order);

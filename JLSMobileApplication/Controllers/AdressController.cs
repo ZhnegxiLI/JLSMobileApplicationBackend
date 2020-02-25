@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JLSDataAccess;
+using JLSDataAccess.Interfaces;
 using JLSDataAccess.Repositories;
 using JLSDataModel.Models.Adress;
 using LjWebApplication.Model;
@@ -15,21 +16,38 @@ namespace JLSMobileApplication.Controllers
     [ApiController]
     public class AdressController : Controller
     {
-        private readonly AdressRepository _adress;
-        private readonly JlsDbContext db;
+        private readonly IAdressRepository _adress;
 
-        public AdressController(AdressRepository adressrepository, JlsDbContext context)
+        public AdressController(IAdressRepository adressrepository)
         {
             _adress = adressrepository;
         }
+        public class CreateOrUpdateAdressCriteria
+        {
+            public CreateOrUpdateAdressCriteria()
+            {
+                this.adress = new Adress();
+            }
+            public Adress adress { get; set; }
+            public int userId { get; set; }
+            public string type { get; set; }
+        }
 
         [HttpPost]
-        public async Task<JsonResult> CreateOrUpdateShippingAdress([FromBody]Adress adress, [FromBody]int userId)
+        public async Task<JsonResult> CreateOrUpdateAdress([FromBody]CreateOrUpdateAdressCriteria criteria)
         {
             try
             {
-                var adressId = await _adress.CreateOrUpdateAdress(adress);
-                var userAdressId = await _adress.CreateOrUpdateUserShippingAdress(adressId,userId);
+                var adressId = await _adress.CreateOrUpdateAdress(criteria.adress);
+                long userAdressId = 0;
+                if ( criteria.type == "shippingAdress")
+                {
+                    userAdressId = await _adress.CreateUserShippingAdress(adressId, criteria.userId);
+                }
+                else if (criteria.type == "facturationAdress")
+                {
+                    userAdressId = await _adress.CreateFacturationAdress(adressId, criteria.userId);
+                }
                 return Json(new ApiResult()
                 {
                     Data = new {
@@ -62,6 +80,26 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
+
+        [HttpGet]
+        public async Task<JsonResult> GetUserDefaultShippingAdress(int UserId)
+        {
+            try
+            {
+                return Json(new ApiResult()
+                {
+                    Data = await _adress.GetUserDefaultShippingAdress(UserId),
+                    Msg = "OK",
+                    Success = true
+                });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+
+        
 
         [HttpGet]
         public async Task<JsonResult> GetUserShippingAdress(int UserId)

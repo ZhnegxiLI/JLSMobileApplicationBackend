@@ -16,11 +16,13 @@ namespace JLSMobileApplication.Controllers
     public class OrderController : Controller
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IAdressRepository _adressRepository;
         private readonly IMapper _mapper;
 
-        public OrderController(IMapper mapper, IOrderRepository order)
+        public OrderController(IMapper mapper, IOrderRepository order, IAdressRepository adress)
         {
             _orderRepository = order;
+            _adressRepository = adress;
             _mapper = mapper;
         }
         public class SaveOrderCriteria{
@@ -40,9 +42,10 @@ namespace JLSMobileApplication.Controllers
         {
             try
             {
+                var adress = await _adressRepository.GetAdressByIdAsync(criteria.ShippingAdressId);
                 return Json(new ApiResult()
                 {
-                    Data = await _orderRepository.SaveOrder(criteria.References, criteria.ShippingAdressId,criteria.FacturationAdressId,criteria.UserId),
+                    Data = await _orderRepository.SaveOrder(criteria.References, adress, criteria.FacturationAdressId,criteria.UserId),
                     Msg = "OK",
                     Success = true
                 });
