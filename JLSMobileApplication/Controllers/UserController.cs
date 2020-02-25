@@ -23,41 +23,6 @@ namespace JLSMobileApplication.Controllers
             _userRepository = user;
         }
 
-        [HttpGet]
-        public async Task<JsonResult> GetUserFacturationAdress(int UserId)
-        {
-            try
-            {
-                return Json(new ApiResult()
-                {
-                    Data = await _userRepository.GetUserFacturationAdress(UserId),
-                    Msg = "OK",
-                    Success = true
-                });
-            }
-            catch (Exception exc)
-            {
-                throw exc;
-            }
-        }
-
-        [HttpGet]
-        public async Task<JsonResult> GetUserShippingAdress(int UserId)
-        {
-            try
-            {
-                return Json(new ApiResult()
-                {
-                    Data = await _userRepository.GetUserShippingAdress(UserId),
-                    Msg = "OK",
-                    Success = true
-                });
-            }
-            catch (Exception exc)
-            {
-                throw exc;
-            }
-        }
 
 
 

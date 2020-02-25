@@ -30,6 +30,7 @@ namespace JLSDataAccess.Repositories
                           where rc.ShortLabel == "OrderStatus" && ri.Code == "OrderStatus_Progressing"
                           select ri).FirstOrDefaultAsync();
 
+            // TODO :change
             /* Step2: construct the orderInfo object */
             var Order = new OrderInfo();
             Order.FacturationAdressId = FacturationAdressId;

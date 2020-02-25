@@ -23,5 +23,6 @@ namespace JLSDataModel.Models.Adress
         public string Provence { get; set; }
 
         public string Country { get; set; }
+        public string EntrepriseName { get; set; }
     }
 }
