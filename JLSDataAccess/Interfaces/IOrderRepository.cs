@@ -11,6 +11,8 @@ namespace JLSDataAccess.Interfaces
     {
         Task<long> SaveOrder(List<OrderProductViewModelMobile> References, Adress adress, long FacturationAdressId, int UserId);
 
+        Task<List<OrderListViewModelMobile>> GetOrdersListByUserId(int UserId, string Lang);
+
         Task<List<OrdersListViewModel>> GetAllOrdersWithInterval(string lang, int intervalCount, int size, string orderActive, string orderDirection);
         Task<OrderViewModel> GetOrderById(long id, string lang);
     }

@@ -56,5 +56,26 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
+
+        [HttpGet]
+        public async Task<JsonResult> GetOrdersListByUserId(int UserId, string Lang)
+        {
+            try
+            {
+               
+                return Json(new ApiResult()
+                {
+                    Data = await _orderRepository.GetOrdersListByUserId(UserId,  Lang),
+                    Msg = "OK",
+                    Success = true
+                });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+        
+
     }
 }

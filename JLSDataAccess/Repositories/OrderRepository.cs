@@ -54,6 +54,7 @@ namespace JLSDataAccess.Repositories
             Order.FacturationAdressId = FacturationAdressId;
             Order.ShippingAdressId = adressToShipping.Id;
             Order.UserId = UserId;
+            //TODO: Order.TotalPrice
             Order.StatusReferenceItemId = status.Id;
             await db.AddAsync(Order);
             await db.SaveChangesAsync();
@@ -75,7 +76,7 @@ namespace JLSDataAccess.Repositories
             return Order.Id;
         }
 
-        public async Task<List<OrderListViewModelMobile>> GetOrdersListByUserId(int UserId)
+        public async Task<List<OrderListViewModelMobile>> GetOrdersListByUserId(int UserId,string Lang)
         {
             var result = await (from o in db.OrderInfo
                           where o.UserId == UserId
@@ -87,7 +88,13 @@ namespace JLSDataAccess.Repositories
                               ShippingAdressId = o.ShippingAdressId,
                               ShippingAdress = (from a in db.Adress
                                                 where a.Id == o.ShippingAdressId
-                                                select a).FirstOrDefault()
+                                                select a).FirstOrDefault(),
+                              StatusCode = (from ri in db.ReferenceItem
+                                        where ri.Id == o.StatusReferenceItemId
+                                        select ri.Code).FirstOrDefault(),
+                              StatusLabel = (from rl in db.ReferenceLabel
+                                            where rl.ReferenceItemId == o.StatusReferenceItemId && rl.Lang == Lang
+                                             select rl.Label).FirstOrDefault(),
                           }).ToListAsync();
             return result;
         }

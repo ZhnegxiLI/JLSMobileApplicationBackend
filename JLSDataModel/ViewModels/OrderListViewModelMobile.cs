@@ -1,4 +1,5 @@
-﻿using JLSDataModel.Models.Adress;
+﻿using JLSDataModel.Models;
+using JLSDataModel.Models.Adress;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,5 +17,7 @@ namespace JLSDataModel.ViewModels
         public float? TotalPrice { get; set; }
         public long ShippingAdressId { get; set; }
         public Adress ShippingAdress { get; set; }
+        public string StatusCode { get; set; }
+        public string StatusLabel { get; set; }
     }
 }
