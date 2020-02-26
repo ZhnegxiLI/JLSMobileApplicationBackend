@@ -80,6 +80,7 @@ namespace JLSDataAccess.Repositories
         {
             var result = await (from o in db.OrderInfo
                           where o.UserId == UserId
+                          orderby o.CreatedOn descending
                           select new OrderListViewModelMobile()
                           {
                               Id = o.Id,
