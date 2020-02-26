@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
 using JLSDataAccess.Interfaces;
+using JLSDataModel.Models.Product;
 using JLSMobileApplication.Resources;
 using LjWebApplication.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace JLSMobileApplication.Controllers
 {
@@ -121,6 +124,31 @@ namespace JLSMobileApplication.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<JsonResult> GetProductCommentListByProductId(long ProductId,int Begin, int Step,string Lang)
+        {
+            try
+            {
+                var productComments = await _productRepository.GetProductCommentListByProductId(ProductId, Lang);
+                
+                return Json(new ApiResult()
+                {
+                    Data = new
+                    {
+                        ProductCommentListData = productComments.Skip(Begin * Step).Take(Step).ToList(),
+                        TotalCount = productComments.Count()
+                    },
+                    Msg = "OK",
+                    Success = true
+                });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+
+
 
         /******************************** ZOOM Service with authentification *******************************/
         [Authorize]
@@ -164,6 +192,25 @@ namespace JLSMobileApplication.Controllers
                 return Json(new ApiResult()
                 {
                     Data = await _productRepository.GetProductInfoByReferenceIds(criteria.ReferenceIds, criteria.Lang),
+                    Msg = "OK",
+                    Success = true
+                });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<JsonResult> SaveProductComment([FromBody] ProductComment comment)
+        {
+            try
+            {
+                return Json(new ApiResult()
+                {
+                    Data = await _productRepository.SaveProductComment(comment.ProductId,comment.Title,comment.Body,comment.Level,comment.UserId),
                     Msg = "OK",
                     Success = true
                 });

@@ -202,13 +202,14 @@ namespace JLSDataAccess.Repositories
         }
 
         public async Task<long> SaveProductComment(long ProductId, string Title, string Body, int Level, int UserId)
-        {
+        {// TODO: change modify
             var ProductComment = new ProductComment();
             ProductComment.Title = Title;
             ProductComment.Body = Body;
             ProductComment.ProductId = ProductId;
             ProductComment.Level = Level;
             ProductComment.CreatedOn = DateTime.Now;
+            ProductComment.UserId = UserId;
             ProductComment.CreatedBy = UserId;
 
             await db.ProductComment.AddAsync(ProductComment);
@@ -217,35 +218,56 @@ namespace JLSDataAccess.Repositories
             return ProductComment.Id;
         }
 
-        public async Task<List<ProductComment>> GetProductCommentList()
+        public async Task<List<ProductComment>> GetAllProductCommentList(int begin, int step)
         {
             var result = await (from pc in db.ProductComment
-                          orderby pc.CreatedOn
-                          select pc).ToListAsync();
+                                orderby pc.CreatedOn
+                                select pc).Skip(begin * step).Take(step).ToListAsync();
             return result;
         }
 
-        public async Task<List<ProductComment>> GetProductCommentListByProductId(long ProductId)
+        public async Task<List<ProductCommentViewModel>> GetProductCommentListByProductId(long ProductId,string Lang)
         {
             var result = await (from pc in db.ProductComment
                                 where pc.ProductId == ProductId
                                 orderby pc.CreatedOn
-                                select pc).ToListAsync();
+                                select new ProductCommentViewModel() {
+                                    User= (from u in db.Users
+                                           where u.Id == pc.UserId
+                                           select u).FirstOrDefault(),
+                                    ProductComment = pc,
+                                    PhotoPath = (from pp in db.ProductPhotoPath
+                                                 where pp.ProductId == pc.ProductId
+                                                 select pp.Path).FirstOrDefault(),
+                                    Label = (from p in db.Product
+                                             join rl in db.ReferenceLabel on p.ReferenceItemId equals rl.ReferenceItemId
+                                             where rl.Lang == Lang && p.Id == pc.ProductId
+                                             select rl.Label).FirstOrDefault()
+
+                                }).ToListAsync();
             return result;
         }
-
-        public async Task<List<ProductComment>> GetProductCommentListByUserId(int UserId)
+        // Todo change
+        public async Task<List<ProductComment>> GetProductCommentListByUserId(int UserId, int begin, int step)
         {
             var result = await (from pc in db.ProductComment
                                 where pc.UserId == UserId
                                 orderby pc.CreatedOn
-                                select pc).ToListAsync();
+                                select pc).Skip(begin * step).Take(step).ToListAsync();
             return result;
         }
 
 
-
-
+        /* TODO: change */
+        public async Task<List<dynamic>> AdvancedProductSearch(string Label, string Lang, int begin, int step)
+        {
+            var result = await (from rl in db.ReferenceLabel
+                                join ri in db.ReferenceItem on rl.ReferenceItemId equals ri.Id
+                                join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                                where (rc.ShortLabel == "Product" || rc.ShortLabel == "MainCategory" || rc.ShortLabel == "SecondCategory") && rl.Label.Contains(Label) && rl.Lang == Lang
+                                select ri).Skip(begin * step).Take(step).ToListAsync<dynamic>();
+            return result;
+        }
 
         /*
          * Admin Zoom

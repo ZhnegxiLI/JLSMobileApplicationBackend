@@ -23,9 +23,11 @@ namespace JLSDataAccess.Interfaces
         Task<ProductListViewModel> GetProductListByPublishDate(string Lang, int begin, int step);
 
 
-        Task<List<ProductComment>> GetProductCommentList();
-        Task<List<ProductComment>> GetProductCommentListByProductId(long ProductId);
-        Task<List<ProductComment>> GetProductCommentListByUserId(int UserId);
+        Task<List<ProductComment>> GetAllProductCommentList(int begin, int step);
+        Task<List<ProductCommentViewModel>> GetProductCommentListByProductId(long ProductId,string Lang);
+        Task<List<ProductComment>> GetProductCommentListByUserId(int UserId, int begin, int step);
+
+        Task<long> SaveProductComment(long ProductId, string Title, string Body, int Level, int UserId);
         /*
          *  Admin zoom
          */
