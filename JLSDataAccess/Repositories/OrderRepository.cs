@@ -101,6 +101,53 @@ namespace JLSDataAccess.Repositories
         }
 
 
+        public async Task<OrderDetailViewModelMobile> GetOrdersListByOrderId(long OrderId, string Lang)
+        {
+            var result = await (from o in db.OrderInfo
+                                where o.Id == OrderId
+                                select new OrderDetailViewModelMobile()
+                                {
+                                   OrderInfo = o,
+                                   Status = (from ri in db.ReferenceItem
+                                             join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
+                                             where rl.Lang == Lang && ri.Id == o.StatusReferenceItemId
+                                             select new ReferenceItemViewModel()
+                                             {
+                                                 Id = ri.Id,
+                                                 Label = rl.Label,
+                                                 Code = ri.Code
+                                             }).FirstOrDefault(),
+                                   FacturationAdress = db.Adress.Where(p=>p.Id == o.FacturationAdressId).FirstOrDefault(),
+                                   ShippingAdress = db.Adress.Where(p=>p.Id == o.ShippingAdressId).FirstOrDefault(),
+                                   ProductList = (from op in db.OrderProduct
+                                                  join p in db.Product on op.ReferenceId equals p.ReferenceItemId
+                                                  where op.OrderId == o.Id
+                                                  select new ProductDetailViewModelMobile()
+                                                  {
+                                                      Id = p.Id,
+                                                      Price = p.Price,
+                                                      QuantityPerBox = p.QuantityPerBox,
+                                                      MinQuantity = p.MinQuantity,
+                                                      Quantity = op.Quantity,
+                                                      PhotoPaths = db.ProductPhotoPath.Where(x=>x.ProductId == p.Id).ToList(),
+                                                      Reference = (from ri in db.ReferenceItem
+                                                                   join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
+                                                                   where ri.Id == p.ReferenceItemId && rl.Lang== Lang
+                                                                   select new ReferenceItemViewModel() { 
+                                                                   Id = ri.Id,
+                                                                   Code = ri.Code,
+                                                                   ParentId = ri.ParentId,
+                                                                   ReferenceCategoryId = ri.ReferenceCategoryId,
+                                                                   Label = rl.Label,
+                                                                   Validity = ri.Validity
+                                                                   }).FirstOrDefault()
+
+                                                  }).ToList()
+                                }).FirstOrDefaultAsync();
+            return result;
+        }
+
+
         /*
          * Admin Zoom 
          */

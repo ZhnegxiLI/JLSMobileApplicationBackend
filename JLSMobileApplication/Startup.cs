@@ -116,7 +116,7 @@ namespace JLSMobileApplication
                 options.AddPolicy(appSettings.MyAllowSpecificOrigins,
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:8080", "ionic://localhost", "http://localhost", "http://localhost:8100", "http://176.176.221.117", "capacitor://localhost")
+                        builder.WithOrigins("http://localhost:8080", "ionic://localhost", "http://localhost", "http://localhost:8100")
                             .AllowAnyHeader()
                             .WithMethods()
                             .AllowCredentials(); ;
@@ -132,8 +132,12 @@ namespace JLSMobileApplication
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, JlsDbContext context)
         {
+            if (!env.IsProduction())
+            {
+                context.Database.Migrate(); // auto update database in not prod env
+            }
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
