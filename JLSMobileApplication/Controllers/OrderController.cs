@@ -6,11 +6,13 @@ using AutoMapper;
 using JLSDataAccess.Interfaces;
 using JLSDataModel.ViewModels;
 using LjWebApplication.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JLSMobileApplication.Controllers
 {
+    [Authorize]
     [Route("api/[controller]/{action}/{id?}")]
     [ApiController]
     public class OrderController : Controller
@@ -55,7 +57,6 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
-
 
         [HttpGet]
         public async Task<JsonResult> GetOrdersListByUserId(int UserId, string Lang)

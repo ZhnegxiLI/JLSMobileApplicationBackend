@@ -49,5 +49,7 @@ namespace JLSDataAccess
         
         public virtual DbSet<ProductComment> ProductComment { get; set; }
 
+        public virtual DbSet<TokenModel> TokenModel { get; set; }
+
     }
 }

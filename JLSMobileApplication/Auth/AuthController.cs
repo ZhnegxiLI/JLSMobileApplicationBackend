@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -100,6 +101,8 @@ namespace JLSMobileApplication.Auth
             }
         }
 
+
+
         // Generate the jwt toekn 
         private string GenerateToken(int userId)
         {
@@ -120,6 +123,16 @@ namespace JLSMobileApplication.Auth
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        private string GenerateRefreshToken(int userId)
+        {
+
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
+        }
 
     }
 

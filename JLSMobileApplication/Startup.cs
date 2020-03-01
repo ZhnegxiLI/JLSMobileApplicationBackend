@@ -20,6 +20,8 @@ using LjWebApplication.Middleware;
 using Newtonsoft.Json.Serialization;
 using JLSDataAccess.Interfaces;
 using JLSDataAccess.Repositories;
+using JLSDataModel.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace JLSMobileApplication
 {
@@ -89,6 +91,7 @@ namespace JLSMobileApplication
 
             //配置JWT 密钥
             var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
             services.AddAuthentication(options =>
             {
@@ -100,14 +103,13 @@ namespace JLSMobileApplication
                  jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
                  {
                      ValidateIssuerSigningKey = true,
-                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.JwtSecret)),
-                     //ValidateIssuer = true,
-                    ValidIssuer = appSettings.JwtIssuer,
-                   // ValidateAudience = true,
-                    ValidAudience = appSettings.JwtAudience,
-                    ValidateLifetime = true, //validate the expiration and not before values in the token
-                    ClockSkew = TimeSpan.FromMinutes(5) //5 minute tolerance for the expiration date
-                };
+                     ValidateIssuer = false,
+                     ValidateAudience = false,
+                    // ValidIssuer = appSettings.Site,
+                     //ValidAudience = appSettings.Audience,
+                     IssuerSigningKey = new SymmetricSecurityKey(key),
+                     ClockSkew = TimeSpan.Zero//TimeSpan.FromMinutes(5)
+                 };
              });
 
             // 配置跨域
@@ -129,6 +131,8 @@ namespace JLSMobileApplication
             services.AddScoped<IOrderRepository, OrderRepository>();
             // services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IAdressRepository, AdressRepository>();
+
+            services.AddScoped<TokenModel>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
