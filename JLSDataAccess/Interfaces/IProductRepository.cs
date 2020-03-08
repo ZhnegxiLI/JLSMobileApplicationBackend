@@ -20,6 +20,10 @@ namespace JLSDataAccess.Interfaces
 
         Task<ProductListViewModel> GetProductListBySalesPerformance(string Lang, int begin, int step);
 
+        Task<dynamic> GetProductPhotoPathById(long ProductId);
+
+        Task<long> SavePhotoPath(long ProductId, string Path);
+
         Task<ProductListViewModel> GetProductListByPublishDate(string Lang, int begin, int step);
 
 
@@ -32,6 +36,8 @@ namespace JLSDataAccess.Interfaces
          *  Admin zoom
          */
         Task<List<dynamic>> AdvancedProductSearchByCriteria(string ProductLabel, long MainCategoryReferenceId, List<long> SecondCategoryReferenceId, bool? Validity, string Lang);
+
+        Task<long> SaveProductInfo(long ProductId, long ReferenceId, int QuantityPerBox, int MinQuantity, float? Price, float? TaxRate, string Description);
 
         Task<ListViewModelWithCount<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection, string filter);
         Task<dynamic> GetProductById(long id);

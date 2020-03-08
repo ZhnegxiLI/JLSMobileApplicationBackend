@@ -20,6 +20,11 @@ namespace JLSDataAccess.Interfaces
         Task<List<ReferenceItem>> GetReferenceItemsByCode(string referencecode, string lang);
 
 
+        Task<ReferenceCategory> GetReferenceCategoryByShortLabel(string ShortLabel);
+
+        Task<long> SaveReferenceItem(long ReferenceId, long CategoryId, string Code, long? ParentId, bool Validity, string Value);
+
+        Task<long> SaveReferenceLabel(long ReferenceId, string Label, string Lang);
         /*
          * Admin zoom
          */

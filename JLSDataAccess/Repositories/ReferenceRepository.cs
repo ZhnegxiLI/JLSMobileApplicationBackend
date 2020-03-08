@@ -32,6 +32,11 @@ namespace JLSDataAccess.Repositories
             throw new NotImplementedException();
         }
 
+        public async Task<ReferenceCategory> GetReferenceCategoryByShortLabel(string ShortLabel)
+        {
+            return await db.ReferenceCategory.Where(p => p.ShortLabel == ShortLabel).FirstOrDefaultAsync();
+        }
+
         public async Task<List<dynamic>> GetReferenceItemsByCategoryLabels(List<string> shortLabels, string lang)
         {
 
@@ -53,6 +58,74 @@ namespace JLSDataAccess.Repositories
                           });
             return await result.ToListAsync<dynamic>();
         }
+
+        public async Task<long> SaveReferenceItem(long ReferenceId, long CategoryId, string Code ,long? ParentId, bool Validity, string Value)
+        {  // TODO Add createdBy / createdOn / UpdatedBy
+            ReferenceItem ReferenceToUpdateOrCreate = null;
+            if (ReferenceId == 0)
+            {
+                ReferenceToUpdateOrCreate = new ReferenceItem();
+            }
+            else
+            {
+                ReferenceToUpdateOrCreate = db.ReferenceItem.Where(p => p.Id == ReferenceId).FirstOrDefault();
+            }
+            if (ReferenceToUpdateOrCreate != null)
+            {
+                ReferenceToUpdateOrCreate.ReferenceCategoryId = CategoryId;
+                ReferenceToUpdateOrCreate.Code = Code;
+                ReferenceToUpdateOrCreate.ParentId = ParentId;
+                ReferenceToUpdateOrCreate.Validity = Validity;
+                ReferenceToUpdateOrCreate.Value = Value;
+
+                if (ReferenceId == 0)
+                {
+                    await db.ReferenceItem.AddAsync(ReferenceToUpdateOrCreate);
+                }
+                else
+                {
+                    db.ReferenceItem.Update(ReferenceToUpdateOrCreate);
+                }
+                await db.SaveChangesAsync();
+                return ReferenceToUpdateOrCreate.Id;
+            }
+            return 0;
+        }
+
+        public async Task<long> SaveReferenceLabel(long ReferenceId, string Label , string Lang)
+        {  // TODO Add createdBy / createdOn / UpdatedBy
+            ReferenceLabel ReferenceLabelToUpdateOrCreate = null;
+            if (ReferenceId == 0)
+            {
+                ReferenceLabelToUpdateOrCreate = new ReferenceLabel();
+                ReferenceLabelToUpdateOrCreate.Id = ReferenceId;
+            }
+            else
+            {
+                ReferenceLabelToUpdateOrCreate = db.ReferenceLabel.Where(p => p.ReferenceItemId == ReferenceId && p.Lang == Lang).FirstOrDefault();
+            }
+            if (ReferenceLabelToUpdateOrCreate != null)
+            {
+                ReferenceLabelToUpdateOrCreate.Label = Label;
+                ReferenceLabelToUpdateOrCreate.Lang = Lang;
+
+                if (ReferenceId == 0)
+                {
+                    await db.ReferenceLabel.AddAsync(ReferenceLabelToUpdateOrCreate);
+                }
+                else
+                {
+                    db.ReferenceLabel.Update(ReferenceLabelToUpdateOrCreate);
+                }
+                await db.SaveChangesAsync();
+                return ReferenceLabelToUpdateOrCreate.Id;
+            }
+            return 0;
+        }
+
+
+
+
 
         public Task<List<ReferenceItem>> GetReferenceItemsByCode(string referencecode, string lang)
         {

@@ -304,6 +304,43 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
+
+
+        public async Task<long> SaveProductInfo(long ProductId, long ReferenceId, int QuantityPerBox, int MinQuantity,float? Price, float? TaxRate, string Description)
+        {
+            Product ProductToUpdateOrCreate = null;
+            if (ProductId == 0)
+            {
+                ProductToUpdateOrCreate = new Product();
+                ProductToUpdateOrCreate.ReferenceItemId = ReferenceId;
+            }
+            else
+            {
+                ProductToUpdateOrCreate = db.Product.Where(p => p.Id == ProductId).FirstOrDefault();
+            }
+            if (ProductToUpdateOrCreate!=null)
+            {
+                ProductToUpdateOrCreate.QuantityPerBox = QuantityPerBox;
+                ProductToUpdateOrCreate.MinQuantity = MinQuantity;
+                ProductToUpdateOrCreate.Price = Price;
+                ProductToUpdateOrCreate.TaxRate = TaxRate;
+                ProductToUpdateOrCreate.Description = Description;
+
+                if (ProductId == 0)
+                {
+                    await db.Product.AddAsync(ProductToUpdateOrCreate);
+                }
+                else
+                {
+                    db.Product.Update(ProductToUpdateOrCreate);
+                }
+                await db.SaveChangesAsync();
+                return ProductToUpdateOrCreate.Id;
+            }
+            return 0;
+        }
+
+
         /*
          * Admin Zoom
          */
@@ -384,6 +421,38 @@ namespace JLSDataAccess.Repositories
  
             return result;
         }
+
+
+        public async Task<dynamic> GetProductPhotoPathById(long ProductId)
+        {
+            var result = await (from pt in db.ProductPhotoPath
+                                where pt.ProductId == ProductId
+                                select pt).ToListAsync();
+
+            if (result == null)
+            {
+                return null;
+            }
+
+            return result;
+        }
+
+        public async Task<long> SavePhotoPath(long ProductId, string Path)
+        {
+            var photoPath = db.ProductPhotoPath.Where(p => p.ProductId == ProductId && p.Path == Path).FirstOrDefault();
+            if (ProductId>0 && Path!="" && photoPath==null)
+            {
+                ProductPhotoPath path = new ProductPhotoPath();
+                path.ProductId = ProductId;
+                path.Path = Path;
+                await db.ProductPhotoPath.AddAsync(path);
+                await db.SaveChangesAsync();
+
+                return path.Id;
+            }
+            return 0;
+        }
+
 
         public async Task<int> RemoveImageById(long id)
         {
