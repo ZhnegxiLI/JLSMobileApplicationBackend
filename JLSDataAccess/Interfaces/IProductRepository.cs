@@ -31,9 +31,10 @@ namespace JLSDataAccess.Interfaces
         /*
          *  Admin zoom
          */
+        Task<List<dynamic>> AdvancedProductSearchByCriteria(string ProductLabel, long MainCategoryReferenceId, List<long> SecondCategoryReferenceId, bool? Validity, string Lang);
 
         Task<ListViewModelWithCount<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection, string filter);
-        Task<ProductViewModel> GetProductById(long id);
+        Task<dynamic> GetProductById(long id);
         Task<int> RemoveImageById(long id);
         Task<List<ProductsListViewModel>> SearchProducts(string lang, string filter);
 

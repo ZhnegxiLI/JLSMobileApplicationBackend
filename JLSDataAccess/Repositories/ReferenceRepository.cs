@@ -17,12 +17,11 @@ namespace JLSDataAccess.Repositories
     public class ReferenceRepository : IReferenceRepository
     {
         private readonly JlsDbContext db;
-        private readonly string _defaultLang;
 
-        public ReferenceRepository(JlsDbContext context, IConfiguration config)
+
+        public ReferenceRepository(JlsDbContext context)
         {
             db = context;
-            _defaultLang = config.GetValue<string>("Lang:DefaultLang");//TODO change to class appsettings
         }
 
         /*
@@ -33,43 +32,28 @@ namespace JLSDataAccess.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<List<ReferenceItemViewModelMobile>> GetReferenceItemsByCategoryLabels(string shortLabels, string lang)
+        public async Task<List<dynamic>> GetReferenceItemsByCategoryLabels(List<string> shortLabels, string lang)
         {
-            List<string> referenceLabelList = new List<string>(shortLabels.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries));
 
             var result =  (from ri in db.ReferenceItem
-                          join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
-                          from rl in db.ReferenceLabel.Where(p => p.ReferenceItemId == ri.Id && p.Lang == lang).DefaultIfEmpty()
-                          where referenceLabelList.Contains(rc.ShortLabel)
-                          select new ReferenceItemViewModelMobile()
+                           join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                           where shortLabels.Contains(rc.ShortLabel)
+                           select new 
                           {
                               Id = ri.Id,
                               Code = ri.Code,
-                              ParentId = ri.ParentId,
-                              ReferenceParent = (from rip in db.ReferenceItem
-                                                 join rcp in db.ReferenceCategory on rip.ReferenceCategoryId equals rcp.Id
-                                                 join rlp in db.ReferenceLabel on rip.Id equals rlp.ReferenceItemId
-                                                 where rip.Id == ri.ParentId
-                                                 select new ReferenceItemViewModelMobile()
-                                                 {
-                                                     Id = rip.Id,
-                                                     Code = rip.Code,
-                                                     Value = rip.Value,
-                                                     Order = rip.Order,
-                                                     ReferenceCategoryId = rcp.Id,
-                                                     ReferenceCategoryLongLabel = rcp.LongLabel,
-                                                     Label = rlp.Label,
-                                                     Validity = rip.Validity
-                                                 }).FirstOrDefault(),
-                              Value = ri.Value,
-                              Order  = ri.Order,
                               ReferenceCategoryId = rc.Id,
-                              ReferenceCategoryLongLabel = rc.LongLabel,
-                              Label = rl.Label,
-                              Validity = ri.Validity
+                              ReferenceCategoryLabel = rc.ShortLabel,
+                              Label = (from rl in db.ReferenceLabel
+                                       where rl.ReferenceItemId == ri.Id && rl.Lang == lang
+                                       select rl.Label).FirstOrDefault(),
+                              ParentId = ri.ParentId,
+                              Validity = ri.Validity,
+                              Value = ri.Value
                           });
-            return await result.ToListAsync();
+            return await result.ToListAsync<dynamic>();
         }
+
         public Task<List<ReferenceItem>> GetReferenceItemsByCode(string referencecode, string lang)
         {
             throw new NotImplementedException();
@@ -124,35 +108,6 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-        public async Task<int> CreatorUpdateItem(ReferenceItem item, List<ReferenceLabel> labels)
-        {
-            if (item.Id == 0)
-            {
-                db.ReferenceItem.Add(item);
-                await db.SaveChangesAsync();
-
-                labels = CheckLabels(labels, item.Id);
-                foreach (ReferenceLabel label in labels)
-                {
-                    db.ReferenceLabel.Add(label);
-                }
-            }
-            else
-            {
-                db.ReferenceItem.Update(item);
-
-                labels = CheckLabels(labels, item.Id);
-                foreach (ReferenceLabel label in labels)
-                {
-                    db.ReferenceLabel.Update(label);
-                }
-
-            }
-
-            await db.SaveChangesAsync();
-
-            return 1;
-        }
 
         public async Task<int> CreatorUpdateCategory(ReferenceCategory category)
         {
@@ -170,20 +125,7 @@ namespace JLSDataAccess.Repositories
             return 1;
         }
 
-        public List<ReferenceLabel> CheckLabels(List<ReferenceLabel> labels, long referenceItemId)
-        {
 
-            string defaultLabel = labels.Find(label => label.Lang.Equals(_defaultLang)).Label;
-            foreach (ReferenceLabel label in labels)
-            {
-                if (label.Label == "")
-                {
-                    label.Label = defaultLabel;
-                }
-                label.ReferenceItemId = referenceItemId;
-            }
-            return labels;
-        }
 
         public Task<ListViewModelWithCount<ReferenceItemViewModel>> GetReferenceItemWithInterval(int intervalCount, int size, string orderActive, string orderDirection, string filter)
         {

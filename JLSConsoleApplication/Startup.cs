@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using JLSConsole.Heplers;
+using JLSConsoleApplication.Middleware;
 using JLSDataAccess;
 using JLSDataAccess.Interfaces;
 using JLSDataAccess.Repositories;
@@ -19,6 +22,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Serialization;
 
 namespace JLSConsoleApplication
 {
@@ -37,7 +42,10 @@ namespace JLSConsoleApplication
         {
             services.AddAutoMapper();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddJsonOptions(options=>
+            {
+                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            }) ;
 
             services.AddDbContext<JlsDbContext>(
              options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"),
@@ -69,11 +77,6 @@ namespace JLSConsoleApplication
                 options.Password.RequiredLength = 6;
                 options.Password.RequiredUniqueChars = 1;
 
-                // Lockout settings.
-                //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                //options.Lockout.MaxFailedAccessAttempts = 5;
-                //options.Lockout.AllowedForNewUsers = true;
-
                 // User settings.
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
@@ -84,7 +87,13 @@ namespace JLSConsoleApplication
 
             });
 
-            /*services.AddAuthentication(options =>
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+
+            services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = "JwtBearer";
                 options.DefaultChallengeScheme = "JwtBearer";
@@ -94,15 +103,15 @@ namespace JLSConsoleApplication
                  jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
                  {
                      ValidateIssuerSigningKey = true,
-                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("JWT:Secret").Value)),
-                     ValidateIssuer = true,
-                     ValidIssuer = Configuration.GetSection("JWT:Issuer").Value,
-                     ValidateAudience = true,
-                     ValidAudience = Configuration.GetSection("JWT:Audience").Value,
-                     ValidateLifetime = true, //validate the expiration and not before values in the token
-                     ClockSkew = TimeSpan.FromMinutes(5) //5 minute tolerance for the expiration date
+                     ValidateIssuer = false,
+                     ValidateAudience = false,
+                     // ValidIssuer = appSettings.Site,
+                     //ValidAudience = appSettings.Audience,
+                     IssuerSigningKey = new SymmetricSecurityKey(key),
+                     ClockSkew = TimeSpan.Zero//TimeSpan.FromMinutes(5)
                  };
-             });*/
+             });
+
 
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
@@ -121,6 +130,16 @@ namespace JLSConsoleApplication
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+
+       
+
+            app.UseCors(MyAllowSpecificOrigins);
+
+            app.UseErrorHandling();
+
+            app.UseAuthentication();
+
             var cachePeriod = env.IsDevelopment() ? "600" : "604800"; // Todo add into the appsettings缓存时间 
 
             app.UseStaticFiles(new StaticFileOptions //TODO, if not exists create配置静态文件夹
@@ -135,9 +154,6 @@ namespace JLSConsoleApplication
                     ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={cachePeriod}");
                 }
             });
-
-            app.UseCors(MyAllowSpecificOrigins);
-            app.UseAuthentication();
             //app.UseHttpsRedirection();
             app.UseMvc();
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JLSConsole.Heplers;
 using JLSDataAccess.Interfaces;
 using JLSDataModel.AdminViewModel;
 using JLSDataModel.Models;
@@ -74,24 +75,32 @@ namespace JLSConsoleApplication.Controllers
             return Json(result);
         }
 
-
-        [HttpPost]
-        public async Task<JsonResult> CreatorUpdateReferenceItem([FromForm]IFormCollection itemData)
+        
+        public class GetReferenceItemsByCategoryLabelsCriteria
         {
-            StringValues itemInfo;
-            StringValues langLabelInfo;
-
-            itemData.TryGetValue("item", out itemInfo);
-            itemData.TryGetValue("langLabel", out langLabelInfo);
-
-            ReferenceItem item = JsonConvert.DeserializeObject<ReferenceItem>(itemInfo);
-            List<ReferenceLabel> langLabels = JsonConvert.DeserializeObject<List<ReferenceLabel>>(langLabelInfo);
-
-            int res = await this._referenceRepository.CreatorUpdateItem(item, langLabels);
-            ApiResult result = new ApiResult() { Success = true, Msg = "OK", Type = "200" };
-            return Json(result);
+            public GetReferenceItemsByCategoryLabelsCriteria()
+            {
+                this.ShortLabels = new List<string>();
+            }
+            public List<string> ShortLabels { get; set; }
+            public string Lang { get; set; }
         }
+        [HttpPost]
+        public async Task<JsonResult> GetReferenceItemsByCategoryLabels([FromBody]GetReferenceItemsByCategoryLabelsCriteria criteria)
+        {
+            try
+            {
+                var result = await _referenceRepository.GetReferenceItemsByCategoryLabels(criteria.ShortLabels, criteria.Lang);
 
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+
+        }
         [HttpPost]
         public async Task<JsonResult> CreatorUpdateReferenceCategory([FromBody]ReferenceCategory category)
         {

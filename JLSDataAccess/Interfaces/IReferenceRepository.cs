@@ -11,7 +11,7 @@ namespace JLSDataAccess.Interfaces
 {
     public interface IReferenceRepository
     {
-        Task<List<ReferenceItemViewModelMobile>> GetReferenceItemsByCategoryLabels(string shortLabel, string lang);
+        Task<List<dynamic>> GetReferenceItemsByCategoryLabels(List<string> shortLabels, string lang);
 
         Task<List<ReferenceItem>> GetReferenceItemsByCategoryIds(string categoryIds, string lang);
 
@@ -31,9 +31,9 @@ namespace JLSDataAccess.Interfaces
 
         Task<List<ReferenceCategory>> GetAllValidityReferenceCategory();
 
-        Task<int> CreatorUpdateItem(ReferenceItem item, List<ReferenceLabel> labels);
+ 
 
         Task<int> CreatorUpdateCategory(ReferenceCategory category);
-        List<ReferenceLabel> CheckLabels(List<ReferenceLabel> labels, long referenceItemId);
+
     }
 }

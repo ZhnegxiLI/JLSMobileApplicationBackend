@@ -140,7 +140,7 @@ namespace JLSMobileApplication.Auth
                             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString() ),
                             new Claim(ClaimTypes.Role, "client"), //todo change
-                            new Claim("LoggedOn", DateTime.Now.ToString()),
+                            new Claim("LoggedOn", DateTime.Now.ToString()), 
 
                          }),
 

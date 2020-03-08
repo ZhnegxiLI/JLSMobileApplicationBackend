@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JLSDataModel.ViewModels
+namespace JLSConsole.Heplers
 {
     public class ApiResult
     {

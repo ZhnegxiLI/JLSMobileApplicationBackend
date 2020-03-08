@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using JLSConsole.Heplers;
 using JLSConsoleApplication.Resources;
 using JLSDataAccess.Interfaces;
 using JLSDataModel.AdminViewModel;
@@ -46,6 +47,45 @@ namespace JLSMobileApplication.Controllers
         }
 
 
+        public class AdvancedProductSearchCriteria {
+
+            public AdvancedProductSearchCriteria()
+            {
+                this.SecondCategoryReferenceId = new List<long>();
+            }
+
+            public string ProductLabel { get; set; }
+            public long MainCategoryReferenceId { get; set; }
+            public List<long> SecondCategoryReferenceId { get; set; }
+
+            public bool? Validity { get; set; }
+            public string Lang { get; set; }
+
+            public int begin { get; set; }
+
+            public int step { get; set; }
+        }
+        [HttpPost]
+        public async Task<JsonResult> AdvancedProductSearchByCriteria(AdvancedProductSearchCriteria criteria )
+        {
+            try
+            {
+               var result = await _productRepository.AdvancedProductSearchByCriteria(criteria.ProductLabel, criteria.MainCategoryReferenceId, criteria.SecondCategoryReferenceId, criteria.Validity, criteria.Lang);
+                var list = result.Skip(criteria.begin * criteria.step).Take(criteria.step);
+
+                return Json(new { 
+                    ProductList = list,
+                    TotalCount = result.Count()
+                });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+    
+        }
+        
+
         [HttpGet]
         public async Task<JsonResult> GetAllProducts(string lang, int intervalCount, int size, string orderActive, string orderDirection, string filter)
         {
@@ -63,13 +103,13 @@ namespace JLSMobileApplication.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetProductById(long id)
+        public async Task<JsonResult> GetProductById(long Id)
         {
             ApiResult result;
             try
             {
-                ProductViewModel data = await _productRepository.GetProductById(id);
-                result = new ApiResult() { Success = true, Msg = "OK", Type = "200", Data = data };
+               var data = await _productRepository.GetProductById(Id);
+                return Json(data);
             }
             catch (Exception e)
             {

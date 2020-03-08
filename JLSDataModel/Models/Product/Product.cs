@@ -8,7 +8,7 @@ namespace JLSDataModel.Models.Product
         public int? QuantityPerBox { get; set; }
         public int? MinQuantity { get; set; }
 
-
+        public float? TaxRate { get; set; }
         /* 不确定需要询问客户 */
         public string Color { get; set; }
 

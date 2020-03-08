@@ -259,13 +259,48 @@ namespace JLSDataAccess.Repositories
 
 
         /* TODO: change */
-        public async Task<List<dynamic>> AdvancedProductSearch(string Label, string Lang, int begin, int step)
+        public async Task<List<dynamic>> SearchProductByLabel(string Label, string Lang, int begin, int step)
         {
             var result = await (from rl in db.ReferenceLabel
                                 join ri in db.ReferenceItem on rl.ReferenceItemId equals ri.Id
                                 join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
                                 where (rc.ShortLabel == "Product" || rc.ShortLabel == "MainCategory" || rc.ShortLabel == "SecondCategory") && rl.Label.Contains(Label) && rl.Lang == Lang
                                 select ri).Skip(begin * step).Take(step).ToListAsync<dynamic>();
+            return result;
+        }
+
+
+        public async Task<List<dynamic>> AdvancedProductSearchByCriteria(string ProductLabel, long MainCategoryReferenceId, List<long> SecondCategoryReferenceId, bool? Validity ,string Lang)
+        {
+            var result = await (from rl in db.ReferenceLabel
+                                join ri in db.ReferenceItem on rl.ReferenceItemId equals ri.Id
+                                join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                                join p in db.Product on ri.Id equals p.ReferenceItemId
+                                join riSecond in db.ReferenceItem on ri.ParentId equals riSecond.Id
+                                join riMain in db.ReferenceItem on riSecond.ParentId equals riMain.Id
+        
+                                where (ProductLabel == "" || rl.Label.Contains(ProductLabel)) 
+                                && (MainCategoryReferenceId==0 || riMain.Id == MainCategoryReferenceId)
+                                && (SecondCategoryReferenceId.Count()== 0 || SecondCategoryReferenceId.Contains(riSecond.Id))
+                                && (Validity == null ||ri.Validity == Validity)
+                                && rl.Lang == Lang && rc.ShortLabel == "Product"
+                                select new { 
+                                    ReferenceId = ri.Id,
+                                    ProductId = p.Id,
+                                    Label = rl.Label,
+                                    Code = ri.Code,
+                                    Validity = ri.Validity,
+                                    CategoryId = rc.Id,
+                                    CategoryLabel = rc.ShortLabel,
+                                    Price = p.Price,
+                                    MainCategoryLabel = (from rlMain in db.ReferenceLabel
+                                                    where rlMain.ReferenceItemId ==  riMain.Id && rlMain.Lang == Lang
+                                                    select rlMain.Label).FirstOrDefault(),
+                                    SecondCategoryLabel = (from rlSecond in db.ReferenceLabel
+                                                    where rlSecond.ReferenceItemId == riSecond.Id && rlSecond.Lang == Lang
+                                                    select rlSecond.Label).FirstOrDefault(),
+                                }).Distinct().ToListAsync<dynamic>();
+
             return result;
         }
 
@@ -303,38 +338,50 @@ namespace JLSDataAccess.Repositories
         }
 
 
-        public async Task<ProductViewModel> GetProductById(long id)
+        public async Task<dynamic> GetProductById(long Id)
         {
             var result = await (from ri in db.ReferenceItem
-                                from rl in db.ReferenceLabel.Where(p => p.ReferenceItemId == ri.Id).DefaultIfEmpty()
                                 join p in db.Product on ri.Id equals p.ReferenceItemId
-                                where p.Id == id
-                                select new ProductViewModel
+                                where p.Id == Id
+                                select new 
                                 {
-                                    Id = p.Id,
-                                    Category = ri.ParentId,
+                                    ProductId = p.Id,
+                                    MainCategoryId =  (from riMain in db.ReferenceItem
+                                                       join riSecond in db.ReferenceItem on                                riMain.Id equals riSecond.ParentId
+                                                       where riSecond.Id == ri.ParentId
+                                                       select riMain.Id).FirstOrDefault(),
+                                    SecondCategoryId = ri.ParentId,
                                     ReferenceCode = ri.Code,
-                                    Color = p.Color,
-                                    Description = p.Description,
-                                    Material = p.Material,
-                                    Size = p.Size,
                                     MinQuantity = p.MinQuantity,
                                     Price = p.Price,
                                     QuantityPerBox = p.QuantityPerBox,
-                                    ReferenceItemId = ri.Id,
+                                    Description = p.Description,
+                                    ReferenceId = ri.Id, 
+                                    TaxRate = ri.Value,
+                                    Translation = (from label in db.ReferenceLabel
+                                                   where label.ReferenceItemId == ri.Id
+                                                   select new { 
+                                                        Id = label.Id,
+                                                        Label= label.Label,
+                                                        Lang = label.Lang
+                                                   }).ToList(),
+                                    ImagesPath = (from path in db.ProductPhotoPath
+                                                  where path.ProductId == p.Id
+                                                  select path.Path).ToList(),
+
+                                    Color = p.Color,
+                             
+                                    Material = p.Material,
+                                    Size = p.Size,
+                                    Validity = ri.Validity
+                               
                                 }).FirstOrDefaultAsync();
 
             if (result == null)
             {
                 return null;
             }
-            result.Label = await (from rl in db.ReferenceLabel
-                                  where rl.ReferenceItemId == result.ReferenceItemId
-                                  select rl).ToListAsync();
-
-            result.Images = await (from img in db.ProductPhotoPath
-                                   where img.ProductId == result.Id
-                                   select img).ToListAsync();
+ 
             return result;
         }
 

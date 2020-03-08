@@ -118,7 +118,7 @@ namespace JLSMobileApplication
                 options.AddPolicy(appSettings.MyAllowSpecificOrigins,
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:8080", "ionic://localhost", "http://localhost", "http://localhost:8100")
+                        builder.WithOrigins("http://localhost:8080", "ionic://localhost", "http://localhost", "http://localhost:8100", "http://localhost:4200")
                             .AllowAnyHeader()
                             .WithMethods()
                             .AllowCredentials(); ;
