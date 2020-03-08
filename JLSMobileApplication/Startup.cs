@@ -138,10 +138,7 @@ namespace JLSMobileApplication
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, JlsDbContext context)
         {
-            if (!env.IsProduction())
-            {
-                context.Database.Migrate(); // auto update database in not prod env
-            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
