@@ -118,7 +118,7 @@ namespace JLSMobileApplication
                 options.AddPolicy(appSettings.MyAllowSpecificOrigins,
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:8080", "ionic://localhost", "http://localhost", "http://localhost:8100", "http://localhost:4200")
+                        builder.WithOrigins("http://localhost:8080", "ionic://localhost", "http://localhost", "http://localhost:8100", "http://localhost:4200", "http://localhost:4201")
                             .AllowAnyHeader()
                             .WithMethods()
                             .AllowCredentials(); ;
@@ -147,7 +147,7 @@ namespace JLSMobileApplication
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors(Configuration.GetSection("AppSettings:MyAllowSpecificOrigins").Value);
+          app.UseCors(Configuration.GetSection("AppSettings:MyAllowSpecificOrigins").Value);
 
            app.UseErrorHandling();
 
