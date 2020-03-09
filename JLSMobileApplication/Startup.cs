@@ -129,9 +129,9 @@ namespace JLSMobileApplication
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
-            // services.AddScoped<IReferenceRepository, ReferenceRepository>();
+            services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IAdressRepository, AdressRepository>();
-
+      
             services.AddScoped<TokenModel>();
         }
 
@@ -144,7 +144,7 @@ namespace JLSMobileApplication
                 app.UseDeveloperExceptionPage();
             }
 
-          app.UseCors(Configuration.GetSection("AppSettings:MyAllowSpecificOrigins").Value);
+           app.UseCors(Configuration.GetSection("AppSettings:MyAllowSpecificOrigins").Value);
 
            app.UseErrorHandling();
 

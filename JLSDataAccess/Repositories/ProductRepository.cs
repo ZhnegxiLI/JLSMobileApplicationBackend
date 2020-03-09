@@ -293,6 +293,9 @@ namespace JLSDataAccess.Repositories
                                     CategoryId = rc.Id,
                                     CategoryLabel = rc.ShortLabel,
                                     Price = p.Price,
+                                    DefaultPhotoPath = (from path in db.ProductPhotoPath
+                                                        where path.ProductId == p.Id
+                                                        select path.Path).FirstOrDefault(),
                                     MainCategoryLabel = (from rlMain in db.ReferenceLabel
                                                     where rlMain.ReferenceItemId ==  riMain.Id && rlMain.Lang == Lang
                                                     select rlMain.Label).FirstOrDefault(),

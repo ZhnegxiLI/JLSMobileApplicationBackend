@@ -16,6 +16,8 @@ namespace JLSDataAccess.Interfaces
         Task<OrderDetailViewModelMobile> GetOrdersListByOrderId(long OrderId, string Lang);
 
 
+        Task<List<dynamic>> AdvancedOrderSearchByCriteria(string Lang, int? UserId, DateTime? FromDate, DateTime? ToDate, long? OrderId, long? StatusId);
+
         Task<List<OrdersListViewModel>> GetAllOrdersWithInterval(string lang, int intervalCount, int size, string orderActive, string orderDirection);
         Task<OrderViewModel> GetOrderById(long id, string lang);
     }

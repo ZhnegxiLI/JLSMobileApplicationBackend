@@ -152,6 +152,40 @@ namespace JLSDataAccess.Repositories
          * Admin Zoom 
          */
 
+        public async Task<List<dynamic>> AdvancedOrderSearchByCriteria(string Lang, int? UserId, DateTime? FromDate, DateTime? ToDate, long? OrderId, long? StatusId)
+        {
+            var result = await (from order in db.OrderInfo
+                          from statusRi in db.ReferenceItem.Where(p => p.Id == order.StatusReferenceItemId).DefaultIfEmpty()
+                          where (StatusId == null || statusRi.Id == StatusId)
+                          && (UserId == null || order.UserId == UserId)
+                          && (OrderId == null || order.Id == OrderId)
+                          && (FromDate == null || order.CreatedOn >= FromDate)
+                          && (ToDate == null || order.CreatedOn <= ToDate)
+                          orderby order.CreatedOn descending
+                          select new
+                          {
+                              Id = order.Id,
+                              User = (from u in db.Users
+                                      where u.Id == order.UserId
+                                      select u).FirstOrDefault(),
+                              Status = ( from statusLabel in db.ReferenceLabel
+                                         where statusLabel.ReferenceItemId == statusRi.Id && statusLabel.Lang == Lang
+                                         select new
+                                         {
+                                             Id = statusRi.Id,
+                                             Label = statusLabel.Label,
+                                             Code = statusRi.Code
+                                         }).FirstOrDefault(),
+                            CreatedOn = order.CreatedOn,
+                            UpdatedOn = order.UpdatedOn,
+                            TotalPrice = order.TotalPrice,
+                            UpdatedUser = (from uu in db.Users
+                                           where uu.Id == order.UpdatedBy
+                                           select uu).FirstOrDefault()
+                          }).ToListAsync<dynamic>();
+            return result;
+        }
+
         public async Task<List<OrdersListViewModel>> GetAllOrdersWithInterval(string lang, int intervalCount, int size, string orderActive, string orderDirection)
         {
             var request = (from order in db.OrderInfo

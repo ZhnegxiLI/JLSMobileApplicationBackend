@@ -11,6 +11,7 @@ F:\jlsimport\JLSMobileApplication\JLSConsoleApplication\bin\Debug\netcoreapp2.2\
 F:\jlsimport\JLSMobileApplication\JLSConsoleApplication\bin\Debug\netcoreapp2.2\JLSDataModel.dll
 F:\jlsimport\JLSMobileApplication\JLSConsoleApplication\bin\Debug\netcoreapp2.2\JLSDataAccess.pdb
 F:\jlsimport\JLSMobileApplication\JLSConsoleApplication\bin\Debug\netcoreapp2.2\JLSDataModel.pdb
+F:\jlsimport\JLSMobileApplication\JLSConsoleApplication\obj\Debug\netcoreapp2.2\JLSConsoleApplication.csprojAssemblyReference.cache
 F:\jlsimport\JLSMobileApplication\JLSConsoleApplication\obj\Debug\netcoreapp2.2\JLSConsoleApplication.RazorAssemblyInfo.cache
 F:\jlsimport\JLSMobileApplication\JLSConsoleApplication\obj\Debug\netcoreapp2.2\JLSConsoleApplication.RazorAssemblyInfo.cs
 F:\jlsimport\JLSMobileApplication\JLSConsoleApplication\obj\Debug\netcoreapp2.2\JLSConsoleApplication.AssemblyInfoInputs.cache
@@ -19,4 +20,3 @@ F:\jlsimport\JLSMobileApplication\JLSConsoleApplication\obj\Debug\netcoreapp2.2\
 F:\jlsimport\JLSMobileApplication\JLSConsoleApplication\obj\Debug\netcoreapp2.2\JLSConsoleApplication.csproj.CopyComplete
 F:\jlsimport\JLSMobileApplication\JLSConsoleApplication\obj\Debug\netcoreapp2.2\JLSConsoleApplication.dll
 F:\jlsimport\JLSMobileApplication\JLSConsoleApplication\obj\Debug\netcoreapp2.2\JLSConsoleApplication.pdb
-F:\jlsimport\JLSMobileApplication\JLSConsoleApplication\obj\Debug\netcoreapp2.2\JLSConsoleApplication.csprojAssemblyReference.cache

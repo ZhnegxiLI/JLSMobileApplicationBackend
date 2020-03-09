@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using JLSDataModel.Models.User;
 
 namespace JLSDataAccess.Repositories
 {
@@ -35,5 +36,16 @@ namespace JLSDataAccess.Repositories
                           select a);
             return await result.ToListAsync();
         }
+
+        public async Task<List<User>> GetUserListByRole(List<string> Roles)
+        {
+            var result = await (from u in db.Users
+                          join userRole in db.UserRoles on u.Id equals userRole.UserId
+                          join role in db.Roles on userRole.RoleId equals role.Id
+                          select u).ToListAsync<User>();
+            return  result;
+        }
+
+
     }
 }
