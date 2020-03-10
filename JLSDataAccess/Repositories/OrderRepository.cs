@@ -168,6 +168,12 @@ namespace JLSDataAccess.Repositories
                               User = (from u in db.Users
                                       where u.Id == order.UserId
                                       select u).FirstOrDefault(),
+                              UpdatedBy = order.UpdatedBy,
+                              UpdatedByUser  = (from u in db.Users
+                                                where u.Id == order.UpdatedBy
+                                                select u).FirstOrDefault(),
+
+                              StatusId = statusRi.Id,
                               Status = ( from statusLabel in db.ReferenceLabel
                                          where statusLabel.ReferenceItemId == statusRi.Id && statusLabel.Lang == Lang
                                          select new

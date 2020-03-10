@@ -41,7 +41,7 @@ namespace JLSMobileApplication
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddJsonOptions(options =>
             {
-                options.SerializerSettings.DateFormatString = "yyyy-MM-dd";
+                options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
             });
 
