@@ -22,6 +22,9 @@ using JLSDataAccess.Interfaces;
 using JLSDataAccess.Repositories;
 using JLSDataModel.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace JLSMobileApplication
 {
@@ -146,7 +149,21 @@ namespace JLSMobileApplication
 
            app.UseCors(Configuration.GetSection("AppSettings:MyAllowSpecificOrigins").Value);
 
-           app.UseErrorHandling();
+            var cachePeriod = env.IsDevelopment() ? "600" : "604800"; // Todo add into the appsettings缓存时间 
+
+            app.UseStaticFiles(new StaticFileOptions //TODO, if not exists create配置静态文件夹
+            {
+                FileProvider = new PhysicalFileProvider(
+                   Path.Combine(Directory.GetCurrentDirectory(), "images")),// Todo add into the configure
+                RequestPath = "/images",
+                OnPrepareResponse = ctx =>
+                {
+                    // Requires the following import:
+                    // using Microsoft.AspNetCore.Http;
+                    ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={cachePeriod}");
+                }
+            });
+            app.UseErrorHandling();
 
             app.UseAuthentication();
 
