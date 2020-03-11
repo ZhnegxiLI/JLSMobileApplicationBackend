@@ -107,7 +107,20 @@ namespace JLSDataAccess.Repositories
                                 where o.Id == OrderId
                                 select new OrderDetailViewModelMobile()
                                 {
-                                   OrderInfo = o,
+                                   OrderInfo = new OrderInfo { 
+                                        Id = o.Id,
+                                        UserId = o.UserId,
+                                        User = (from u in db.Users
+                                                where u.Id == o.UserId
+                                                select u).FirstOrDefault(),
+                                        TaxRate = o.TaxRate,
+                                        TotalPrice = o.TotalPrice,
+                                        ClientRemark = o.ClientRemark,
+                                        AdminRemark = o.AdminRemark,
+                                        PaymentInfo = o.PaymentInfo,
+                                        CreatedOn = o.CreatedOn,
+                                        UpdatedOn = o.UpdatedOn
+                                   },
                                    Status = (from ri in db.ReferenceItem
                                              join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
                                              where rl.Lang == Lang && ri.Id == o.StatusReferenceItemId
@@ -117,6 +130,26 @@ namespace JLSDataAccess.Repositories
                                                  Label = rl.Label,
                                                  Code = ri.Code
                                              }).FirstOrDefault(),
+                                   StatusInfo = (from statusInfo in db.OrderInfoStatusLog
+                                                 where statusInfo.OrderInfoId == o.Id
+                                                 orderby statusInfo.ActionTime descending
+                                                 select new { 
+                                                     Id = statusInfo.Id,
+                                                     OldStatus = (from rlOld in db.ReferenceLabel
+                                                                  where rlOld.ReferenceItemId == statusInfo.OldStatusId && rlOld.Lang == Lang
+                                                                  select new { 
+                                                                        ReferenceId = rlOld.ReferenceItemId,
+                                                                        Label = rlOld.Label
+                                                                  }).FirstOrDefault(),
+                                                    NewStatus = (from rlNew in db.ReferenceLabel
+                                                                 where rlNew.ReferenceItemId == statusInfo.OldStatusId && rlNew.Lang == Lang
+                                                                 select new
+                                                                 {
+                                                                     ReferenceId = rlNew.ReferenceItemId,
+                                                                     Label = rlNew.Label
+                                                                 }).FirstOrDefault(),
+                                                    ActionTime = statusInfo.ActionTime
+                                                 }).ToList(),
                                    FacturationAdress = db.Adress.Where(p=>p.Id == o.FacturationAdressId).FirstOrDefault(),
                                    ShippingAdress = db.Adress.Where(p=>p.Id == o.ShippingAdressId).FirstOrDefault(),
                                    ProductList = (from op in db.OrderProduct

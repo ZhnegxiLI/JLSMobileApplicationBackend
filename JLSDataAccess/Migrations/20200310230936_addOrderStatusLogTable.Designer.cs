@@ -4,14 +4,16 @@ using JLSDataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace JLSDataAccess.Migrations
 {
     [DbContext(typeof(JlsDbContext))]
-    partial class JlsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200310230936_addOrderStatusLogTable")]
+    partial class addOrderStatusLogTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,52 +145,6 @@ namespace JLSDataAccess.Migrations
                     b.ToTable("DeletedRecords");
                 });
 
-            modelBuilder.Entity("JLSDataModel.Models.Message.Message", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Body");
-
-                    b.Property<long?>("CreatedBy");
-
-                    b.Property<DateTime?>("CreatedOn");
-
-                    b.Property<string>("Title");
-
-                    b.Property<long?>("UpdatedBy");
-
-                    b.Property<DateTime?>("UpdatedOn");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Message");
-                });
-
-            modelBuilder.Entity("JLSDataModel.Models.Message.MessageDestination", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long?>("CreatedBy");
-
-                    b.Property<DateTime?>("CreatedOn");
-
-                    b.Property<int?>("FromUserId");
-
-                    b.Property<int?>("ToUserId");
-
-                    b.Property<long?>("UpdatedBy");
-
-                    b.Property<DateTime?>("UpdatedOn");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MessageDestination");
-                });
-
             modelBuilder.Entity("JLSDataModel.Models.Order.OrderInfo", b =>
                 {
                     b.Property<long>("Id")
@@ -206,8 +162,6 @@ namespace JLSDataAccess.Migrations
                     b.Property<long>("FacturationAdressId");
 
                     b.Property<string>("OrderReferenceCode");
-
-                    b.Property<string>("OrderType");
 
                     b.Property<string>("PaymentInfo");
 

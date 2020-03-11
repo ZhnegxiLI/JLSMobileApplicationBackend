@@ -18,6 +18,7 @@ namespace JLSDataModel.Models.Order
 
         public float? TaxRate { get; set; }
 
+        public string OrderType { get; set; } // client or internal
         // Foreign key 
         public int UserId { get; set; }
         public User.User User { get; set; }

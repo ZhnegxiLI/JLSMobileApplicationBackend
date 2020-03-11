@@ -1,6 +1,7 @@
 ﻿using JLSDataModel.Models;
 using JLSDataModel.Models.Adress;
 using JLSDataModel.Models.Audit;
+using JLSDataModel.Models.Message;
 using JLSDataModel.Models.Order;
 using JLSDataModel.Models.Product;
 using JLSDataModel.Models.User;
@@ -51,5 +52,10 @@ namespace JLSDataAccess
 
         public virtual DbSet<TokenModel> TokenModel { get; set; }
 
+        public virtual DbSet<OrderInfoStatusLog> OrderInfoStatusLog { get; set; }
+
+        public virtual DbSet<Message> Message { get; set; }
+
+        public virtual DbSet<MessageDestination> MessageDestination { get; set; }
     }
 }

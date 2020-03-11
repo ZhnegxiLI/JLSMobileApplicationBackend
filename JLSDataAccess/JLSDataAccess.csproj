@@ -7,6 +7,8 @@
   <ItemGroup>
     <Compile Remove="Migrations\20200307223513_addTaxRateInProduct.cs" />
     <Compile Remove="Migrations\20200307223513_addTaxRateInProduct.Designer.cs" />
+    <Compile Remove="Migrations\20200310231751_addMessageTables.cs" />
+    <Compile Remove="Migrations\20200310231751_addMessageTables.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

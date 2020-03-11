@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JLSMobileApplication.Controllers
 {
-    [Authorize]
+    //[Authorize] //todo add authorize
     [Route("api/[controller]/{action}/{id?}")]
     [ApiController]
     public class OrderController : Controller
