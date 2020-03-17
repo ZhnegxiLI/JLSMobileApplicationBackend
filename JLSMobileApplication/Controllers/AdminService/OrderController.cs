@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using JLSDataAccess.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JLSMobileApplication.Controllers.AdminService
 {
-
+    [Authorize]
     [Route("admin/[controller]/{action}")]
     [ApiController]
     public class OrderController : Controller

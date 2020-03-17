@@ -59,7 +59,7 @@ namespace JLSMobileApplication.Auth
                     return await RefreshToken(model);
                 default:
                     // not supported - return a HTTP 401 (Unauthorized)
-                    return new UnauthorizedResult();
+                    return new BadRequestResult();
             }
 
         }
@@ -202,13 +202,13 @@ namespace JLSMobileApplication.Auth
                 if (rt == null)
                 {
                     // refresh token not found or invalid (or invalid clientId)
-                    return new UnauthorizedResult();
+                    return new BadRequestResult();
                 }
 
                 // check if refresh token is expired
                 if (rt.ExpiryTime < DateTime.UtcNow)
                 {
-                    return new UnauthorizedResult();
+                    return new BadRequestResult();
                 }
 
                 // check if there's an user with the refresh token's userId
@@ -218,7 +218,7 @@ namespace JLSMobileApplication.Auth
                 if (user == null)
                 {
                     // UserId not found or invalid
-                    return new UnauthorizedResult();
+                    return new BadRequestResult();
                 }
 
                 // generate a new refresh token 
@@ -244,7 +244,7 @@ namespace JLSMobileApplication.Auth
             catch (Exception ex)
             {
 
-                return new UnauthorizedResult();
+                return new BadRequestResult();
             }
         }
     }

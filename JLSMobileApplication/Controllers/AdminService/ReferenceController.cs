@@ -6,6 +6,7 @@ using JLSDataAccess.Interfaces;
 using JLSDataModel.AdminViewModel;
 using JLSDataModel.Models;
 using JLSDataModel.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
@@ -13,6 +14,7 @@ using Newtonsoft.Json;
 
 namespace JLSConsoleApplication.Controllers.AdminService
 {
+    [Authorize]
     [Route("admin/[controller]/{action}")]
     [ApiController]
     public class ReferenceController : Controller

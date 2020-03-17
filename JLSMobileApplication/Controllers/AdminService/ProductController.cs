@@ -10,6 +10,7 @@ using JLSDataModel.AdminViewModel;
 using JLSDataModel.Models;
 using JLSDataModel.Models.Product;
 using JLSDataModel.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
@@ -17,6 +18,7 @@ using Newtonsoft.Json;
 
 namespace JLSMobileApplication.Controllers.AdminService
 {
+    [Authorize]
     [Route("admin/[controller]/{action}")]
     [ApiController]
     public class ProductController : Controller
@@ -166,9 +168,12 @@ namespace JLSMobileApplication.Controllers.AdminService
 
                 if (file.Length > 0)
                 {
-                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                   
+                    var fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+               
                     var fullPath = Path.Combine(pathToSave, fileName);
                     var dbPath = Path.Combine(folderName, fileName);
+
 
                     using (var stream = new FileStream(fullPath, FileMode.Create))
                     {
