@@ -27,7 +27,7 @@ namespace JLSMobileApplication.Controllers.AdminService
             try
             {
                 var result = await _userRepository.GetUserListByRole(Roles);
- 
+
                 return Json(result);
             }
             catch (Exception e)
@@ -35,5 +35,87 @@ namespace JLSMobileApplication.Controllers.AdminService
                 throw e;
             }
         }
+
+
+        public class AdvancedUserSearchCriteria{
+            public int? UserType { get; set; }
+            public bool? Validity { get; set; }
+            public string Username { get; set; }
+            public int begin { get; set; }
+            public int step { get; set; }
+        }
+        [HttpPost]
+        public async Task<JsonResult> AdvancedUserSearch(AdvancedUserSearchCriteria criteria)
+        {
+            try
+            {
+                var result = await _userRepository.AdvancedUserSearch(criteria.UserType, criteria.Validity, criteria.Username);
+                var totalCount = result.Count();
+                return Json(new {
+                    UserList = result,
+                    TotalCount = totalCount
+                });
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetUserRoleList()
+        {
+            try
+            {
+                var result = await _userRepository.GetUserRoleList();
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetUserById(int UserId)
+        {
+            try
+            {
+                var result = await _userRepository.GetUserById(UserId);
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
+        public class CreateOrUpdateUserCriteria
+        {
+            public int UserId { get; set; }
+            public string Email { get; set; }
+
+            public string Password { get; set; }
+            public bool Validity { get; set; }
+            public int RoleId { get; set; }
+        }
+        [HttpPost]
+        public async Task<JsonResult> CreateOrUpdateUser([FromBody]CreateOrUpdateUserCriteria criteria)
+        {
+            try
+            {
+                var result = await _userRepository.CreateOrUpdateUser(criteria.UserId, criteria.Email, criteria.Password, criteria.RoleId, criteria.Validity);
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
     }
 }
