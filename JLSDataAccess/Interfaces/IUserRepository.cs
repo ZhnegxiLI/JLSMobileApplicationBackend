@@ -21,6 +21,6 @@ namespace JLSDataAccess.Interfaces
         Task<List<dynamic>> GetUserRoleList();
         Task<dynamic> GetUserById(int UserId);
 
-        Task<int> CreateOrUpdateUser(int UserId, string Email, string Password, int RoleId, bool Validity);
+        Task<dynamic> CreateOrUpdateUser(int UserId, string Email, string Password, int RoleId, bool Validity);
     }
 }

@@ -161,7 +161,7 @@ namespace JLSMobileApplication.Auth
                 token = encodedToken,
                 expiration = newtoken.ValidTo,
                 refresh_token = refreshToken,
-                roles = "client",
+                roles = roles[0],
                 username = user.UserName,
                 userId = user.Id
                 };
@@ -181,7 +181,7 @@ namespace JLSMobileApplication.Auth
                 UserId = userId,
                 Value = Guid.NewGuid().ToString("N"),
                 CreatedDate = DateTime.UtcNow,
-                ExpiryTime = DateTime.UtcNow.AddMinutes(90)
+                ExpiryTime = DateTime.UtcNow.AddDays(1)
             };
         }
 

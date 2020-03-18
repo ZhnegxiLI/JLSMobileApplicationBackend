@@ -20,6 +20,6 @@ namespace JLSDataModel.Models.User
         public string EntrepriseName { get; set; }
 
         public long FacturationAdressId { get; set; }
-        public Adress.Adress FacturationAdress { get; set; }
+       // public Adress.Adress FacturationAdress { get; set; }
     }
 }

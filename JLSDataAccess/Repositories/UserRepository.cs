@@ -56,7 +56,7 @@ namespace JLSDataAccess.Repositories
                           join r in db.Roles on ur.RoleId equals r.Id
                           where (UserType == null || ur.RoleId == UserType)
                           && (Validity == null || u.Validity == Validity)
-                          && (Username == "" || u.UserName == Username)
+                          && (Username == "" || u.UserName.Contains(Username))
                           select new
                           {
                               Id = u.Id,
@@ -100,14 +100,22 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-        public async Task<int> CreateOrUpdateUser(int UserId, string Email , string Password, int RoleId, bool Validity)
+        public async Task<dynamic> CreateOrUpdateUser(int UserId, string Email , string Password, int RoleId, bool Validity)
         {
+            //UserRole by RoleId
+            var role = await db.Roles.Where(r => r.Id == RoleId).FirstOrDefaultAsync();
+
             User UserToCreateOrUpdate = null;
             if (UserId==0)
             {
                 UserToCreateOrUpdate = new User();
                 UserToCreateOrUpdate.CreatedOn = DateTime.Now;
                 UserToCreateOrUpdate.Email = Email;
+                UserToCreateOrUpdate.UserName = Email;
+                if (role.Name == "Admin")
+                {
+                    UserToCreateOrUpdate.EmailConfirmed = true;
+                }
             }
             else
             {
@@ -117,17 +125,23 @@ namespace JLSDataAccess.Repositories
        
             if(UserId == 0)
             {
-                await _userManager.CreateAsync(UserToCreateOrUpdate, Password);
+              var result =   await _userManager.CreateAsync(UserToCreateOrUpdate, Password);
+                if (result.Succeeded==false)
+                {
+                    return result;
+                }
             }
             else
             {
                 await _userManager.UpdateAsync(UserToCreateOrUpdate);
-                var token = await _userManager.GeneratePasswordResetTokenAsync(UserToCreateOrUpdate);
-                await _userManager.ResetPasswordAsync(UserToCreateOrUpdate, token, Password);
+                if (Password!="")
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(UserToCreateOrUpdate);
+                    await _userManager.ResetPasswordAsync(UserToCreateOrUpdate, token, Password);
+                }
             }
 
-            //UserRole by RoleId
-            var role = await db.Roles.Where(r=>r.Id == RoleId).FirstOrDefaultAsync();
+        
             //Remove all role for user 
             var userRoleToRemove = await db.UserRoles.Where(p => p.UserId == UserToCreateOrUpdate.Id).ToListAsync();
 
