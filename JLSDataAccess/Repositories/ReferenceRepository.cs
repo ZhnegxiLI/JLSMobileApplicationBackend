@@ -126,6 +126,76 @@ namespace JLSDataAccess.Repositories
 
 
 
+        public async Task<List<ReferenceCategory>> GetAllCategoryList()
+        {
+            var result = await db.ReferenceCategory.ToListAsync();
+            return result;
+        }
+
+        public async Task<List<dynamic>> AdvancedSearchReferenceItem(string SearchText, long? ReferenceCategoryId,bool? Validity, long? ParentId, string Lang, bool? IgnoreProduct)
+        {
+            var result = await (from ri in db.ReferenceItem
+                                from rl in db.ReferenceLabel.Where(p => p.ReferenceItemId == ri.Id).DefaultIfEmpty()
+                                join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                                where (rl==null || rl.Lang == Lang) &&
+                                (SearchText == "" || ri.Code == SearchText || rl.Label == SearchText) &&
+                                (ReferenceCategoryId == null || ri.ReferenceCategoryId == ReferenceCategoryId) &&
+                                (Validity == null || ri.Validity == Validity) &&
+                                (ParentId == null || ri.ParentId == ParentId ) && 
+                                (IgnoreProduct == null || IgnoreProduct == false || (IgnoreProduct == true && rc.ShortLabel!= "Product"))
+                                select new
+                                {
+                                    Id = ri.Id,
+                                    Label = rl.Label,
+                                    Value = ri.Value,
+                                    Validity = ri.Validity,
+                                    Code = ri.Code,
+                                    CategoryId = ri.ReferenceCategoryId,
+                                    Category = (from category in db.ReferenceCategory
+                                                where category.Id == ri.ReferenceCategoryId
+                                                select new
+                                                {
+                                                    Id = category.Id,
+                                                    ShortLabel = category.ShortLabel
+                                                }).FirstOrDefault(),
+                                    Labels = (from l in db.ReferenceLabel
+                                              where l.ReferenceItemId == ri.Id
+                                              select new
+                                              {
+                                                  Id = l.Id,
+                                                  Lang = l.Lang,
+                                                  Label = l.Label
+                                              }).ToList(),
+                                    ParentId = ri.ParentId,
+                                    ParentReferenceItem = (from rip in db.ReferenceItem
+                                                           join rlp in db.ReferenceLabel on rip.Id equals rlp.ReferenceItemId
+                                                           where rip.Id == ri.ParentId && rlp.Lang == Lang
+                                                           select new
+                                                           {
+                                                               Id = rip.Id,
+                                                               Code = rip.Code,
+                                                               Label = rlp.Label,
+                                                               CategoryId = rip.ReferenceCategoryId
+                                                           }).FirstOrDefault(),
+                                }).ToListAsync<dynamic>();
+                          
+            return result;
+        }
+
+        public async Task<List<dynamic>> GetAllReferenceItemWithChildren(string Lang)
+        {
+            var result = await (from ri in db.ReferenceItem
+                                join rip in db.ReferenceItem on ri.ParentId equals rip.Id
+                                join rlp in db.ReferenceLabel on rip.Id equals rlp.ReferenceItemId
+                                where rlp.Lang == Lang
+                                select new {
+                                    Id = rip.Id,
+                                    Code = rip.Code,
+                                    Label = rlp.Label,
+                                    CategoryId = rip.ReferenceCategoryId
+                                }).Distinct().ToListAsync<dynamic>();
+            return result;
+        }
 
         public Task<List<ReferenceItem>> GetReferenceItemsByCode(string referencecode, string lang)
         {

@@ -82,6 +82,13 @@ namespace JLSMobileApplication.Auth
                     return Unauthorized(new { LoginError = "We sent you an Confirmation Email. Please Confirm Your Registration With Techhowdy.com To Log in." });
                 }
 
+                if (user.Validity == false)
+                {
+                    ModelState.AddModelError(string.Empty, "Account is locked");
+
+                    return Unauthorized(new { LoginError = "Your account is locked, please contact admin for more information" });
+                }
+
                 // username & password matches: create the refresh token
                 var newRtoken = CreateRefreshToken(_appSettings.ClientId, user.Id);
 

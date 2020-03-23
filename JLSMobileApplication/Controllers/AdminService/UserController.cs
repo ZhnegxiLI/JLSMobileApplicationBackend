@@ -138,7 +138,12 @@ namespace JLSMobileApplication.Controllers.AdminService
                     UserToCreateOrUpdate = await db.Users.FindAsync(criteria.UserId);
                 }
                 UserToCreateOrUpdate.Validity = criteria.Validity;
-
+                if (criteria.Validity == false)
+                {
+                    var refreshToken = await db.TokenModel.Where(p => p.UserId == criteria.UserId).ToListAsync();
+                    db.TokenModel.RemoveRange(refreshToken);
+                    await db.SaveChangesAsync();
+                }
                 if (criteria.UserId == 0)
                 {
                     var result = await _userManager.CreateAsync(UserToCreateOrUpdate, criteria.Password);
