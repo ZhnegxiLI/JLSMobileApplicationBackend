@@ -163,7 +163,7 @@ namespace JLSMobileApplication
                     ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={cachePeriod}");
                 }
             });
-            app.UseErrorHandling();
+            //app.UseErrorHandling();
 
             app.UseAuthentication();
 
