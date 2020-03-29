@@ -118,13 +118,13 @@ namespace JLSMobileApplication
             // 配置跨域
             services.AddCors(options =>
             {
-                options.AddPolicy(appSettings.MyAllowSpecificOrigins,
+                options.AddPolicy("_myAllowSpecificOrigins",
                     builder =>
                     {
                         builder.WithOrigins("http://localhost:8080", "ionic://localhost", "http://localhost", "http://localhost:8100", "http://localhost:4200", "http://localhost:4201", "http://localhost:81", "http://jlsadmin.europetechs.com") // todo change 
                             .AllowAnyHeader()
                             .WithMethods()
-                            .AllowCredentials(); ;
+                            .AllowCredentials();
                     });
             });
 
@@ -147,7 +147,7 @@ namespace JLSMobileApplication
                 app.UseDeveloperExceptionPage();
             }
 
-           app.UseCors(Configuration.GetSection("AppSettings:MyAllowSpecificOrigins").Value);
+           app.UseCors("_myAllowSpecificOrigins");
 
             var cachePeriod = env.IsDevelopment() ? "600" : "604800"; // Todo add into the appsettings缓存时间 
 
