@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using AutoMapper;
+using JLSDataAccess;
 using JLSDataAccess.Interfaces;
 using JLSDataModel.AdminViewModel;
 using JLSDataModel.Models;
@@ -26,33 +27,50 @@ namespace JLSMobileApplication.Controllers.AdminService
         private IProductRepository _productRepository;
         private IReferenceRepository _referenceRepository;
         private readonly IMapper _mapper;
-        public ProductController(IProductRepository productRepository, IReferenceRepository referenceRepository, IMapper mapper)
+        private readonly JlsDbContext db;
+
+        public ProductController(IProductRepository productRepository, IReferenceRepository referenceRepository, IMapper mapper, JlsDbContext context)
         {
             this._referenceRepository = referenceRepository;
             this._productRepository = productRepository;
             _mapper = mapper;
+            db = context;
         }
 
-        //[HttpPost]
-        //public  Task<long> RemoveImageById([FromBody]long id)
-        ////{
-        ////    int res = await this._productRepository.RemoveImageById(id);
-        ////    ApiResult result;
-        ////    if (res == 1)
-        ////    {
-        ////        result = new ApiResult() { Success = true, Msg = "OK", Type = "200" };
-        ////    }
-        ////    else
-        ////    {
-        ////        result = new ApiResult() { Success = false, Msg = "Fail", Type = "500" };
-        ////    }
+        [HttpPost]
+        public async Task<long> RemoveImageById([FromBody]long Id)
+        {
+            ProductPhotoPath image = await db.ProductPhotoPath.FindAsync(Id);
 
-        ////    return Json(result);
-        //    return 0;
-        //}
+            if (image == null)
+            {
+                return 0;
+            }
+
+            string imagePath = "images/" + image.Path; // todo place into the configuration
+
+            try
+            {
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+
+                var PhotoId = image.Id;
+                db.ProductPhotoPath.Remove(image);
+
+                await db.SaveChangesAsync();
+
+                return PhotoId;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
 
 
-        public class AdvancedProductSearchCriteria {
+    public class AdvancedProductSearchCriteria {
 
             public AdvancedProductSearchCriteria()
             {
@@ -150,6 +168,30 @@ namespace JLSMobileApplication.Controllers.AdminService
 
         }
 
+        public class GetProductInfoByReferenceIdsCriteria
+        {
+            public GetProductInfoByReferenceIdsCriteria()
+            {
+                this.ReferenceIds = new List<long>();
+            }
+            public List<long> ReferenceIds { get; set; }
+            public string Lang { get; set; }
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetProductInfoByReferenceIds([FromBody] GetProductInfoByReferenceIdsCriteria criteria)
+        {
+            try
+            {
+                return Json(await _productRepository.GetProductInfoByReferenceIds(criteria.ReferenceIds, criteria.Lang));
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+
+
         [HttpPost, DisableRequestSizeLimit]
         public async Task<IActionResult> UploadPhoto()
         {
@@ -161,7 +203,7 @@ namespace JLSMobileApplication.Controllers.AdminService
 
                 Request.Form.TryGetValue("ProductId", out ProductId); // get ProductId todo change 
 
-                var folderName = Path.Combine("Images", ProductId.ToString());
+                var folderName = Path.Combine("Images", ProductId.ToString()); // todo : place into the configruation file
                 var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
 
                 DirectoryInfo di = Directory.CreateDirectory(pathToSave); // 创建路径

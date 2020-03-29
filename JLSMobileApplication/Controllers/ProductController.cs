@@ -175,34 +175,6 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-        public class GetProductInfoByReferenceIdsCriteria {
-            public GetProductInfoByReferenceIdsCriteria()
-            {
-                this.ReferenceIds = new List<long>();
-            }
-            public List<long> ReferenceIds { get; set; }
-            public string Lang { get; set; }
-        }
-   
-        [HttpPost]
-        public async Task<JsonResult> GetProductInfoByReferenceIds([FromBody] GetProductInfoByReferenceIdsCriteria criteria)
-        {
-            try
-            {
-                return Json(new ApiResult()
-                {
-                    Data = await _productRepository.GetProductInfoByReferenceIds(criteria.ReferenceIds, criteria.Lang),
-                    Msg = "OK",
-                    Success = true
-                });
-            }
-            catch (Exception exc)
-            {
-                throw exc;
-            }
-        }
-
-
         [HttpPost]
         public async Task<JsonResult> SaveProductComment([FromBody] ProductComment comment)
         {

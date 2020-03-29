@@ -76,6 +76,111 @@ namespace JLSDataAccess.Repositories
             return Order.Id;
         }
 
+
+        public async Task<long> SaveAdminOrder(long OrderId,List<OrderProductViewModelMobile> References, long ShippingAddressId, long FacturationAddressId, int CreatedOrUpdatedBy, long StatusReferenceId)
+        {
+            try
+            {
+                /* Step2: construct the orderInfo object */
+                OrderInfo OrderInfoToCreateOrUpdate = null;
+
+                if (OrderId == 0)
+                {
+                    OrderInfoToCreateOrUpdate = new OrderInfo();
+
+                    OrderInfoToCreateOrUpdate.CreatedBy = CreatedOrUpdatedBy;
+                    OrderInfoToCreateOrUpdate.CreatedOn = DateTime.Now;
+
+                    OrderInfoToCreateOrUpdate.UserId = CreatedOrUpdatedBy;
+                }
+                else
+                {
+                    OrderInfoToCreateOrUpdate = db.OrderInfo.Find(OrderId);
+                    OrderInfoToCreateOrUpdate.UpdatedBy = CreatedOrUpdatedBy;
+
+                    if (OrderInfoToCreateOrUpdate.StatusReferenceItemId != StatusReferenceId)
+                    {
+                        var orderInfoStatusLog = new OrderInfoStatusLog();
+
+                        orderInfoStatusLog.OrderInfoId = OrderInfoToCreateOrUpdate.Id;
+                        orderInfoStatusLog.OldStatusId = OrderInfoToCreateOrUpdate.StatusReferenceItemId;
+                        orderInfoStatusLog.NewStatusId = StatusReferenceId;
+                        orderInfoStatusLog.UserId = CreatedOrUpdatedBy;
+                        orderInfoStatusLog.ActionTime = DateTime.Now;
+
+                        db.OrderInfoStatusLog.Add(orderInfoStatusLog);
+                    }
+                }
+
+                OrderInfoToCreateOrUpdate.FacturationAdressId = FacturationAddressId ;
+                OrderInfoToCreateOrUpdate.ShippingAdressId = ShippingAddressId;
+
+                //TODO: Order.TotalPrice
+                OrderInfoToCreateOrUpdate.StatusReferenceItemId = StatusReferenceId;
+
+
+                if (OrderId > 0)
+                {
+                    db.Update(OrderInfoToCreateOrUpdate);
+
+                    await db.SaveChangesAsync();
+                }
+                else
+                {
+                    await db.AddAsync(OrderInfoToCreateOrUpdate);
+                    await db.SaveChangesAsync();
+
+                    var orderInfoStatusLog = new OrderInfoStatusLog();
+
+                    orderInfoStatusLog.OrderInfoId = OrderInfoToCreateOrUpdate.Id;
+
+                    orderInfoStatusLog.NewStatusId = StatusReferenceId;
+                    orderInfoStatusLog.UserId = CreatedOrUpdatedBy;
+                    orderInfoStatusLog.ActionTime = DateTime.Now;
+
+                    db.OrderInfoStatusLog.Add(orderInfoStatusLog);
+
+                    await db.SaveChangesAsync();
+                 
+                }
+   
+
+                /* Step 1: remove all the product in order */
+                var PreviousOrderProducts = await db.OrderProduct.Where(p => p.OrderId == OrderInfoToCreateOrUpdate.Id).ToListAsync();
+                db.RemoveRange(PreviousOrderProducts);
+
+                List<OrderProduct> products = new List<OrderProduct>();
+                /* Step 2: Add product in order */
+                if (References.Count() > 0)
+                {
+                    foreach (var item in References)
+                    {
+                        var reference = new OrderProduct();
+                        reference.ReferenceId = item.ReferenceId;
+                        reference.Quantity = item.Quantity;
+                        reference.OrderId = OrderInfoToCreateOrUpdate.Id;
+
+
+                        products.Add(reference);
+                    }
+                }
+
+
+                await db.AddRangeAsync(products);
+                await db.SaveChangesAsync();
+
+                // Return new orderId
+                return OrderInfoToCreateOrUpdate.Id;
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+
+         
+        }
+
         public async Task<List<OrderListViewModelMobile>> GetOrdersListByUserId(int UserId,string Lang)
         {
             var result = await (from o in db.OrderInfo
@@ -101,11 +206,11 @@ namespace JLSDataAccess.Repositories
         }
 
 
-        public async Task<OrderDetailViewModelMobile> GetOrdersListByOrderId(long OrderId, string Lang)
+        public async Task<dynamic> GetOrdersListByOrderId(long OrderId, string Lang)
         {
             var result = await (from o in db.OrderInfo
                                 where o.Id == OrderId
-                                select new OrderDetailViewModelMobile()
+                                select new 
                                 {
                                    OrderInfo = new OrderInfo { 
                                         Id = o.Id,
@@ -136,45 +241,56 @@ namespace JLSDataAccess.Repositories
                                                  select new { 
                                                      Id = statusInfo.Id,
                                                      OldStatus = (from rlOld in db.ReferenceLabel
+                                                                  join riOld in db.ReferenceItem on rlOld.ReferenceItemId equals riOld.Id
                                                                   where rlOld.ReferenceItemId == statusInfo.OldStatusId && rlOld.Lang == Lang
                                                                   select new { 
                                                                         ReferenceId = rlOld.ReferenceItemId,
+                                                                        Code = riOld.Code,
                                                                         Label = rlOld.Label
                                                                   }).FirstOrDefault(),
                                                     NewStatus = (from rlNew in db.ReferenceLabel
-                                                                 where rlNew.ReferenceItemId == statusInfo.OldStatusId && rlNew.Lang == Lang
+                                                                 join riNew in db.ReferenceItem on rlNew.ReferenceItemId equals riNew.Id
+                                                                 where rlNew.ReferenceItemId == statusInfo.NewStatusId && rlNew.Lang == Lang
                                                                  select new
                                                                  {
                                                                      ReferenceId = rlNew.ReferenceItemId,
+                                                                     Code = riNew.Code,
                                                                      Label = rlNew.Label
                                                                  }).FirstOrDefault(),
-                                                    ActionTime = statusInfo.ActionTime
+                                                    ActionTime = statusInfo.ActionTime,
+
+                                                    UserId = statusInfo.UserId,
+                                                    UserName = (from u in db.Users
+                                                            where u.Id == statusInfo.UserId
+                                                            select u.UserName).FirstOrDefault()
                                                  }).ToList(),
                                    FacturationAdress = db.Adress.Where(p=>p.Id == o.FacturationAdressId).FirstOrDefault(),
                                    ShippingAdress = db.Adress.Where(p=>p.Id == o.ShippingAdressId).FirstOrDefault(),
                                    ProductList = (from op in db.OrderProduct
                                                   join p in db.Product on op.ReferenceId equals p.ReferenceItemId
-                                                  where op.OrderId == o.Id
-                                                  select new ProductDetailViewModelMobile()
+                                                  join riProduct in db.ReferenceItem on p.ReferenceItemId equals riProduct.Id
+                                                  join rc in db.ReferenceCategory on riProduct.ReferenceCategoryId equals rc.Id
+                                                  join rl in db.ReferenceLabel on riProduct.Id equals rl.ReferenceItemId
+                                                  where op.OrderId == o.Id && rc.ShortLabel == "Product" && riProduct.Validity == true && rl.Lang == Lang 
+                                                  select new 
                                                   {
-                                                      Id = p.Id,
+                                                      Quantity = op.Quantity,
+                                                      ProductId = p.Id,
+                                                      ReferenceId = riProduct.Id,
+                                                      Code = riProduct.Code,
+                                                      ParentId = riProduct.ParentId,
+                                                      Value = riProduct.Value,
+                                                      Order = riProduct.Order,
+                                                      Label = rl.Label,
                                                       Price = p.Price,
                                                       QuantityPerBox = p.QuantityPerBox,
                                                       MinQuantity = p.MinQuantity,
-                                                      Quantity = op.Quantity,
-                                                      PhotoPaths = db.ProductPhotoPath.Where(x=>x.ProductId == p.Id).ToList(),
-                                                      Reference = (from ri in db.ReferenceItem
-                                                                   join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
-                                                                   where ri.Id == p.ReferenceItemId && rl.Lang== Lang
-                                                                   select new ReferenceItemViewModel() { 
-                                                                   Id = ri.Id,
-                                                                   Code = ri.Code,
-                                                                   ParentId = ri.ParentId,
-                                                                   ReferenceCategoryId = ri.ReferenceCategoryId,
-                                                                   Label = rl.Label,
-                                                                   Validity = ri.Validity
-                                                                   }).FirstOrDefault()
-
+                                                      DefaultPhotoPath = (from path in db.ProductPhotoPath
+                                                                          where path.ProductId == p.Id
+                                                                          select path.Path).FirstOrDefault(),
+                                                      PhotoPath = (from path in db.ProductPhotoPath
+                                                                   where path.ProductId == p.Id
+                                                                   select new ProductListPhotoPath() { Path = path.Path }).ToList()
                                                   }).ToList()
                                 }).FirstOrDefaultAsync();
             return result;

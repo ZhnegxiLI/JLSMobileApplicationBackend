@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using JLSDataAccess.Interfaces;
+using JLSDataModel.Models.Adress;
+using JLSDataModel.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,10 +19,13 @@ namespace JLSMobileApplication.Controllers.AdminService
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
-        public OrderController(IOrderRepository orderRepository, IMapper mapper)
+        private readonly IAdressRepository _adressRepository;
+
+        public OrderController(IOrderRepository orderRepository, IMapper mapper, IAdressRepository adressRepository)
         {
             this._orderRepository = orderRepository;
             _mapper = mapper;
+            _adressRepository = adressRepository;
         }
 
         public class AdvancedOrderSearchCriteria
@@ -60,6 +65,48 @@ namespace JLSMobileApplication.Controllers.AdminService
                 throw e;
             }
         }
+
+
+        public class SaveAdminOrderCriteria
+        {
+            public Adress ShippingAddress { get; set; }
+
+            public Adress FacturationAddress { get; set; }
+
+            public List<OrderProductViewModelMobile> References { get; set; }
+
+            public long OrderId { get; set; }
+
+            public int CreatedOrUpdatedBy { get; set; }
+
+            public long StatusReferenceId { get; set; }
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> SaveAdminOrder(SaveAdminOrderCriteria criteria)
+        {
+            try
+            {
+
+                /* Step1 : save shipping address */
+                var ShippingAddressId = await _adressRepository.CreateOrUpdateAdress(criteria.ShippingAddress);
+
+                /* Step2 : save facturation address */
+                var FacturationAddressId = await _adressRepository.CreateOrUpdateAdress(criteria.FacturationAddress);
+
+                /* Step 3: save order info */
+
+
+                var result = await _orderRepository.SaveAdminOrder(criteria.OrderId, criteria.References, ShippingAddressId, FacturationAddressId, criteria.CreatedOrUpdatedBy, criteria.StatusReferenceId);
+
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+        
 
     }
 }

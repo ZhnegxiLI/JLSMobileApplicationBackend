@@ -142,19 +142,28 @@ namespace JLSConsoleApplication.Controllers.AdminService
 
         public class SaveReferenceItemCriteria
         {
-            public long ReferenceId { get; set; }
+            public long Id { get; set; }
             public long CategoryId { get; set; }
             public string Code { get; set; }
             public long? ParentId { get; set; }
             public bool Validity { get; set; }
             public string Value { get; set; }
+            public string LabelFR { get; set; }
+            public string LabelCN { get; set; }
+            public string LabelEN { get; set; }
         }
         [HttpPost]
         public async Task<JsonResult> SaveReferenceItem([FromBody]SaveReferenceItemCriteria criteria)
         {
             try
             {
-                var result = await _referenceRepository.SaveReferenceItem(criteria.ReferenceId,criteria.CategoryId,criteria.Code,criteria.ParentId,criteria.Validity,criteria.Value);
+                var result = await _referenceRepository.SaveReferenceItem(criteria.Id, criteria.CategoryId,criteria.Code,criteria.ParentId,criteria.Validity,criteria.Value);
+
+                long ReferenceLabelFrId = await _referenceRepository.SaveReferenceLabel(result, criteria.LabelFR, "fr");
+                long ReferenceLabelEnId = await _referenceRepository.SaveReferenceLabel(result, criteria.LabelEN, "en");
+                long ReferenceLabelCnId = await _referenceRepository.SaveReferenceLabel(result, criteria.LabelCN, "cn");
+           
+
                 return Json(result);
             }
             catch (Exception e)

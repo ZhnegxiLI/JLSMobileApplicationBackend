@@ -27,6 +27,7 @@ namespace JLSDataAccess.Repositories
         /*
          * Mobile Zoom
          */
+         // todo adapt mobile and admin
         public async Task<List<ProductListData>> GetProductInfoByReferenceIds(List<long> ReferenceIds, string Lang)
         {
             var result = (from ri in db.ReferenceItem
@@ -46,6 +47,9 @@ namespace JLSDataAccess.Repositories
                                 Price = product.Price,
                                 QuantityPerBox = product.QuantityPerBox,
                                 MinQuantity = product.MinQuantity,
+                                DefaultPhotoPath = (from path in db.ProductPhotoPath
+                                                                       where path.ProductId == product.Id
+                                                                       select path.Path).FirstOrDefault(),
                                 PhotoPath = (from path in db.ProductPhotoPath
                                             where path.ProductId == product.Id
                                             select new ProductListPhotoPath() { Path = path.Path }).ToList()
@@ -407,7 +411,7 @@ namespace JLSDataAccess.Repositories
                                                    }).ToList(),
                                     ImagesPath = (from path in db.ProductPhotoPath
                                                   where path.ProductId == p.Id
-                                                  select path.Path).ToList(),
+                                                  select new { path.Id , path.Path }).ToList(),
 
                                     Color = p.Color,
                              
@@ -457,16 +461,16 @@ namespace JLSDataAccess.Repositories
         }
 
 
-        public async Task<int> RemoveImageById(long id)
+        public async Task<int> RemoveImageById(long Id)
         {
-            ProductPhotoPath image = await db.ProductPhotoPath.FindAsync(id);
+            ProductPhotoPath image = await db.ProductPhotoPath.FindAsync(Id);
 
             if (image == null)
             {
                 return 0;
             }
 
-            string imagePath = "images/" + image.Path;
+            string imagePath = "images/" + image.Path; // todo place into the configuration
 
             try
             {

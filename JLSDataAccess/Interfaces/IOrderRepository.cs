@@ -13,12 +13,14 @@ namespace JLSDataAccess.Interfaces
 
         Task<List<OrderListViewModelMobile>> GetOrdersListByUserId(int UserId, string Lang);
 
-        Task<OrderDetailViewModelMobile> GetOrdersListByOrderId(long OrderId, string Lang);
+        Task<dynamic> GetOrdersListByOrderId(long OrderId, string Lang);
 
 
         Task<List<dynamic>> AdvancedOrderSearchByCriteria(string Lang, int? UserId, DateTime? FromDate, DateTime? ToDate, long? OrderId, long? StatusId);
 
         Task<List<OrdersListViewModel>> GetAllOrdersWithInterval(string lang, int intervalCount, int size, string orderActive, string orderDirection);
         Task<OrderViewModel> GetOrderById(long id, string lang);
+
+        Task<long> SaveAdminOrder(long OrderId, List<OrderProductViewModelMobile> References, long ShippingAddressId, long FacturationAddressId, int CreatedOrUpdatedBy, long StatusReferenceId);
     }
 }

@@ -35,6 +35,8 @@ namespace JLSDataModel.ViewModels
         public int? QuantityPerBox { get; set; }
         public int? MinQuantity { get; set; }
 
+        public string DefaultPhotoPath { get; set; }
+
         public List<ProductListPhotoPath> PhotoPath { get; set; }
     }
 }

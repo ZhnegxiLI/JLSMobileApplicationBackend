@@ -94,33 +94,29 @@ namespace JLSDataAccess.Repositories
 
         public async Task<long> SaveReferenceLabel(long ReferenceId, string Label , string Lang)
         {  // TODO Add createdBy / createdOn / UpdatedBy
-            ReferenceLabel ReferenceLabelToUpdateOrCreate = null;
-            if (ReferenceId == 0)
+
+            var ReferenceLabelToUpdateOrCreate = db.ReferenceLabel.Where(p => p.ReferenceItemId == ReferenceId && p.Lang == Lang).FirstOrDefault();
+
+            if (ReferenceLabelToUpdateOrCreate == null)
             {
                 ReferenceLabelToUpdateOrCreate = new ReferenceLabel();
-                ReferenceLabelToUpdateOrCreate.Id = ReferenceId;
+                ReferenceLabelToUpdateOrCreate.ReferenceItemId = ReferenceId;
+            }
+
+            ReferenceLabelToUpdateOrCreate.Label = Label;
+            ReferenceLabelToUpdateOrCreate.Lang = Lang;
+
+            if (ReferenceId == 0)
+            {
+                await db.ReferenceLabel.AddAsync(ReferenceLabelToUpdateOrCreate);
             }
             else
             {
-                ReferenceLabelToUpdateOrCreate = db.ReferenceLabel.Where(p => p.ReferenceItemId == ReferenceId && p.Lang == Lang).FirstOrDefault();
+                db.ReferenceLabel.Update(ReferenceLabelToUpdateOrCreate);
             }
-            if (ReferenceLabelToUpdateOrCreate != null)
-            {
-                ReferenceLabelToUpdateOrCreate.Label = Label;
-                ReferenceLabelToUpdateOrCreate.Lang = Lang;
+            await db.SaveChangesAsync();
+            return ReferenceLabelToUpdateOrCreate.Id;
 
-                if (ReferenceId == 0)
-                {
-                    await db.ReferenceLabel.AddAsync(ReferenceLabelToUpdateOrCreate);
-                }
-                else
-                {
-                    db.ReferenceLabel.Update(ReferenceLabelToUpdateOrCreate);
-                }
-                await db.SaveChangesAsync();
-                return ReferenceLabelToUpdateOrCreate.Id;
-            }
-            return 0;
         }
 
 
