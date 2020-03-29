@@ -37,7 +37,7 @@ namespace JLSDataAccess.Interfaces
          */
         Task<List<dynamic>> AdvancedProductSearchByCriteria(string ProductLabel, long MainCategoryReferenceId, List<long> SecondCategoryReferenceId, bool? Validity, string Lang);
 
-        Task<long> SaveProductInfo(long ProductId, long ReferenceId, int QuantityPerBox, int MinQuantity, float? Price, float? TaxRate, string Description);
+        Task<long> SaveProductInfo(long ProductId, long ReferenceId, int QuantityPerBox, int MinQuantity, float? Price, long? TaxRate, string Description, string Color, string Material, string Size);
 
         Task<ListViewModelWithCount<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection, string filter);
         Task<dynamic> GetProductById(long id);

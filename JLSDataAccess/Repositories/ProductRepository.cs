@@ -313,7 +313,7 @@ namespace JLSDataAccess.Repositories
 
 
 
-        public async Task<long> SaveProductInfo(long ProductId, long ReferenceId, int QuantityPerBox, int MinQuantity,float? Price, float? TaxRate, string Description)
+        public async Task<long> SaveProductInfo(long ProductId, long ReferenceId, int QuantityPerBox, int MinQuantity,float? Price, long? TaxRateId, string Description, string Color, string Material, string Size)
         {
             Product ProductToUpdateOrCreate = null;
             if (ProductId == 0)
@@ -330,8 +330,11 @@ namespace JLSDataAccess.Repositories
                 ProductToUpdateOrCreate.QuantityPerBox = QuantityPerBox;
                 ProductToUpdateOrCreate.MinQuantity = MinQuantity;
                 ProductToUpdateOrCreate.Price = Price;
-                ProductToUpdateOrCreate.TaxRate = TaxRate;
+                ProductToUpdateOrCreate.TaxRateId = TaxRateId;
                 ProductToUpdateOrCreate.Description = Description;
+                ProductToUpdateOrCreate.Color = Color;
+                ProductToUpdateOrCreate.Material = Material;
+                ProductToUpdateOrCreate.Size = Size;
 
                 if (ProductId == 0)
                 {
@@ -401,7 +404,10 @@ namespace JLSDataAccess.Repositories
                                     QuantityPerBox = p.QuantityPerBox,
                                     Description = p.Description,
                                     ReferenceId = ri.Id, 
-                                    TaxRate = ri.Value,
+                                    TaxRateId = p.TaxRateId,
+                                    TaxRate = (from riTaxRate in db.ReferenceItem
+                                               where riTaxRate.Id == p.TaxRateId
+                                               select riTaxRate).FirstOrDefault(),
                                     Translation = (from label in db.ReferenceLabel
                                                    where label.ReferenceItemId == ri.Id
                                                    select new { 

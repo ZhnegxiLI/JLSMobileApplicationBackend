@@ -136,10 +136,11 @@ namespace JLSMobileApplication
             services.AddScoped<IAdressRepository, AdressRepository>();
       
             services.AddScoped<TokenModel>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, JlsDbContext context)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, JlsDbContext context, UserManager<User> userManager)
         {
 
             if (env.IsDevelopment())
@@ -163,11 +164,14 @@ namespace JLSMobileApplication
                     ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={cachePeriod}");
                 }
             });
-            //app.UseErrorHandling();
+
+            Initialization.AddAdminUser(userManager, context);
+
+            app.UseErrorHandling();
 
             app.UseAuthentication();
 
-           app.UseStaticFiles();
+            app.UseStaticFiles();
 
             app.UseMvc(routes =>
             {
