@@ -48,5 +48,7 @@ namespace JLSDataAccess.Interfaces
 
         Task<int> CreatorUpdateCategory(ReferenceCategory category);
 
+        Task<bool> CheckReferenceCodeExists(string Code);
+
     }
 }

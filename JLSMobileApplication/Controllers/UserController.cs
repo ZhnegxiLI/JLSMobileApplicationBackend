@@ -23,6 +23,12 @@ namespace JLSMobileApplication.Controllers
             _userRepository = user;
         }
 
+        [HttpGet]
+        public async Task<bool> CheckUserIsAlreadyExistAsync(string Username)
+        {
+            return await _userRepository.CheckUserIsAlreadyExist(Username);
+        }
+
 
 
 

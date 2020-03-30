@@ -140,6 +140,21 @@ namespace JLSConsoleApplication.Controllers.AdminService
             }
         }
 
+
+        [HttpGet]
+        public async Task<bool> CheckReferenceCodeExists(string Code)
+        {
+            try
+            {
+                var result = await _referenceRepository.CheckReferenceCodeExists(Code);
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         public class SaveReferenceItemCriteria
         {
             public int? CreatedOrUpdatedBy { get; set; }

@@ -268,6 +268,13 @@ namespace JLSDataAccess.Repositories
         }
 
 
+        public async Task<bool> CheckReferenceCodeExists(string Code)
+        {
+            var result = await db.ReferenceItem.Where(p => p.Code == Code).FirstOrDefaultAsync();
+
+            return result!=null ? true : false;
+        }
+
 
         public Task<ListViewModelWithCount<ReferenceItemViewModel>> GetReferenceItemWithInterval(int intervalCount, int size, string orderActive, string orderDirection, string filter)
         {

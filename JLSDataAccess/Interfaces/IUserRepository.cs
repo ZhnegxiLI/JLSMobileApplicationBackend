@@ -9,6 +9,9 @@ namespace JLSDataAccess.Interfaces
 {
     public interface IUserRepository
     {
+
+        Task<bool> CheckUserIsAlreadyExist(string Username);
+
         Task<Adress> GetUserFacturationAdress(int userId);
 
         Task<List<Adress>> GetUserShippingAdress(int userId);

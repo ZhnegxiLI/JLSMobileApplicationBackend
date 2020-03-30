@@ -152,6 +152,11 @@ namespace JLSDataAccess.Repositories
             return UserToCreateOrUpdate.Id;
         }
 
+        public async Task<bool> CheckUserIsAlreadyExist(string Username)
+        {
+            var result = await db.Users.Where(p => p.UserName == Username).FirstOrDefaultAsync();
+            return result!=null?true:false ;
+        }
 
     }
 }
