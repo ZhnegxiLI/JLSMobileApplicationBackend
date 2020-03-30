@@ -181,14 +181,14 @@ namespace JLSDataAccess.Repositories
         public async Task<List<dynamic>> GetAllReferenceItemWithChildren(string Lang)
         {
             var result = await (from ri in db.ReferenceItem
-                                join rip in db.ReferenceItem on ri.ParentId equals rip.Id
-                                join rlp in db.ReferenceLabel on rip.Id equals rlp.ReferenceItemId
-                                where rlp.Lang == Lang
+                                join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
+                                join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                                where rl.Lang == Lang && rc.ShortLabel != "Product" // todo place all into an  configuration table
                                 select new {
-                                    Id = rip.Id,
-                                    Code = rip.Code,
-                                    Label = rlp.Label,
-                                    CategoryId = rip.ReferenceCategoryId
+                                    Id = ri.Id,
+                                    Code = ri.Code,
+                                    Label = rl.Label,
+                                    CategoryId = ri.ReferenceCategoryId
                                 }).Distinct().ToListAsync<dynamic>();
             return result;
         }
