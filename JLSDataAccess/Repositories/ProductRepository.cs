@@ -313,7 +313,7 @@ namespace JLSDataAccess.Repositories
 
 
 
-        public async Task<long> SaveProductInfo(long ProductId, long ReferenceId, int QuantityPerBox, int MinQuantity,float? Price, long? TaxRateId, string Description, string Color, string Material, string Size,int? CreatedOrUpdatedBy)
+        public async Task<long> SaveProductInfo(long ProductId, long ReferenceId, int? QuantityPerBox, int? MinQuantity,float? Price, long? TaxRateId, string Description, string Color, string Material, string Size,int? CreatedOrUpdatedBy)
         {
             Product ProductToUpdateOrCreate = null;
             if (ProductId == 0)

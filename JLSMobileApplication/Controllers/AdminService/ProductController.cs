@@ -126,9 +126,9 @@ namespace JLSMobileApplication.Controllers.AdminService
 
             public long ReferenceId { get; set; }
 
-            public int QuantityPerBox { get; set; }
+            public int? QuantityPerBox { get; set; }
 
-            public int MinQuantity { get; set; }
+            public int? MinQuantity { get; set; }
 
             public float? Price { get; set; }
 
