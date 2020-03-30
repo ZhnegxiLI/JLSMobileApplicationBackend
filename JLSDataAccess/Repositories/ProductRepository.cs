@@ -313,17 +313,20 @@ namespace JLSDataAccess.Repositories
 
 
 
-        public async Task<long> SaveProductInfo(long ProductId, long ReferenceId, int QuantityPerBox, int MinQuantity,float? Price, long? TaxRateId, string Description, string Color, string Material, string Size)
+        public async Task<long> SaveProductInfo(long ProductId, long ReferenceId, int QuantityPerBox, int MinQuantity,float? Price, long? TaxRateId, string Description, string Color, string Material, string Size,int? CreatedOrUpdatedBy)
         {
             Product ProductToUpdateOrCreate = null;
             if (ProductId == 0)
             {
                 ProductToUpdateOrCreate = new Product();
                 ProductToUpdateOrCreate.ReferenceItemId = ReferenceId;
+                ProductToUpdateOrCreate.CreatedBy = CreatedOrUpdatedBy;
+                ProductToUpdateOrCreate.CreatedOn = DateTime.Now;
             }
             else
             {
                 ProductToUpdateOrCreate = db.Product.Where(p => p.Id == ProductId).FirstOrDefault();
+                ProductToUpdateOrCreate.UpdatedBy = CreatedOrUpdatedBy;
             }
             if (ProductToUpdateOrCreate!=null)
             {

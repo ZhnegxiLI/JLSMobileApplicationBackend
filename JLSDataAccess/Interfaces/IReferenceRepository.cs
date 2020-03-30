@@ -27,7 +27,7 @@ namespace JLSDataAccess.Interfaces
 
         Task<List<dynamic>> AdvancedSearchReferenceItem(string SearchText, long? ReferenceCategoryId, bool? Validity, long? ParentId, string Lang, bool? IgnoreProduct);
 
-        Task<long> SaveReferenceItem(long ReferenceId, long CategoryId, string Code, long? ParentId, bool Validity, string Value);
+        Task<long> SaveReferenceItem(long ReferenceId, long CategoryId, string Code, long? ParentId, bool Validity, string Value, int? CreatedOrUpdatedBy);
 
         Task<long> SaveReferenceLabel(long ReferenceId, string Label, string Lang);
         /*

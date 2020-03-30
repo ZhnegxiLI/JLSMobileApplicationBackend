@@ -89,9 +89,27 @@ namespace JLSMobileApplication.Controllers.AdminService
             {
 
                 /* Step1 : save shipping address */
+                if (criteria.ShippingAddress!=null && criteria.ShippingAddress.Id==0)
+                {
+                    criteria.ShippingAddress.CreatedBy = criteria.CreatedOrUpdatedBy;
+                    criteria.ShippingAddress.CreatedOn = DateTime.Now;
+                }
+                else
+                {
+                    criteria.ShippingAddress.UpdatedBy = criteria.CreatedOrUpdatedBy;
+                }
                 var ShippingAddressId = await _adressRepository.CreateOrUpdateAdress(criteria.ShippingAddress);
 
                 /* Step2 : save facturation address */
+                if (criteria.FacturationAddress != null && criteria.FacturationAddress.Id == 0)
+                {
+                    criteria.FacturationAddress.CreatedBy = criteria.CreatedOrUpdatedBy;
+                    criteria.FacturationAddress.CreatedOn = DateTime.Now;
+                }
+                else
+                {
+                    criteria.FacturationAddress.UpdatedBy = criteria.CreatedOrUpdatedBy;
+                }
                 var FacturationAddressId = await _adressRepository.CreateOrUpdateAdress(criteria.FacturationAddress);
 
                 /* Step 3: save order info */

@@ -106,6 +106,7 @@ namespace JLSMobileApplication.Controllers.AdminService
 
         public class CreateOrUpdateUserCriteria
         {
+            public int? CreatedOrUpdatedBy { get; set; }
             public int UserId { get; set; }
             public string Email { get; set; }
 

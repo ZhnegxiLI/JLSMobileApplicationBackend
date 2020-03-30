@@ -142,6 +142,7 @@ namespace JLSConsoleApplication.Controllers.AdminService
 
         public class SaveReferenceItemCriteria
         {
+            public int? CreatedOrUpdatedBy { get; set; }
             public long Id { get; set; }
             public long CategoryId { get; set; }
             public string Code { get; set; }
@@ -157,7 +158,7 @@ namespace JLSConsoleApplication.Controllers.AdminService
         {
             try
             {
-                var result = await _referenceRepository.SaveReferenceItem(criteria.Id, criteria.CategoryId,criteria.Code,criteria.ParentId,criteria.Validity,criteria.Value);
+                var result = await _referenceRepository.SaveReferenceItem(criteria.Id, criteria.CategoryId,criteria.Code,criteria.ParentId,criteria.Validity,criteria.Value, criteria.CreatedOrUpdatedBy);
 
                 long ReferenceLabelFrId = await _referenceRepository.SaveReferenceLabel(result, criteria.LabelFR, "fr");
                 long ReferenceLabelEnId = await _referenceRepository.SaveReferenceLabel(result, criteria.LabelEN, "en");

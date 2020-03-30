@@ -59,16 +59,19 @@ namespace JLSDataAccess.Repositories
             return await result.ToListAsync<dynamic>();
         }
 
-        public async Task<long> SaveReferenceItem(long ReferenceId, long CategoryId, string Code ,long? ParentId, bool Validity, string Value)
+        public async Task<long> SaveReferenceItem(long ReferenceId, long CategoryId, string Code ,long? ParentId, bool Validity, string Value, int? CreatedOrUpdatedBy)
         {  // TODO Add createdBy / createdOn / UpdatedBy
             ReferenceItem ReferenceToUpdateOrCreate = null;
             if (ReferenceId == 0)
             {
                 ReferenceToUpdateOrCreate = new ReferenceItem();
+                ReferenceToUpdateOrCreate.CreatedBy = CreatedOrUpdatedBy;
+                ReferenceToUpdateOrCreate.CreatedOn = DateTime.Now;
             }
             else
             {
                 ReferenceToUpdateOrCreate = db.ReferenceItem.Where(p => p.Id == ReferenceId).FirstOrDefault();
+                ReferenceToUpdateOrCreate.UpdatedBy = CreatedOrUpdatedBy;
             }
             if (ReferenceToUpdateOrCreate != null)
             {
