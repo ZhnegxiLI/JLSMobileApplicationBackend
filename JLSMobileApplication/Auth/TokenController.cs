@@ -251,7 +251,7 @@ namespace JLSMobileApplication.Auth
             catch (Exception ex)
             {
 
-                return new BadRequestResult();
+                return new UnauthorizedResult();// BadRequestResult();
             }
         }
     }

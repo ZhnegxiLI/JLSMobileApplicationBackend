@@ -4,14 +4,16 @@ using JLSDataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace JLSDataAccess.Migrations
 {
     [DbContext(typeof(JlsDbContext))]
-    partial class JlsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200331210720_addOrderType")]
+    partial class addOrderType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,35 +145,6 @@ namespace JLSDataAccess.Migrations
                     b.ToTable("DeletedRecords");
                 });
 
-            modelBuilder.Entity("JLSDataModel.Models.CustomerInfo", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long?>("CreatedBy");
-
-                    b.Property<DateTime?>("CreatedOn");
-
-                    b.Property<string>("Email");
-
-                    b.Property<string>("EntrepriseName");
-
-                    b.Property<string>("PhoneNumber");
-
-                    b.Property<string>("Siret");
-
-                    b.Property<long?>("UpdatedBy");
-
-                    b.Property<DateTime?>("UpdatedOn");
-
-                    b.Property<int?>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CustomerInfo");
-                });
-
             modelBuilder.Entity("JLSDataModel.Models.Message.Message", b =>
                 {
                     b.Property<long>("Id")
@@ -231,8 +204,6 @@ namespace JLSDataAccess.Migrations
                     b.Property<long?>("CreatedBy");
 
                     b.Property<DateTime?>("CreatedOn");
-
-                    b.Property<long>("CustomerId");
 
                     b.Property<long>("FacturationAdressId");
 

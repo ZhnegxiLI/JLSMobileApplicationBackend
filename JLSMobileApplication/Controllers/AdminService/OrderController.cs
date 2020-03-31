@@ -39,7 +39,7 @@ namespace JLSMobileApplication.Controllers.AdminService
 
             public long? StatusId { get; set; }
             
-            public long? OrderId { get; set; }
+            public string OrderId { get; set; }
 
             public int begin { get; set; }
 

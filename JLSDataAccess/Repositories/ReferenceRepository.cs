@@ -137,7 +137,7 @@ namespace JLSDataAccess.Repositories
                                 from rl in db.ReferenceLabel.Where(p => p.ReferenceItemId == ri.Id).DefaultIfEmpty()
                                 join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
                                 where (rl==null || rl.Lang == Lang) &&
-                                (SearchText == "" || ri.Code == SearchText || rl.Label == SearchText) &&
+                                (SearchText == "" || ri.Code.Contains(SearchText) || rl.Label.Contains(SearchText)) &&
                                 (ReferenceCategoryId == null || ri.ReferenceCategoryId == ReferenceCategoryId) &&
                                 (Validity == null || ri.Validity == Validity) &&
                                 (ParentId == null || ri.ParentId == ParentId ) && 

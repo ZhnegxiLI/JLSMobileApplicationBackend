@@ -95,10 +95,5 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
-
-
-
-
-
     }
 }

@@ -283,7 +283,7 @@ namespace JLSDataAccess.Repositories
                                 join riSecond in db.ReferenceItem on ri.ParentId equals riSecond.Id
                                 join riMain in db.ReferenceItem on riSecond.ParentId equals riMain.Id
         
-                                where (ProductLabel == "" || rl.Label.Contains(ProductLabel)) 
+                                where (ProductLabel == "" || rl.Label.Contains(ProductLabel) || ri.Code.Contains(ProductLabel)) 
                                 && (MainCategoryReferenceId==0 || riMain.Id == MainCategoryReferenceId)
                                 && (SecondCategoryReferenceId.Count()== 0 || SecondCategoryReferenceId.Contains(riSecond.Id))
                                 && (Validity == null ||ri.Validity == Validity)

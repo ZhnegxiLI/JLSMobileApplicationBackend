@@ -224,8 +224,20 @@ namespace JLSDataAccess.Repositories
                                         AdminRemark = o.AdminRemark,
                                         PaymentInfo = o.PaymentInfo,
                                         CreatedOn = o.CreatedOn,
-                                        UpdatedOn = o.UpdatedOn
+                                        UpdatedOn = o.UpdatedOn,
+                                        OrderTypeId = o.OrderTypeId
                                    },
+                                   CustomerInfo = (from customer in db.CustomerInfo
+                                                   where customer.Id == o.CustomerId
+                                                   select customer).FirstOrDefault(),
+                                   OrderType = (from riOrderType in db.ReferenceItem
+                                                join rlOrderType in db.ReferenceLabel on riOrderType.Id equals rlOrderType.ReferenceItemId
+                                                where rlOrderType.Lang == Lang && riOrderType.Id == o.OrderTypeId
+                                                select new { 
+                                                    Id = riOrderType.Id,
+                                                    Code = riOrderType.Code,
+                                                    Label = rlOrderType.Label
+                                                }).FirstOrDefault(),
                                    Status = (from ri in db.ReferenceItem
                                              join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
                                              where rl.Lang == Lang && ri.Id == o.StatusReferenceItemId
@@ -301,13 +313,13 @@ namespace JLSDataAccess.Repositories
          * Admin Zoom 
          */
 
-        public async Task<List<dynamic>> AdvancedOrderSearchByCriteria(string Lang, int? UserId, DateTime? FromDate, DateTime? ToDate, long? OrderId, long? StatusId)
+        public async Task<List<dynamic>> AdvancedOrderSearchByCriteria(string Lang, int? UserId, DateTime? FromDate, DateTime? ToDate, string OrderId, long? StatusId)
         {
             var result = await (from order in db.OrderInfo
                           from statusRi in db.ReferenceItem.Where(p => p.Id == order.StatusReferenceItemId).DefaultIfEmpty()
-                          where (StatusId == null || statusRi.Id == StatusId)
+                            where (StatusId == null || statusRi.Id == StatusId)
                           && (UserId == null || order.UserId == UserId)
-                          && (OrderId == null || order.Id == OrderId)
+                          && (OrderId == null || order.Id.ToString().Contains(OrderId))
                           && (FromDate == null || order.CreatedOn >= FromDate)
                           && (ToDate == null || order.CreatedOn <= ToDate)
                           orderby order.CreatedOn descending
@@ -334,6 +346,15 @@ namespace JLSDataAccess.Repositories
                             CreatedOn = order.CreatedOn,
                             UpdatedOn = order.UpdatedOn,
                             TotalPrice = order.TotalPrice,
+                            OrderType = (from orderTypeRi in db.ReferenceItem
+                                         join orderTypeRl in db.ReferenceLabel on orderTypeRi.Id equals orderTypeRl.ReferenceItemId
+                                         where orderTypeRi.Id == order.OrderTypeId && orderTypeRl.Lang == Lang
+                                         select new {
+                                            Id = orderTypeRi.Id,
+                                            Code = orderTypeRi.Code,
+                                            Label = orderTypeRl.Label
+                                         }).FirstOrDefault(),
+
                             UpdatedUser = (from uu in db.Users
                                            where uu.Id == order.UpdatedBy
                                            select uu).FirstOrDefault()
