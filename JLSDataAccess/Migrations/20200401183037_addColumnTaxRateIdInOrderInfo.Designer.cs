@@ -4,14 +4,16 @@ using JLSDataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace JLSDataAccess.Migrations
 {
     [DbContext(typeof(JlsDbContext))]
-    partial class JlsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200401183037_addColumnTaxRateIdInOrderInfo")]
+    partial class addColumnTaxRateIdInOrderInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -224,9 +226,9 @@ namespace JLSDataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long?>("AdminRemarkId");
+                    b.Property<string>("AdminRemark");
 
-                    b.Property<long?>("ClientRemarkId");
+                    b.Property<string>("ClientRemark");
 
                     b.Property<long?>("CreatedBy");
 
@@ -241,8 +243,6 @@ namespace JLSDataAccess.Migrations
                     b.Property<long>("OrderTypeId");
 
                     b.Property<string>("PaymentInfo");
-
-                    b.Property<long?>("ShipmentInfoId");
 
                     b.Property<long>("ShippingAdressId");
 
@@ -360,56 +360,6 @@ namespace JLSDataAccess.Migrations
                     b.HasIndex("ReferenceId");
 
                     b.ToTable("OrderProduct");
-                });
-
-            modelBuilder.Entity("JLSDataModel.Models.Order.Remark", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long?>("CreatedBy");
-
-                    b.Property<DateTime?>("CreatedOn");
-
-                    b.Property<string>("Text");
-
-                    b.Property<long?>("UpdatedBy");
-
-                    b.Property<DateTime?>("UpdatedOn");
-
-                    b.Property<int?>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Remark");
-                });
-
-            modelBuilder.Entity("JLSDataModel.Models.Order.ShipmentInfo", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long?>("CreatedBy");
-
-                    b.Property<DateTime?>("CreatedOn");
-
-                    b.Property<DateTime?>("Date");
-
-                    b.Property<float?>("Fee");
-
-                    b.Property<string>("ShipmentNumber");
-
-                    b.Property<long?>("UpdatedBy");
-
-                    b.Property<DateTime?>("UpdatedOn");
-
-                    b.Property<string>("Weight");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ShipmentInfo");
                 });
 
             modelBuilder.Entity("JLSDataModel.Models.Product.DiscountActivity", b =>

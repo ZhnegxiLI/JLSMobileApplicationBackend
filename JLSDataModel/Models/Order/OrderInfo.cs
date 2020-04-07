@@ -10,17 +10,19 @@ namespace JLSDataModel.Models.Order
 
         public string PaymentInfo { get; set; }
 
-        public string ClientRemark { get; set; }
+        public long? ClientRemarkId { get; set; }
 
-        public string AdminRemark { get; set; }
+        public long? AdminRemarkId { get; set; }
 
         public float? TotalPrice { get; set; }
 
-        public float? TaxRate { get; set; }
+        public long? TaxRateId { get; set; }
 
         public long OrderTypeId { get; set; }
 
         public long CustomerId { get; set; }
+
+        public long? ShipmentInfoId { get; set; }
         // Foreign key 
         public int UserId { get; set; }
         public User.User User { get; set; }

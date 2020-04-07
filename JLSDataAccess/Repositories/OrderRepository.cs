@@ -9,6 +9,7 @@ using JLSDataModel.ViewModels;
 using JLSDataModel.Models.Order;
 using System.Linq.Expressions;
 using JLSDataModel.Models.Adress;
+using JLSDataModel.Models;
 
 namespace JLSDataAccess.Repositories
 {
@@ -77,64 +78,66 @@ namespace JLSDataAccess.Repositories
         }
 
 
-        public async Task<long> SaveAdminOrder(long OrderId,List<OrderProductViewModelMobile> References, long ShippingAddressId, long FacturationAddressId, int CreatedOrUpdatedBy, long StatusReferenceId)
+        public async Task<long> SaveAdminOrder(OrderInfo order,List<OrderProductViewModelMobile> References,  int CreatedOrUpdatedBy)
         {
             try
             {
-                /* Step2: construct the orderInfo object */
-                OrderInfo OrderInfoToCreateOrUpdate = null;
-
-                if (OrderId == 0)
+                OrderInfo orderToUpdate = null;
+                if (order.Id == 0)
                 {
-                    OrderInfoToCreateOrUpdate = new OrderInfo();
+                    orderToUpdate = new OrderInfo();
 
-                    OrderInfoToCreateOrUpdate.CreatedBy = CreatedOrUpdatedBy;
-                    OrderInfoToCreateOrUpdate.CreatedOn = DateTime.Now;
+                    orderToUpdate.CreatedBy = CreatedOrUpdatedBy;
+                    orderToUpdate.CreatedOn = DateTime.Now;
 
-                    OrderInfoToCreateOrUpdate.UserId = CreatedOrUpdatedBy;
+                    orderToUpdate.UserId = CreatedOrUpdatedBy;
                 }
                 else
                 {
-                    OrderInfoToCreateOrUpdate = db.OrderInfo.Find(OrderId);
-                    OrderInfoToCreateOrUpdate.UpdatedBy = CreatedOrUpdatedBy;
+                    orderToUpdate = await db.OrderInfo.AsNoTracking().Where(x => x.Id == order.Id).FirstOrDefaultAsync();
+                    var oldOrder = await db.OrderInfo.FindAsync(order.Id);
+                    orderToUpdate.UpdatedBy = CreatedOrUpdatedBy;
 
-                    if (OrderInfoToCreateOrUpdate.StatusReferenceItemId != StatusReferenceId)
+                    if (oldOrder.StatusReferenceItemId != order.StatusReferenceItemId)
                     {
                         var orderInfoStatusLog = new OrderInfoStatusLog();
 
-                        orderInfoStatusLog.OrderInfoId = OrderInfoToCreateOrUpdate.Id;
-                        orderInfoStatusLog.OldStatusId = OrderInfoToCreateOrUpdate.StatusReferenceItemId;
-                        orderInfoStatusLog.NewStatusId = StatusReferenceId;
+                        orderInfoStatusLog.OrderInfoId = order.Id;
+                        orderInfoStatusLog.OldStatusId = oldOrder.StatusReferenceItemId;
+                        orderInfoStatusLog.NewStatusId = order.StatusReferenceItemId;
                         orderInfoStatusLog.UserId = CreatedOrUpdatedBy;
                         orderInfoStatusLog.ActionTime = DateTime.Now;
 
                         db.OrderInfoStatusLog.Add(orderInfoStatusLog);
+                        await db.SaveChangesAsync();
                     }
                 }
 
-                OrderInfoToCreateOrUpdate.FacturationAdressId = FacturationAddressId ;
-                OrderInfoToCreateOrUpdate.ShippingAdressId = ShippingAddressId;
+                orderToUpdate.AdminRemarkId = order.AdminRemarkId;
+                orderToUpdate.ClientRemarkId = order.ClientRemarkId;
+                orderToUpdate.FacturationAdressId = order.FacturationAdressId;
+                orderToUpdate.ShipmentInfoId = order.ShipmentInfoId;
+                orderToUpdate.StatusReferenceItemId = order.StatusReferenceItemId;
+                orderToUpdate.TaxRateId = order.TaxRateId;
+                orderToUpdate.CustomerId = order.CustomerId;
+                orderToUpdate.UserId = order.UserId;
 
-                //TODO: Order.TotalPrice
-                OrderInfoToCreateOrUpdate.StatusReferenceItemId = StatusReferenceId;
-
-
-                if (OrderId > 0)
+                if (order.Id > 0)
                 {
-                    db.Update(OrderInfoToCreateOrUpdate);
+                    db.Update(order);
 
                     await db.SaveChangesAsync();
                 }
                 else
                 {
-                    await db.AddAsync(OrderInfoToCreateOrUpdate);
+                    await db.OrderInfo.AddAsync(order);
                     await db.SaveChangesAsync();
 
                     var orderInfoStatusLog = new OrderInfoStatusLog();
 
-                    orderInfoStatusLog.OrderInfoId = OrderInfoToCreateOrUpdate.Id;
+                    orderInfoStatusLog.OrderInfoId = order.Id;
 
-                    orderInfoStatusLog.NewStatusId = StatusReferenceId;
+                    orderInfoStatusLog.NewStatusId = order.StatusReferenceItemId;
                     orderInfoStatusLog.UserId = CreatedOrUpdatedBy;
                     orderInfoStatusLog.ActionTime = DateTime.Now;
 
@@ -146,9 +149,10 @@ namespace JLSDataAccess.Repositories
    
 
                 /* Step 1: remove all the product in order */
-                var PreviousOrderProducts = await db.OrderProduct.Where(p => p.OrderId == OrderInfoToCreateOrUpdate.Id).ToListAsync();
+                var PreviousOrderProducts = await db.OrderProduct.Where(p => p.OrderId == order.Id).ToListAsync();
                 db.RemoveRange(PreviousOrderProducts);
 
+                float TotalPrice = 0;
                 List<OrderProduct> products = new List<OrderProduct>();
                 /* Step 2: Add product in order */
                 if (References.Count() > 0)
@@ -158,23 +162,29 @@ namespace JLSDataAccess.Repositories
                         var reference = new OrderProduct();
                         reference.ReferenceId = item.ReferenceId;
                         reference.Quantity = item.Quantity;
-                        reference.OrderId = OrderInfoToCreateOrUpdate.Id;
-
-
+                        reference.UnitPrice = item.Price;
+                        reference.OrderId = order.Id;
+                      
+                        TotalPrice = TotalPrice + (item.Price.Value * item.Quantity);
+                        
                         products.Add(reference);
                     }
                 }
 
 
                 await db.AddRangeAsync(products);
+
+                order.TotalPrice = TotalPrice;
+
+                db.Update(order);
+
                 await db.SaveChangesAsync();
 
                 // Return new orderId
-                return OrderInfoToCreateOrUpdate.Id;
+                return order.Id;
             }
             catch (Exception e)
             {
-
                 throw e;
             }
 
@@ -218,15 +228,33 @@ namespace JLSDataAccess.Repositories
                                         User = (from u in db.Users
                                                 where u.Id == o.UserId
                                                 select u).FirstOrDefault(),
-                                        TaxRate = o.TaxRate,
+                                        TaxRateId = o.TaxRateId,
                                         TotalPrice = o.TotalPrice,
-                                        ClientRemark = o.ClientRemark,
-                                        AdminRemark = o.AdminRemark,
+                                        ClientRemarkId = o.ClientRemarkId,
+                                        AdminRemarkId = o.AdminRemarkId,
                                         PaymentInfo = o.PaymentInfo,
                                         CreatedOn = o.CreatedOn,
                                         UpdatedOn = o.UpdatedOn,
-                                        OrderTypeId = o.OrderTypeId
+                                        OrderTypeId = o.OrderTypeId,
+                                       ShipmentInfoId = o.ShipmentInfoId
                                    },
+                                   ClientRemark = ( from clientRemark in db.Remark
+                                                    where clientRemark.Id == o.ClientRemarkId
+                                                    select clientRemark).FirstOrDefault(),
+                                   AdminRemark = (from adminRemark in db.Remark
+                                                   where adminRemark.Id == o.AdminRemarkId
+                                                   select adminRemark).FirstOrDefault(),
+                                   ShipmentInfo = (from shipmentInfo in db.ShipmentInfo
+                                                   where shipmentInfo.Id == o.ShipmentInfoId
+                                                   select shipmentInfo).FirstOrDefault(),
+                                   TaxRate = (from taxRateRi in db.ReferenceItem
+                                              where taxRateRi.Id == o.TaxRateId 
+                                              select new {
+                                                Id = taxRateRi.Id,
+                                                Code = taxRateRi.Code,
+                                                Value = taxRateRi.Value
+                                              }).FirstOrDefault(),
+
                                    CustomerInfo = (from customer in db.CustomerInfo
                                                    where customer.Id == o.CustomerId
                                                    select customer).FirstOrDefault(),
@@ -294,7 +322,7 @@ namespace JLSDataAccess.Repositories
                                                       Value = riProduct.Value,
                                                       Order = riProduct.Order,
                                                       Label = rl.Label,
-                                                      Price = p.Price,
+                                                      Price = op.UnitPrice,
                                                       QuantityPerBox = p.QuantityPerBox,
                                                       MinQuantity = p.MinQuantity,
                                                       DefaultPhotoPath = (from path in db.ProductPhotoPath
@@ -360,6 +388,61 @@ namespace JLSDataAccess.Repositories
                                            select uu).FirstOrDefault()
                           }).ToListAsync<dynamic>();
             return result;
+        }
+
+        public async Task<long> SaveOrderRemark(Remark remark, int? CreatedOrUpadatedBy)
+        {
+            if (remark.Id != 0)
+            {
+                remark.UpdatedBy = CreatedOrUpadatedBy;
+                db.Remark.Update(remark);
+            }
+            else
+            {
+                remark.CreatedBy = CreatedOrUpadatedBy;
+                remark.CreatedOn = DateTime.Now;
+                await db.Remark.AddAsync(remark);
+            }
+            await db.SaveChangesAsync();
+            return remark.Id;
+        }
+
+        public async Task<long> SaveCustomerInfo(CustomerInfo customer, int? CreatedOrUpadatedBy)
+        {
+            if (customer.Id != 0)
+            {
+                customer.UpdatedBy = CreatedOrUpadatedBy;
+                db.CustomerInfo.Update(customer);
+            }
+            else
+            {
+                customer.CreatedBy = CreatedOrUpadatedBy;
+                customer.CreatedOn = DateTime.Now;
+                await db.CustomerInfo.AddAsync(customer);
+            }
+            await db.SaveChangesAsync();
+            return customer.Id;
+        }
+
+        public async Task<long> SaveOrderShipmentInfo(ShipmentInfo shipment, int? CreatedOrUpadatedBy)
+        {
+            if (shipment.Id != 0)
+            {
+                shipment.UpdatedBy = CreatedOrUpadatedBy;
+
+                db.ShipmentInfo.Update(shipment);
+            }
+            else
+            {
+                shipment.CreatedBy = CreatedOrUpadatedBy;
+                shipment.CreatedOn = DateTime.Now;
+
+                await db.ShipmentInfo.AddAsync(shipment);
+            }
+
+            await db.SaveChangesAsync();
+
+            return shipment.Id;
         }
 
         public async Task<List<OrdersListViewModel>> GetAllOrdersWithInterval(string lang, int intervalCount, int size, string orderActive, string orderDirection)
@@ -445,10 +528,10 @@ namespace JLSDataAccess.Repositories
                                 {
                                     OrderReferenceCode = order.OrderReferenceCode,
                                     PaymentInfo = order.PaymentInfo,
-                                    TaxRate = order.TaxRate,
+                                   // TaxRateId = order.TaxRateId,
                                     TotalPrice = order.TotalPrice,
-                                    AdminRemark = order.AdminRemark,
-                                    ClientRemark = order.ClientRemark,
+                                   // AdminRemarkId = order.AdminRemarkId,
+                                  //  ClientRemark = order.ClientRemarkId,
                                     StatusLabel = rls.Label,
                                     StatusReferenceItem = ris,
                                     User = new UserViewModel

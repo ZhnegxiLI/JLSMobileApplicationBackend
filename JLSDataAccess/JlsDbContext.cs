@@ -60,5 +60,8 @@ namespace JLSDataAccess
         public virtual DbSet<Message> Message { get; set; }
 
         public virtual DbSet<MessageDestination> MessageDestination { get; set; }
+        public virtual DbSet<Remark> Remark { get; set; }
+        public virtual DbSet<ShipmentInfo> ShipmentInfo { get; set; }
+        
     }
 }

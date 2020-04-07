@@ -43,6 +43,7 @@ namespace JLSDataAccess.Repositories
             var result =  (from ri in db.ReferenceItem
                            join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
                            where shortLabels.Contains(rc.ShortLabel)
+                           orderby ri.Order
                            select new 
                           {
                               Id = ri.Id,
