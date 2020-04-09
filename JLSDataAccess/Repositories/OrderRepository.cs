@@ -44,7 +44,7 @@ namespace JLSDataAccess.Repositories
             adressToShipping.City = adress.City;
             adressToShipping.Provence = adress.Provence;
 
-            adressToShipping.Country = adress.Country;
+            adressToShipping.CountryId = adress.CountryId;
             adressToShipping.EntrepriseName = adress.EntrepriseName;
             await db.AddAsync(adressToShipping);
             await db.SaveChangesAsync();

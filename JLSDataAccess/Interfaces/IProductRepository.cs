@@ -18,7 +18,7 @@ namespace JLSDataAccess.Interfaces
 
         Task<List<ProductListData>> GetProductInfoByReferenceIds(List<long> ReferenceIds, string Lang);
 
-        Task<ProductListViewModel> GetProductListBySalesPerformance(string Lang, int begin, int step);
+        Task<dynamic> GetProductListBySalesPerformance(string Lang, int begin, int step);
 
         Task<dynamic> GetProductPhotoPathById(long ProductId);
 

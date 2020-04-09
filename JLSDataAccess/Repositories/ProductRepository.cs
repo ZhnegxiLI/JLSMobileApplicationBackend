@@ -76,9 +76,9 @@ namespace JLSDataAccess.Repositories
                                     Price = product.Price,
                                     QuantityPerBox = product.QuantityPerBox,
                                     MinQuantity = product.MinQuantity,
-                                    PhotoPath = (from path in db.ProductPhotoPath
+                                    DefaultPhotoPath = (from path in db.ProductPhotoPath
                                                     where path.ProductId == product.Id
-                                                    select new ProductListPhotoPath() { Path = path.Path }).ToList()
+                                                    select path.Path).FirstOrDefault()
                                 });
             var totalCount = result.Count();
             var productList = await result.Skip(begin * step).Take(step).ToListAsync();
@@ -112,9 +112,9 @@ namespace JLSDataAccess.Repositories
                               Price = product.Price,
                               QuantityPerBox = product.QuantityPerBox,
                               MinQuantity = product.MinQuantity,
-                              PhotoPath = (from path in db.ProductPhotoPath
+                              DefaultPhotoPath = (from path in db.ProductPhotoPath
                                            where path.ProductId == product.Id
-                                           select new ProductListPhotoPath() { Path = path.Path }).ToList()
+                                           select path.Path).FirstOrDefault()
                           });
             var totalCount = result.Count();
             var productList = await result.Skip(begin * step).Take(step).ToListAsync();
@@ -126,7 +126,7 @@ namespace JLSDataAccess.Repositories
         }
 
         // By sales performance // todo: by every month
-        public async Task<ProductListViewModel> GetProductListBySalesPerformance(string Lang, int begin, int step)
+        public async Task<dynamic> GetProductListBySalesPerformance(string Lang, int begin, int step)
         {
             var result = (from ri in db.ReferenceItem
                           join riSecond in db.ReferenceItem on ri.ParentId equals riSecond.Id
@@ -139,7 +139,7 @@ namespace JLSDataAccess.Repositories
                           && riSecond.Validity == true && riMain.Validity == true
                           group op by new { ri.Id, productId = product.Id, ri.ParentId, ri.Code, ri.Value, rl.Label, product.Price, product.QuantityPerBox, product.MinQuantity } into g
                           orderby g.Sum(x => x.Quantity) descending
-                          select new ProductListData()
+                          select new
                           {
                               ReferenceId = g.Key.Id,
                               ProductId = g.Key.productId,
@@ -149,13 +149,30 @@ namespace JLSDataAccess.Repositories
                               Label = g.Key.Label,
                               Price = g.Key.Price,
                               QuantityPerBox = g.Key.QuantityPerBox,
-                              MinQuantity = g.Key.MinQuantity,
+                              MinQuantity = g.Key.MinQuantity
                           });
             var totalCount = result.Count();
             var productList = await result.Skip(begin * step).Take(step).ToListAsync();
-            return new ProductListViewModel()
+
+            var result1 = (from r in productList
+                           select new
+                           {
+                               ReferenceId = r.ReferenceId,
+                               ProductId = r.ProductId,
+                               Code = r.Code,
+                               ParentId = r.ParentId,
+                               Value = r.Value,
+                               Label = r.Label,
+                               Price = r.Price,
+                               QuantityPerBox = r.QuantityPerBox,
+                               MinQuantity = r.MinQuantity,
+                               DefaultPhotoPath = (from pp in db.ProductPhotoPath
+                                                   where pp.ProductId == r.ProductId
+                                                   select pp.Path).FirstOrDefault()
+                           }).ToList();
+            return new
             {
-                ProductListData = productList,
+                ProductListData = result1,
                 TotalCount = totalCount
             };
         }
@@ -164,11 +181,12 @@ namespace JLSDataAccess.Repositories
         public async Task<List<ProductCategoryViewModel>> GetProductMainCategory(string Lang)
         {
             var result = await (from ri in db.ReferenceItem
-                          join rip in db.ReferenceItem on ri.ParentId equals rip.Id
+                          join riSecond in db.ReferenceItem on ri.ParentId equals riSecond.Id
+                          join rip in db.ReferenceItem on riSecond.ParentId equals rip.Id
                           join rlp in db.ReferenceLabel on rip.Id equals rlp.ReferenceItemId
                           join rcp in db.ReferenceCategory on rip.ReferenceCategoryId equals rcp.Id
-                          where rcp.ShortLabel == "MainCategory" && rlp.Lang == Lang && rip.Validity == true
-                          group rip by new { rip.Id,rip.Code, rlp.Label} into g
+                          where rcp.ShortLabel == "MainCategory" && rlp.Lang == Lang && rip.Validity == true && ri.Validity == true && riSecond.Validity == true
+                                group rip by new { rip.Id,rip.Code, rlp.Label} into g
                           select new ProductCategoryViewModel()
                           {
                               TotalCount = g.Count(),
