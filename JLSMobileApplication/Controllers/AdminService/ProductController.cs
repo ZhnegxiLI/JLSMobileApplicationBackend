@@ -258,7 +258,7 @@ namespace JLSMobileApplication.Controllers.AdminService
         {
             try
             {
-               var data = await _productRepository.GetProductById(Id);
+               var data = await _productRepository.GetProductById(Id,"");
                 return Json(data);
             }
             catch (Exception e)

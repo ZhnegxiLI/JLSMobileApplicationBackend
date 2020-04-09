@@ -149,6 +149,22 @@ namespace JLSMobileApplication.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<JsonResult> GetProductById(long ProductId, string Lang)
+        {
+            try
+            {
+                var data = await _productRepository.GetProductById(ProductId, Lang);
+                return Json(data);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+
+
 
         /******************************** ZOOM Service with authentification *******************************/
         [Authorize]

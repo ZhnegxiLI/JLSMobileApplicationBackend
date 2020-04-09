@@ -279,7 +279,6 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-
         /* TODO: change */
         public async Task<List<dynamic>> SearchProductByLabel(string Label, string Lang, int begin, int step)
         {
@@ -406,7 +405,7 @@ namespace JLSDataAccess.Repositories
         }
 
 
-        public async Task<dynamic> GetProductById(long Id)
+        public async Task<dynamic> GetProductById(long Id, string Lang)
         {
             var result = await (from ri in db.ReferenceItem
                                 join p in db.Product on ri.Id equals p.ReferenceItemId
@@ -415,7 +414,7 @@ namespace JLSDataAccess.Repositories
                                 {
                                     ProductId = p.Id,
                                     MainCategoryId =  (from riMain in db.ReferenceItem
-                                                       join riSecond in db.ReferenceItem on                                riMain.Id equals riSecond.ParentId
+                                                       join riSecond in db.ReferenceItem on riMain.Id equals riSecond.ParentId
                                                        where riSecond.Id == ri.ParentId
                                                        select riMain.Id).FirstOrDefault(),
                                     SecondCategoryId = ri.ParentId,
@@ -426,6 +425,9 @@ namespace JLSDataAccess.Repositories
                                     Description = p.Description,
                                     ReferenceId = ri.Id, 
                                     TaxRateId = p.TaxRateId,
+                                    Label = (from rl in db.ReferenceLabel
+                                             where rl.ReferenceItemId == ri.Id && rl.Lang == Lang
+                                             select rl.Label).FirstOrDefault(),
                                     TaxRate = (from riTaxRate in db.ReferenceItem
                                                where riTaxRate.Id == p.TaxRateId
                                                select riTaxRate).FirstOrDefault(),
@@ -439,9 +441,10 @@ namespace JLSDataAccess.Repositories
                                     ImagesPath = (from path in db.ProductPhotoPath
                                                   where path.ProductId == p.Id
                                                   select new { path.Id , path.Path }).ToList(),
-
+                                    Comments = ( from c in db.ProductComment
+                                                where c.ProductId == p.Id
+                                                select c).ToList(),
                                     Color = p.Color,
-                             
                                     Material = p.Material,
                                     Size = p.Size,
                                     Validity = ri.Validity
