@@ -13,7 +13,7 @@ namespace JLSDataAccess.Interfaces
     {
         Task<long> SaveOrder(List<OrderProductViewModelMobile> References, Adress adress, long FacturationAdressId, int UserId);
 
-        Task<List<OrderListViewModelMobile>> GetOrdersListByUserId(int UserId, string Lang);
+        Task<List<OrderListViewModelMobile>> GetOrdersListByUserId(int UserId, string StatusCode, string Lang);
 
         Task<dynamic> GetOrdersListByOrderId(long OrderId, string Lang);
 

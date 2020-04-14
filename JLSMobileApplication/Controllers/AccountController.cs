@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using JLSDataAccess;
+using JLSDataAccess.Interfaces;
+using JLSDataModel.Models;
 using JLSDataModel.Models.Adress;
 using JLSDataModel.Models.User;
 using JLSMobileApplication.Resources;
@@ -20,23 +22,35 @@ namespace JLSMobileApplication.Controllers
         private readonly UserManager<User> _userManager;
         private JlsDbContext db;
         private readonly IEmailService _emailService;
+        private readonly IAdressRepository _adressRepository;
         private readonly IMapper _mapper;
 
-        public AccountController(UserManager<User> userManager, JlsDbContext dbContext, IMapper mapper, IEmailService emailService)
+        public AccountController(UserManager<User> userManager, JlsDbContext dbContext, IMapper mapper, IEmailService emailService, IAdressRepository adressRepository)
         {
             _mapper = mapper;
             _userManager = userManager;
             db = dbContext;
             _emailService = emailService;
+            _adressRepository = adressRepository;
         }
-        /// <summary>
-        /// 注册controller
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
+    
+
+        public class RegistreCriteria
+        {
+            public string Email { get; set; }
+
+            public string Password { get; set; }
+            public string EntrepriseName { get; set; }
+            public string Siret { get; set; }
+            public string PhoneNumber { get; set; }
+            public Adress FacturationAdress { get; set; }
+
+            public Adress ShipmentAdress { get; set; }
+        }
+
         [AllowAnonymous]
         [HttpPost("[action]")]
-        public async Task<IActionResult> Register([FromBody] UserRegistrationView model)
+        public async Task<IActionResult> Register([FromBody] RegistreCriteria model)
         {
             if (!ModelState.IsValid)
             {
@@ -45,14 +59,18 @@ namespace JLSMobileApplication.Controllers
             try
             {
                 // Step 1: 建立新地址
-                var adress = _mapper.Map<Adress>(model);
-                await db.AddAsync(adress);
-                await db.SaveChangesAsync();
+                var shippingAddressId = await _adressRepository.CreateOrUpdateAdress(model.ShipmentAdress);
+                var facturationAddressId = await _adressRepository.CreateOrUpdateAdress(model.FacturationAdress);
 
                 // Step2: 整理用户信息(以邮箱作用户名)
-                var userIdentity = _mapper.Map<User>(model);// 将UserRegistrationView 映射到User(转化为User(type:User))
-                userIdentity.UserName = userIdentity.Email;
-                userIdentity.FacturationAdressId = adress.Id;
+                var userIdentity = new User();// 将UserRegistrationView 映射到User(转化为User(type:User))
+                userIdentity.UserName = model.Email;
+                userIdentity.FacturationAdressId = facturationAddressId;
+                userIdentity.PhoneNumber = model.PhoneNumber;
+                userIdentity.Email = model.Email;
+                userIdentity.EntrepriseName = model.EntrepriseName;
+                userIdentity.Siret = model.Siret;
+
                 var result = await _userManager.CreateAsync(userIdentity, model.Password);
                 
                 // Step3: 检查注册是否成功 
@@ -68,11 +86,15 @@ namespace JLSMobileApplication.Controllers
                         Success = false
                     });
                 }
+
+                // Step2bis : 添加发货地址与用户的关系
+                await _adressRepository.CreateUserShippingAdress(shippingAddressId, userIdentity.Id);
+                    
+
                 // Step3: 加入用户权限
                 var result1 = await _userManager.AddToRoleAsync(userIdentity, "Client");
                 if (!result1.Succeeded)
                 {
-                    
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
@@ -84,17 +106,6 @@ namespace JLSMobileApplication.Controllers
                     });
                 }
 
-                // Step5: 检查是否将发货地址与发票地址设置为同一地址 
-                if (model.UseSameAddress == true)
-                {
-                    var userShippingAdress = new UserShippingAdress();
-                    userShippingAdress.ShippingAdressId = adress.Id;
-                    userShippingAdress.UserId = userIdentity.Id;
-
-                    await db.AddAsync(userShippingAdress);
-                    await db.SaveChangesAsync();
-                }
-
                 // Step6: 发送确认邮件
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(userIdentity);
                 var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = userIdentity.Id, code = code }, HttpContext.Request.Scheme);
@@ -104,7 +115,7 @@ namespace JLSMobileApplication.Controllers
 
                 return Json(new ApiResult()
                 {
-                    DataExt = body,
+                    DataExt = userIdentity.Email,
                     Data= r,
                     Msg = "OK",
                     Success = true
@@ -194,15 +205,19 @@ namespace JLSMobileApplication.Controllers
 
         [HttpGet("[action]")]
         [AllowAnonymous]
-        public async Task<IActionResult> SendPasswordResetLink(string username)
+        public async Task<JsonResult> SendPasswordResetLink(string username)
         {
             User user = _userManager.FindByNameAsync(username).Result;
 
             if (user == null || !(_userManager.
                   IsEmailConfirmedAsync(user).Result))
             {
-                ViewBag.Message = "Error while  resetting your password!";
-                return View("Error");
+                return Json(new ApiResult()
+                {
+                    Data = "Account is not exists or not yet confirm",
+                    Msg = "OK",
+                    Success = false
+                });
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -210,8 +225,17 @@ namespace JLSMobileApplication.Controllers
             var resetLink = Url.Action("ResetPassword",
                 "Account", new { token = token },HttpContext.Request.Scheme);
 
-   
-            return new OkObjectResult(resetLink);
+            string body = "Click this link to reset the password:" + resetLink;
+            //Email service 
+            var r = _emailService.SendEmail(username, "Confirmation votre compte", body);
+
+
+            return Json(new ApiResult()
+            {
+                Data = username,
+                Msg = "OK",
+                Success = true
+            });
         }
 
     }

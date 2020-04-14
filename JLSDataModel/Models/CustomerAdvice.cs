@@ -6,6 +6,8 @@ namespace JLSDataModel.Models
 {
     public class CustomerAdvice:BaseObject
     {
+
+        public long? OrderId { get; set; }
         public string Title { get; set; }
 
         public string Body { get; set; }

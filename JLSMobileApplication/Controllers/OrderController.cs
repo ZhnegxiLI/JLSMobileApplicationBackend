@@ -59,14 +59,14 @@ namespace JLSMobileApplication.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetOrdersListByUserId(int UserId, string Lang)
+        public async Task<JsonResult> GetOrdersListByUserId(int UserId, string StatusCode, string Lang)
         {
             try
             {
                
                 return Json(new ApiResult()
                 {
-                    Data = await _orderRepository.GetOrdersListByUserId(UserId,  Lang),
+                    Data = await _orderRepository.GetOrdersListByUserId(UserId, StatusCode, Lang),
                     Msg = "OK",
                     Success = true
                 });

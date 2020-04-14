@@ -134,7 +134,8 @@ namespace JLSMobileApplication
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IReferenceRepository, ReferenceRepository>();
             services.AddScoped<IAdressRepository, AdressRepository>();
-      
+            services.AddScoped<IMessageRepository, MessageRepository>();
+
             services.AddScoped<TokenModel>();
 
         }

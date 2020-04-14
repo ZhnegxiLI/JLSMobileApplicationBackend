@@ -191,27 +191,28 @@ namespace JLSDataAccess.Repositories
          
         }
 
-        public async Task<List<OrderListViewModelMobile>> GetOrdersListByUserId(int UserId,string Lang)
+        public async Task<List<OrderListViewModelMobile>> GetOrdersListByUserId(int UserId, string StatusCode, string Lang)
         {
             var result = await (from o in db.OrderInfo
-                          where o.UserId == UserId
-                          orderby o.CreatedOn descending
-                          select new OrderListViewModelMobile()
-                          {
-                              Id = o.Id,
-                              CreatedOn = o.CreatedOn,
-                              TotalPrice = o.TotalPrice,
-                              ShippingAdressId = o.ShippingAdressId,
-                              ShippingAdress = (from a in db.Adress
-                                                where a.Id == o.ShippingAdressId
-                                                select a).FirstOrDefault(),
-                              StatusCode = (from ri in db.ReferenceItem
-                                        where ri.Id == o.StatusReferenceItemId
-                                        select ri.Code).FirstOrDefault(),
-                              StatusLabel = (from rl in db.ReferenceLabel
-                                            where rl.ReferenceItemId == o.StatusReferenceItemId && rl.Lang == Lang
-                                             select rl.Label).FirstOrDefault(),
-                          }).ToListAsync();
+                                join riStatus in db.ReferenceItem on o.StatusReferenceItemId equals riStatus.Id
+                                where o.UserId == UserId && (StatusCode == "All" || riStatus.Code == StatusCode)
+                                orderby o.CreatedOn descending
+                                select new OrderListViewModelMobile()
+                                {
+                                    Id = o.Id,
+                                    CreatedOn = o.CreatedOn,
+                                    TotalPrice = o.TotalPrice,
+                                    ShippingAdressId = o.ShippingAdressId,
+                                    ShippingAdress = (from a in db.Adress
+                                                    where a.Id == o.ShippingAdressId
+                                                    select a).FirstOrDefault(),
+                                    StatusCode = (from ri in db.ReferenceItem
+                                            where ri.Id == o.StatusReferenceItemId
+                                            select ri.Code).FirstOrDefault(),
+                                    StatusLabel = (from rl in db.ReferenceLabel
+                                                where rl.ReferenceItemId == o.StatusReferenceItemId && rl.Lang == Lang
+                                                    select rl.Label).FirstOrDefault(),
+                                }).ToListAsync();
             return result;
         }
 
@@ -325,6 +326,9 @@ namespace JLSDataAccess.Repositories
                                                       Price = op.UnitPrice,
                                                       QuantityPerBox = p.QuantityPerBox,
                                                       MinQuantity = p.MinQuantity,
+                                                      Size = p.Size,
+                                                      Color = p.Color,
+                                                      Material = p.Material,
                                                       DefaultPhotoPath = (from path in db.ProductPhotoPath
                                                                           where path.ProductId == p.Id
                                                                           select path.Path).FirstOrDefault(),
