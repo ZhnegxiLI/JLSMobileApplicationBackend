@@ -148,6 +148,29 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
+        public class GetProductInfoByReferenceIdsCriteria
+        {
+            public GetProductInfoByReferenceIdsCriteria()
+            {
+                this.ReferenceIds = new List<long>();
+            }
+            public List<long> ReferenceIds { get; set; }
+            public string Lang { get; set; }
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetProductInfoByReferenceIds([FromBody] GetProductInfoByReferenceIdsCriteria criteria)
+        {
+            try
+            {
+                return Json(await _productRepository.GetProductInfoByReferenceIds(criteria.ReferenceIds, criteria.Lang));
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+
 
         [HttpGet]
         public async Task<JsonResult> GetProductById(long ProductId, string Lang)

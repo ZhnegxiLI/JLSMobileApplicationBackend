@@ -95,7 +95,18 @@ namespace JLSDataAccess.Repositories
                                     Id = u.Id,
                                     RoleId = r.Id,
                                     Email = u.Email,
-                                    Validity = u.Validity
+                                    Validity = u.Validity,
+                                    EntrepriseName = u.EntrepriseName,
+                                    Siret = u.Siret,
+                                    PhoneNumber = u.PhoneNumber,
+                                    ShippingAdress = (from a in db.Adress
+                                                      join ua in db.UserShippingAdress on a.Id equals ua.ShippingAdressId
+                                                      where ua.UserId == UserId
+                                                      select a).ToList(),
+                                    FacturationAdress = (from a in db.Adress
+                                                         join u in db.Users on a.Id equals u.FacturationAdressId
+                                                         where u.Id == UserId
+                                                         select a).FirstOrDefault()
                                 }).FirstOrDefaultAsync();
             return result;
         }

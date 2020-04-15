@@ -11,7 +11,7 @@ namespace JLSDataAccess.Interfaces
 {
     public interface IOrderRepository
     {
-        Task<long> SaveOrder(List<OrderProductViewModelMobile> References, Adress adress, long FacturationAdressId, int UserId);
+        Task<long> SaveOrder(List<OrderProductViewModelMobile> References, long ShippingAdressId, long FacturationAdressId, int UserId, long? ClientRemarkId, long CutomerInfoId);
 
         Task<List<OrderListViewModelMobile>> GetOrdersListByUserId(int UserId, string StatusCode, string Lang);
 

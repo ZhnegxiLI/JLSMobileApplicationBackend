@@ -24,7 +24,7 @@ namespace JLSDataAccess.Repositories
         /*
          * Mobile Zoom 
          */
-        public async Task<long> SaveOrder(List<OrderProductViewModelMobile> References, Adress adress, long FacturationAdressId, int UserId)
+        public async Task<long> SaveOrder(List<OrderProductViewModelMobile> References, long ShippingAdressId, long FacturationAdressId, int UserId, long? ClientRemarkId, long CutomerInfoId)
         {
             /* Step1: get progressing status ri */
             var status = await (from ri in db.ReferenceItem
@@ -32,34 +32,51 @@ namespace JLSDataAccess.Repositories
                           where rc.ShortLabel == "OrderStatus" && ri.Code == "OrderStatus_Progressing"
                           select ri).FirstOrDefaultAsync();
 
-            /* Copy the shipping address from usershipping adress*/
-            Adress adressToShipping = new Adress();
-            adressToShipping.FirstLineAddress = adress.ContactTelephone;
-            adressToShipping.ContactFax = adress.ContactFax;
-            adressToShipping.ContactLastName = adress.ContactLastName;
-            adressToShipping.ContactFirstName = adress.ContactFirstName;
-            adressToShipping.ZipCode = adress.ZipCode;
-            adressToShipping.FirstLineAddress = adress.FirstLineAddress;
-            adressToShipping.SecondLineAddress = adress.SecondLineAddress;
-            adressToShipping.City = adress.City;
-            adressToShipping.Provence = adress.Provence;
+            var orderType = await (from ri in db.ReferenceItem
+                                join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                                where rc.ShortLabel == "OrderType" && ri.Code == "OrderType_External"
+                                   select ri).FirstOrDefaultAsync();
 
-            adressToShipping.CountryId = adress.CountryId;
-            adressToShipping.EntrepriseName = adress.EntrepriseName;
-            await db.AddAsync(adressToShipping);
-            await db.SaveChangesAsync();
 
-            // TODO :change
+            var TaxRate = await (from ri in db.ReferenceItem
+                                   join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                                   where rc.ShortLabel == "TaxRate" && ri.Validity == true
+                                   orderby ri.Order descending
+                                   select ri).FirstOrDefaultAsync();
+
             /* Step2: construct the orderInfo object */
             var Order = new OrderInfo();
             Order.FacturationAdressId = FacturationAdressId;
-            Order.ShippingAdressId = adressToShipping.Id;
+            Order.ShippingAdressId = ShippingAdressId;
             Order.UserId = UserId;
-            //TODO: Order.TotalPrice
             Order.StatusReferenceItemId = status.Id;
+            Order.OrderTypeId = orderType.Id;
+            Order.TaxRateId = TaxRate.Id;
+
+            Order.CreatedBy = UserId;
+            Order.CreatedOn = DateTime.Now;
+
+            Order.ClientRemarkId = ClientRemarkId;
+            Order.CustomerId = CutomerInfoId;
+
             await db.AddAsync(Order);
             await db.SaveChangesAsync();
 
+            /* Step3: add OrderInfoStatusLog*/
+
+            var orderInfoStatusLog = new OrderInfoStatusLog();
+
+            orderInfoStatusLog.OrderInfoId = Order.Id;
+
+            orderInfoStatusLog.NewStatusId = Order.StatusReferenceItemId;
+            orderInfoStatusLog.UserId = UserId;
+            orderInfoStatusLog.ActionTime = DateTime.Now;
+            db.OrderInfoStatusLog.Add(orderInfoStatusLog);
+
+            await db.SaveChangesAsync();
+
+            /* Step4: Add product */
+            float TotalPrice = 0;
             var OrderProducts = new List<OrderProduct>();
             foreach(var r in References)
             {
@@ -67,12 +84,18 @@ namespace JLSDataAccess.Repositories
                 {
                     OrderId = Order.Id,
                     Quantity = r.Quantity,
-                    ReferenceId = r.ReferenceId
+                    ReferenceId = r.ReferenceId,
+                    UnitPrice = r.Price
                 });
+                TotalPrice = (r.Quantity * r.Price.Value) + TotalPrice;
             }
             await db.AddRangeAsync(OrderProducts);
             await db.SaveChangesAsync();
 
+            Order.TotalPrice = TotalPrice;
+
+            db.Update(Order);
+            await db.SaveChangesAsync();
             // Return new orderId
             return Order.Id;
         }
@@ -239,6 +262,10 @@ namespace JLSDataAccess.Repositories
                                         OrderTypeId = o.OrderTypeId,
                                        ShipmentInfoId = o.ShipmentInfoId
                                    },
+                                   ShippingMessage = (from riShippingMessage in db.ReferenceItem
+                                                      join rlShippingMessage in db.ReferenceLabel on riShippingMessage.Id equals rlShippingMessage.ReferenceItemId
+                                                      where rlShippingMessage.Lang == Lang && riShippingMessage.Code == "ShippingMessage"
+                                                      select rlShippingMessage.Label).FirstOrDefault(),
                                    ClientRemark = ( from clientRemark in db.Remark
                                                     where clientRemark.Id == o.ClientRemarkId
                                                     select clientRemark).FirstOrDefault(),

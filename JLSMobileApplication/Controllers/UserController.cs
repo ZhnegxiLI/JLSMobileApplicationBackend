@@ -29,6 +29,20 @@ namespace JLSMobileApplication.Controllers
             return await _userRepository.CheckUserIsAlreadyExist(Username);
         }
 
+        [HttpGet]
+        public async Task<JsonResult> GetUserById(int UserId)
+        {
+            try
+            {
+                return Json(await _userRepository.GetUserById(UserId));
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
 
 
 
