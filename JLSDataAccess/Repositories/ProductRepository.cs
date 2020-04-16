@@ -88,7 +88,18 @@ namespace JLSDataAccess.Repositories
                 TotalCount = totalCount
             }; 
         }
+        public async Task<long> RemoveProductCommentById(long ProductCommentId)
+        {
+            var ProductComment = db.ProductComment.Find(ProductCommentId);
+            if (ProductComment!=null)
+            {
+                db.Remove(ProductComment);
+                await db.SaveChangesAsync();
 
+                return ProductComment.Id;
+            }
+            return 0;
+        }
         public async Task<ProductListViewModel> GetProductListByPublishDate(string Lang, int begin, int step)
         {
             var result = (from ri in db.ReferenceItem
@@ -248,12 +259,15 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-        public async Task<List<ProductCommentViewModel>> GetProductCommentListByProductId(long ProductId,string Lang)
+        public async Task<List<ProductCommentViewModel>> GetProductCommentListByCriteria(long? ProductId,long? UserId, string Lang)
         {
             var result = await (from pc in db.ProductComment
-                                where pc.ProductId == ProductId
+                                where (ProductId == null || pc.ProductId == ProductId) 
+                                && (UserId == null || pc.UserId == UserId )
                                 orderby pc.CreatedOn
                                 select new ProductCommentViewModel() {
+                                    CreatedOn = pc.CreatedOn,
+                                    UserId = pc.UserId,
                                     User= (from u in db.Users
                                            where u.Id == pc.UserId
                                            select u).FirstOrDefault(),
@@ -267,15 +281,6 @@ namespace JLSDataAccess.Repositories
                                              select rl.Label).FirstOrDefault()
 
                                 }).ToListAsync();
-            return result;
-        }
-        // Todo change
-        public async Task<List<ProductComment>> GetProductCommentListByUserId(int UserId, int begin, int step)
-        {
-            var result = await (from pc in db.ProductComment
-                                where pc.UserId == UserId
-                                orderby pc.CreatedOn
-                                select pc).Skip(begin * step).Take(step).ToListAsync();
             return result;
         }
 

@@ -132,11 +132,13 @@ namespace JLSMobileApplication.Controllers
                                                      Quantity = ri.Quantity,
                                                      ReferenceId = ri.ReferenceId
                                                  }).ToList();
+
                     return Json(new ApiResult()
                     {
                         Data = await _orderRepository.SaveOrder(FormatedReferenceList, shippingAddressId, criteria.FacturationAdressId, criteria.UserId, ClientRemarkId, CustomerId),
                         Msg = "OK",
-                        Success = true
+                        Success = true,
+                        DataExt = User.Email
                     });
                 }
                 else

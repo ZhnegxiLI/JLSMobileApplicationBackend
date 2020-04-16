@@ -42,9 +42,29 @@ namespace JLSMobileApplication.Controllers
                 throw e;
             }
         }
+        public class UpdateUserInfoCriteria
+        {
+            public int UserId { get; set; }
 
+            public string EntrepriseName { get; set; }
 
+            public string Siret { get; set; }
 
+            public string PhoneNumber { get; set; }
+        }
+        [HttpPost]
+        public async Task<JsonResult> UpdateUserInfo(UpdateUserInfoCriteria criteria)
+        {
+            try
+            {
+                var result = await _userRepository.UpdateUserInfo(criteria.UserId, criteria.EntrepriseName, criteria.Siret, criteria.PhoneNumber);
+                return Json(result);
+            }
+            catch (Exception e)
+            {
 
+                throw e;
+            }
+        }
     }
 }

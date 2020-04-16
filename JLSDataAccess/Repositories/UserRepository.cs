@@ -163,6 +163,23 @@ namespace JLSDataAccess.Repositories
             return UserToCreateOrUpdate.Id;
         }
 
+
+        public async Task<long> UpdateUserInfo(int UserId, string EntrepriseName, string Siret, string PhoneNumber)
+        {
+            var user = db.Users.Find(UserId);
+            if (user != null)
+            {
+                user.EntrepriseName = EntrepriseName;
+                user.Siret = Siret;
+                user.PhoneNumber = PhoneNumber;
+
+                db.Update(user);
+
+                await db.SaveChangesAsync();
+                return user.Id;
+            }
+            return 0;
+        }
         public async Task<bool> CheckUserIsAlreadyExist(string Username)
         {
             var result = await db.Users.Where(p => p.UserName == Username).FirstOrDefaultAsync();

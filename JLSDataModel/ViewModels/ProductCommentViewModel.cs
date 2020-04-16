@@ -16,7 +16,11 @@ namespace JLSDataModel.ViewModels
         }
         public ProductComment ProductComment { get; set; }
         public User User { get; set; }
-  
+
+        public DateTime? CreatedOn { get; set; }
+
+        public int? UserId { get; set; }
+
         public string Label { get; set; }
         public string PhotoPath { get; set; }
     }

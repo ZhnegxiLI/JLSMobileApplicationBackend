@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using JLSDataModel.ViewModels;
 
 namespace JLSMobileApplication.Controllers
 {
@@ -125,17 +126,26 @@ namespace JLSMobileApplication.Controllers
 
 
         [HttpGet]
-        public async Task<JsonResult> GetProductCommentListByProductId(long ProductId,int Begin, int Step,string Lang)
+        public async Task<JsonResult> GetProductCommentListByCriteria(long? ProductId, long? UserId,int Begin, int Step,string Lang)
         {
             try
             {
-                var productComments = await _productRepository.GetProductCommentListByProductId(ProductId, Lang);
-                
+                var productComments = await _productRepository.GetProductCommentListByCriteria(ProductId, UserId, Lang);
+
+                List<ProductCommentViewModel> list = new List<ProductCommentViewModel>();
+                if (Begin!=-1 && Step!=-1)
+                {
+                    list = productComments.Skip(Begin * Step).Take(Step).ToList();
+                }
+                else
+                {
+                    list = productComments.ToList();
+                }
                 return Json(new ApiResult()
                 {
                     Data = new
                     {
-                        ProductCommentListData = productComments.Skip(Begin * Step).Take(Step).ToList(),
+                        ProductCommentListData = list,
                         TotalCount = productComments.Count()
                     },
                     Msg = "OK",
@@ -147,6 +157,7 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
+
 
         public class GetProductInfoByReferenceIdsCriteria
         {

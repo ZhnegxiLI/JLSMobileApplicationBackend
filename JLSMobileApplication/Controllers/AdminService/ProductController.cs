@@ -69,8 +69,20 @@ namespace JLSMobileApplication.Controllers.AdminService
             }
         }
 
-
-    public class AdvancedProductSearchCriteria {
+        [HttpGet]
+        public async Task<long> RemoveProductCommentById(long CommentId)
+        {
+            try
+            {
+                var productCommentId = await _productRepository.RemoveProductCommentById(CommentId);
+                return productCommentId;
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+        public class AdvancedProductSearchCriteria {
 
             public AdvancedProductSearchCriteria()
             {
