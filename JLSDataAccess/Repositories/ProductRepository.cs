@@ -12,6 +12,8 @@ using JLSDataModel.Models;
 using System.IO;
 using System.Linq.Expressions;
 using JLSDataModel.AdminViewModel;
+using JLSDataModel.Models.User;
+using System.Data.SqlClient;
 
 namespace JLSDataAccess.Repositories
 {
@@ -188,6 +190,58 @@ namespace JLSDataAccess.Repositories
             };
         }
 
+        public async Task<List<dynamic>> GetFavoriteListByUserId(int UserId,string Lang)
+        {
+            var result = await (from ri in db.ReferenceItem
+                                join riSecond in db.ReferenceItem on ri.ParentId equals riSecond.Id
+                                join riMain in db.ReferenceItem on riSecond.ParentId equals riMain.Id
+                                join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                                join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
+                                join product in db.Product on ri.Id equals product.ReferenceItemId
+                                join favoriteList in db.ProductFavorite on product.Id equals favoriteList.ProductId
+                                where rc.ShortLabel == "Product" && ri.Validity == true && rl.Lang == Lang
+                                && riSecond.Validity == true && riMain.Validity == true && favoriteList.UserId == UserId
+                                orderby ri.CreatedOn descending, rc.Id, rl.Label
+                                select new
+                                {
+                                    ProductId = product.Id,
+                                    ReferenceId = ri.Id,
+                                    Code = ri.Code,
+                                    ParentId = ri.ParentId,
+                                    Value = ri.Value,
+                                    Order = ri.Order,
+                                    Label = rl.Label,
+                                    Price = product.Price,
+                                    QuantityPerBox = product.QuantityPerBox,
+                                    MinQuantity = product.MinQuantity,
+                                    DefaultPhotoPath = (from path in db.ProductPhotoPath
+                                                        where path.ProductId == product.Id
+                                                        select path.Path).FirstOrDefault()
+                                }).ToListAsync<dynamic>();
+            return result;
+        }
+
+        public async Task<long> AddIntoProductFavoriteList(int UserId, long ProductId, bool? IsFavorite)
+        {
+            var result = db.ProductFavorite.Where(p => p.UserId == UserId && p.ProductId == ProductId).FirstOrDefault();
+            if (result==null&& IsFavorite==true)
+            {
+                var FavoriteToInsert = new ProductFavorite();
+                FavoriteToInsert.UserId = UserId;
+                FavoriteToInsert.ProductId = ProductId;
+
+                await db.AddAsync(FavoriteToInsert);
+                await db.SaveChangesAsync();
+                return FavoriteToInsert.Id;
+            }
+            else if (result!=null && IsFavorite== false)
+            {
+                db.Remove(result);
+                await db.SaveChangesAsync();
+                return result.Id;
+            }
+            return 0;
+        }
 
         public async Task<List<ProductCategoryViewModel>> GetProductMainCategory(string Lang)
         {
@@ -333,7 +387,34 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
+        // For mobile attention : same format as by sales performance... (todo: fix format)
+        public async Task<List<dynamic>> SimpleProductSearch(string SearchText, string Lang)
+        {
+            var result = await (from riProduct in db.ReferenceItem
+                                join p in db.Product on riProduct.Id equals p.ReferenceItemId
+                                join rlProduct in db.ReferenceLabel on riProduct.Id equals rlProduct.ReferenceItemId
+                                join riSecond in db.ReferenceItem on riProduct.ParentId equals riSecond.Id
+                                join rlSecond in db.ReferenceLabel on riProduct.Id equals rlSecond.ReferenceItemId
+                                join riMain in db.ReferenceItem on riSecond.ParentId equals riMain.Id
+                                join rlMain in db.ReferenceLabel on riMain.Id equals rlMain.ReferenceItemId
+                                where riProduct.Validity == true && riSecond.Validity == true && riMain.Validity == true && rlProduct.Lang == Lang && rlSecond.Lang == Lang && rlMain.Lang == Lang && (rlMain.Label.Contains(SearchText) || rlSecond.Label.Contains(SearchText) || rlMain.Label.Contains(SearchText) || p.Description.Contains(SearchText)) 
+                                select new {
+                                    ReferenceId = p.ReferenceItemId,
+                                    ProductId = p.Id,
+                                    Code = riProduct.Code,
+                                    ParentId = riProduct.ParentId,
+                                    Value = riProduct.Value,
+                                    Label = rlProduct.Label,
+                                    Price = p.Price,
+                                    QuantityPerBox = p.QuantityPerBox,
+                                    MinQuantity = p.MinQuantity,
+                                    DefaultPhotoPath = (from pp in db.ProductPhotoPath
+                                                        where pp.ProductId == p.Id
+                                                        select pp.Path).FirstOrDefault()
+                                }).ToListAsync<dynamic>();
 
+            return result;
+        }
 
         public async Task<long> SaveProductInfo(long ProductId, long ReferenceId, int? QuantityPerBox, int? MinQuantity,float? Price, long? TaxRateId, string Description, string Color, string Material, string Size,int? CreatedOrUpdatedBy)
         {
@@ -412,23 +493,25 @@ namespace JLSDataAccess.Repositories
 
         public async Task<dynamic> GetProductById(long Id, string Lang)
         {
+
             var result = await (from ri in db.ReferenceItem
                                 join p in db.Product on ri.Id equals p.ReferenceItemId
                                 where p.Id == Id
-                                select new 
+                                select new
                                 {
                                     ProductId = p.Id,
-                                    MainCategoryId =  (from riMain in db.ReferenceItem
-                                                       join riSecond in db.ReferenceItem on riMain.Id equals riSecond.ParentId
-                                                       where riSecond.Id == ri.ParentId
-                                                       select riMain.Id).FirstOrDefault(),
+                                    IsFavorite = db.ProductFavorite.Where(p => p.ProductId == Id).FirstOrDefault()!=null? true : false,
+                                    MainCategoryId = (from riMain in db.ReferenceItem
+                                                      join riSecond in db.ReferenceItem on riMain.Id equals riSecond.ParentId
+                                                      where riSecond.Id == ri.ParentId
+                                                      select riMain.Id).FirstOrDefault(),
                                     SecondCategoryId = ri.ParentId,
                                     ReferenceCode = ri.Code,
                                     MinQuantity = p.MinQuantity,
                                     Price = p.Price,
                                     QuantityPerBox = p.QuantityPerBox,
                                     Description = p.Description,
-                                    ReferenceId = ri.Id, 
+                                    ReferenceId = ri.Id,
                                     TaxRateId = p.TaxRateId,
                                     Label = (from rl in db.ReferenceLabel
                                              where rl.ReferenceItemId == ri.Id && rl.Lang == Lang
@@ -438,24 +521,23 @@ namespace JLSDataAccess.Repositories
                                                select riTaxRate).FirstOrDefault(),
                                     Translation = (from label in db.ReferenceLabel
                                                    where label.ReferenceItemId == ri.Id
-                                                   select new { 
-                                                        Id = label.Id,
-                                                        Label= label.Label,
-                                                        Lang = label.Lang
+                                                   select new {
+                                                       Id = label.Id,
+                                                       Label = label.Label,
+                                                       Lang = label.Lang
                                                    }).ToList(),
                                     ImagesPath = (from path in db.ProductPhotoPath
                                                   where path.ProductId == p.Id
-                                                  select new { path.Id , path.Path }).ToList(),
-                                    Comments = ( from c in db.ProductComment
+                                                  select new { path.Id, path.Path }).ToList(),
+                                    Comments = (from c in db.ProductComment
                                                 where c.ProductId == p.Id
                                                 select c).ToList(),
                                     Color = p.Color,
                                     Material = p.Material,
                                     Size = p.Size,
                                     Validity = ri.Validity
-                               
-                                }).FirstOrDefaultAsync();
 
+                                }).FirstOrDefaultAsync();
             if (result == null)
             {
                 return null;

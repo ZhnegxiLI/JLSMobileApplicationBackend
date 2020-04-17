@@ -41,8 +41,6 @@ namespace JLSDataAccess
 
         public virtual DbSet<CustomerInfo> CustomerInfo { get; set; }
 
-        
-        public virtual DbSet<UserToken> UserToken { get; set; }
         public virtual DbSet<UserShippingAdress> UserShippingAdress { get; set; }
 
         public virtual DbSet<Audit> Audit { get; set; }
@@ -63,7 +61,11 @@ namespace JLSDataAccess
         public virtual DbSet<Remark> Remark { get; set; }
         public virtual DbSet<ShipmentInfo> ShipmentInfo { get; set; }
 
-        public virtual DbSet<CustomerAdvice> CustomerAdvice { get; set; }
+        public virtual DbSet<ProductSearchCount> ProductSearchCount { get; set; }
+        public virtual DbSet<ProductVisitCount> ProductVisitCount { get; set; }
 
+        public virtual DbSet<ProductFavorite> ProductFavorite { get; set; }
+
+        public virtual DbSet<UserCountInfo> UserCountInfo { get; set; }
     }
 }

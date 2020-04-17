@@ -32,6 +32,8 @@ namespace JLSDataAccess.Interfaces
 
         Task<long> RemoveProductCommentById(long ProductCommentId);
 
+        Task<List<dynamic>> SimpleProductSearch(string SearchText, string Lang);
+
         Task<long> SaveProductComment(long ProductId, string Title, string Body, int Level, int UserId);
         /*
          *  Admin zoom
@@ -44,6 +46,10 @@ namespace JLSDataAccess.Interfaces
         Task<dynamic> GetProductById(long id,string Lang);
         Task<int> RemoveImageById(long id);
         Task<List<ProductsListViewModel>> SearchProducts(string lang, string filter);
+
+
+        Task<List<dynamic>> GetFavoriteListByUserId(int UserId, string Lang);
+        Task<long> AddIntoProductFavoriteList(int UserId, long ProductId, bool? IsFavorite);
 
     }
 }

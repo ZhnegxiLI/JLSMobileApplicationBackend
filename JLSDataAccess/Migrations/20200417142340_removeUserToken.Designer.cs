@@ -4,14 +4,16 @@ using JLSDataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace JLSDataAccess.Migrations
 {
     [DbContext(typeof(JlsDbContext))]
-    partial class JlsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200417142340_removeUserToken")]
+    partial class removeUserToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -538,29 +540,6 @@ namespace JLSDataAccess.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ProductComment");
-                });
-
-            modelBuilder.Entity("JLSDataModel.Models.Product.ProductFavorite", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long?>("CreatedBy");
-
-                    b.Property<DateTime?>("CreatedOn");
-
-                    b.Property<long>("ProductId");
-
-                    b.Property<long?>("UpdatedBy");
-
-                    b.Property<DateTime?>("UpdatedOn");
-
-                    b.Property<int>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProductFavorite");
                 });
 
             modelBuilder.Entity("JLSDataModel.Models.Product.ProductPhotoPath", b =>

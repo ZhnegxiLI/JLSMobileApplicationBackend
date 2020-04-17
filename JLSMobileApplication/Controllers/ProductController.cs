@@ -182,6 +182,22 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<JsonResult> SimpleProductSearch(string SearchText, string Lang,int Begin,int Step)
+        {
+            try
+            {
+                var result = await _productRepository.SimpleProductSearch(SearchText, Lang);
+                return Json(new { 
+                    TotalCount = result.Count,
+                    List = result.Skip(Begin * Step).Take(Step).ToList()
+                });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
 
         [HttpGet]
         public async Task<JsonResult> GetProductById(long ProductId, string Lang)
@@ -197,7 +213,37 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-
+        
+        [HttpGet]
+        public async Task<JsonResult> GetFavoriteListByUserId(int UserId, string Lang, int Step, int Begin)
+        {
+            try
+            {
+                var favoriteProductList = await _productRepository.GetFavoriteListByUserId(UserId, Lang);
+                var totalCount = favoriteProductList.Count();
+                return Json(new { 
+                    TotalCount = totalCount,
+                    List = favoriteProductList.Skip(Begin * Step).Take(Step).ToList()
+            });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+        [HttpGet]
+        public async Task<JsonResult> AddIntoProductFavoriteList(int UserId, long ProductId, bool? IsFavorite)
+        {
+            try
+            {
+                var favoriteProductList = await _productRepository.AddIntoProductFavoriteList(UserId , ProductId, IsFavorite);
+                return Json(favoriteProductList);
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
 
 
         /******************************** ZOOM Service with authentification *******************************/

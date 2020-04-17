@@ -8,6 +8,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using JLSDataModel.Models.User;
 using Microsoft.AspNetCore.Identity;
+using System.Data.SqlClient;
 
 namespace JLSDataAccess.Repositories
 {
@@ -93,6 +94,9 @@ namespace JLSDataAccess.Repositories
                                 select new
                                 {
                                     Id = u.Id,
+                                    OrderCount = db.OrderInfo.Where(p=>p.UserId == UserId).Count(),
+                                    CommentCount = db.ProductComment.Where(p=>p.UserId == UserId).Count(),
+                                    FavoriteCount = db.ProductFavorite.Where(p=>p.UserId == UserId).Count(),
                                     RoleId = r.Id,
                                     Email = u.Email,
                                     Validity = u.Validity,
@@ -110,6 +114,7 @@ namespace JLSDataAccess.Repositories
                                 }).FirstOrDefaultAsync();
             return result;
         }
+      
 
         public async Task<dynamic> CreateOrUpdateUser(int UserId, string Email , string Password, int RoleId, bool Validity)
         {
