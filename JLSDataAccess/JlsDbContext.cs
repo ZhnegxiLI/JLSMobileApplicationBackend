@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace JLSDataAccess
 {
-    public class JlsDbContext  :IdentityDbContext<User, IdentityRole<int>, int>
+    public class JlsDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
         public JlsDbContext(DbContextOptions<JlsDbContext> options)
             : base(options)
@@ -48,7 +48,7 @@ namespace JLSDataAccess
 
         public virtual DbSet<DeletedRecords> DeletedRecords { get; set; }
         public virtual DbSet<OrderProduct> OrderProduct { get; set; }
-        
+
         public virtual DbSet<ProductComment> ProductComment { get; set; }
 
         public virtual DbSet<TokenModel> TokenModel { get; set; }
@@ -67,5 +67,7 @@ namespace JLSDataAccess
         public virtual DbSet<ProductFavorite> ProductFavorite { get; set; }
 
         public virtual DbSet<UserCountInfo> UserCountInfo { get; set; }
+
+        public virtual DbSet<ExportConfiguration> ExportConfiguration { get; set; }
     }
 }

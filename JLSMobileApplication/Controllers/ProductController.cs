@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using JLSDataModel.ViewModels;
+using JLSMobileApplication.Services;
 
 namespace JLSMobileApplication.Controllers
 {
@@ -20,11 +21,13 @@ namespace JLSMobileApplication.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
+        private readonly IExportService _exportService;
 
-        public ProductController(IMapper mapper, IProductRepository product)
+        public ProductController(IMapper mapper, IProductRepository product, IExportService exportService)
         {
             _productRepository = product;
             _mapper = mapper;
+            _exportService = exportService;
         }
 
         [HttpGet]
@@ -106,7 +109,7 @@ namespace JLSMobileApplication.Controllers
             try
             {
                 var productList = await _productRepository.GetProductListBySecondCategory(SecondCategoryReferenceId, Lang, Begin, Step);
-            
+
                 return Json(new ApiResult()
                 {
                     Data = new
@@ -126,14 +129,14 @@ namespace JLSMobileApplication.Controllers
 
 
         [HttpGet]
-        public async Task<JsonResult> GetProductCommentListByCriteria(long? ProductId, long? UserId,int Begin, int Step,string Lang)
+        public async Task<JsonResult> GetProductCommentListByCriteria(long? ProductId, long? UserId, int Begin, int Step, string Lang)
         {
             try
             {
                 var productComments = await _productRepository.GetProductCommentListByCriteria(ProductId, UserId, Lang);
 
                 List<ProductCommentViewModel> list = new List<ProductCommentViewModel>();
-                if (Begin!=-1 && Step!=-1)
+                if (Begin != -1 && Step != -1)
                 {
                     list = productComments.Skip(Begin * Step).Take(Step).ToList();
                 }
@@ -183,15 +186,32 @@ namespace JLSMobileApplication.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> SimpleProductSearch(string SearchText, string Lang,int Begin,int Step)
+        public async Task<JsonResult> SimpleProductSearch(string SearchText, string Lang, int Begin, int Step)
         {
             try
             {
                 var result = await _productRepository.SimpleProductSearch(SearchText, Lang);
-                return Json(new { 
+                return Json(new
+                {
                     TotalCount = result.Count,
                     List = result.Skip(Begin * Step).Take(Step).ToList()
                 });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+
+        [HttpGet] // todo change to post
+        public async Task<IActionResult> SimpleProductSearchExport()
+        {
+            try
+            {
+                var result = await _productRepository.SimpleProductSearch("a","fr");
+
+                var memory = _exportService.ExportExcel(result, "SimpleProductSearch");
+                return File(memory, "application/vnd.ms-excel"); //, "SimpleProductSearch_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xlsx"
             }
             catch (Exception exc)
             {
@@ -213,7 +233,7 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-        
+
         [HttpGet]
         public async Task<JsonResult> GetFavoriteListByUserId(int UserId, string Lang, int Step, int Begin)
         {
@@ -221,10 +241,11 @@ namespace JLSMobileApplication.Controllers
             {
                 var favoriteProductList = await _productRepository.GetFavoriteListByUserId(UserId, Lang);
                 var totalCount = favoriteProductList.Count();
-                return Json(new { 
+                return Json(new
+                {
                     TotalCount = totalCount,
                     List = favoriteProductList.Skip(Begin * Step).Take(Step).ToList()
-            });
+                });
             }
             catch (Exception exc)
             {
@@ -236,7 +257,7 @@ namespace JLSMobileApplication.Controllers
         {
             try
             {
-                var favoriteProductList = await _productRepository.AddIntoProductFavoriteList(UserId , ProductId, IsFavorite);
+                var favoriteProductList = await _productRepository.AddIntoProductFavoriteList(UserId, ProductId, IsFavorite);
                 return Json(favoriteProductList);
             }
             catch (Exception exc)
@@ -254,10 +275,11 @@ namespace JLSMobileApplication.Controllers
             try
             {
                 var productList = await _productRepository.GetProductListBySecondCategory(SecondCategoryReferenceId, Lang, Begin, Step);
-              // var result = _mapper.Map<ProductListViewModelWithAuth>(productList.ProductListData);
+                // var result = _mapper.Map<ProductListViewModelWithAuth>(productList.ProductListData);
                 return Json(new ApiResult()
                 {
-                    Data = new {
+                    Data = new
+                    {
                         ProductListData = productList.ProductListData,
                         TotalCount = productList.TotalCount
                     },
@@ -278,7 +300,7 @@ namespace JLSMobileApplication.Controllers
             {
                 return Json(new ApiResult()
                 {
-                    Data = await _productRepository.SaveProductComment(comment.ProductId,comment.Title,comment.Body,comment.Level,comment.UserId),
+                    Data = await _productRepository.SaveProductComment(comment.ProductId, comment.Title, comment.Body, comment.Level, comment.UserId),
                     Msg = "OK",
                     Success = true
                 });

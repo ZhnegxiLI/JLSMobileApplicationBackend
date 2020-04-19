@@ -365,6 +365,7 @@ namespace JLSDataAccess.Repositories
                                 && (Validity == null ||ri.Validity == Validity)
                                 && rl.Lang == Lang && rc.ShortLabel == "Product"
                                 select new { 
+                                    CreatedOn = p.CreatedOn,
                                     ReferenceId = ri.Id,
                                     ProductId = p.Id,
                                     Label = rl.Label,

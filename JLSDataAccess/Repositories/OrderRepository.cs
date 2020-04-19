@@ -339,7 +339,7 @@ namespace JLSDataAccess.Repositories
                                                   join riProduct in db.ReferenceItem on p.ReferenceItemId equals riProduct.Id
                                                   join rc in db.ReferenceCategory on riProduct.ReferenceCategoryId equals rc.Id
                                                   join rl in db.ReferenceLabel on riProduct.Id equals rl.ReferenceItemId
-                                                  where op.OrderId == o.Id && rc.ShortLabel == "Product" && riProduct.Validity == true && rl.Lang == Lang 
+                                                  where op.OrderId == o.Id && rc.ShortLabel == "Product" &&  rl.Lang == Lang 
                                                   select new 
                                                   {
                                                       Quantity = op.Quantity,
