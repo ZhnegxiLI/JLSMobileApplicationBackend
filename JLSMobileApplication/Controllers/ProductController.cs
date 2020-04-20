@@ -21,13 +21,11 @@ namespace JLSMobileApplication.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
-        private readonly IExportService _exportService;
 
-        public ProductController(IMapper mapper, IProductRepository product, IExportService exportService)
+        public ProductController(IMapper mapper, IProductRepository product)
         {
             _productRepository = product;
             _mapper = mapper;
-            _exportService = exportService;
         }
 
         [HttpGet]
@@ -58,6 +56,26 @@ namespace JLSMobileApplication.Controllers
                     Data = await _productRepository.GetProductListBySalesPerformance(Lang, Begin, Step),
                     Msg = "OK",
                     Success = true
+                });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<JsonResult> GetProductByPrice(string Lang, int Begin, int Step)
+        {
+            try
+            {
+                var result = await _productRepository.GetProductByPrice(Lang);
+
+                return Json(new
+                {
+                    TotalCount = result.Count,
+                    List = result.Skip(Begin * Step).Take(Step).ToList()
                 });
             }
             catch (Exception exc)
@@ -203,21 +221,41 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-        [HttpGet] // todo change to post
-        public async Task<IActionResult> SimpleProductSearchExport()
+
+        public class AdvancedSearchCriteria
+        {
+            public string SearchText { get; set; }
+            public long? MainCategory { get; set; }
+            public long? SecondCategory { get; set; }
+            public int? PriceIntervalLower { get; set; }
+            public int? PriceIntervalUpper { get; set; }
+            public int? MinQuantity { get; set; }
+            public string OrderBy_PublishDate { get; set; }
+            public string OrderBy_SalesPerformance { get; set; }
+            public string OrderBy_Price { get; set; }
+            public string Lang { get; set; }
+
+            public int Begin { get; set; }
+            public int Step { get; set; }
+        }
+        [HttpPost]
+        public async Task<JsonResult> AdvancedProductSearchClient(AdvancedSearchCriteria criteria)
         {
             try
             {
-                var result = await _productRepository.SimpleProductSearch("a","fr");
-
-                var memory = _exportService.ExportExcel(result, "SimpleProductSearch");
-                return File(memory, "application/vnd.ms-excel"); //, "SimpleProductSearch_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xlsx"
+                var result = await _productRepository.AdvancedProductSearchClient(criteria.SearchText,criteria.MainCategory,criteria.SecondCategory,criteria.PriceIntervalLower,criteria.PriceIntervalUpper,criteria.MinQuantity,criteria.OrderBy_PublishDate,criteria.OrderBy_PublishDate,criteria.OrderBy_Price, criteria.Lang);
+                return Json(new
+                {
+                   TotalCount = result.Count,
+                   List = result.Skip(criteria.Begin * criteria.Step).Take(criteria.Step).ToList()
+                });
             }
             catch (Exception exc)
             {
                 throw exc;
             }
         }
+        
 
         [HttpGet]
         public async Task<JsonResult> GetProductById(long ProductId, string Lang)

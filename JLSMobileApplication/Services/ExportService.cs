@@ -2,6 +2,7 @@
 using JLSMobileApplication.Heplers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
@@ -46,10 +47,11 @@ namespace JLSMobileApplication.Services
 
                     /* Step1: Get export model */
                     var ExportConfiguration = db.ExportConfiguration.Where(p => p.ExportName == ExportName).FirstOrDefault();
-                    List<string> ExportConfigurationModel = null;
+                    List<ExportModel> ExportConfigurationModel = null;
                     if (ExportConfiguration!=null && ExportConfiguration.ExportModel!=null && ExportConfiguration.ExportModel!="")
                     {
-                        ExportConfigurationModel = ExportConfiguration.ExportModel.Split(';').ToList();
+
+                        ExportConfigurationModel = JsonConvert.DeserializeObject<List<ExportModel>>(ExportConfiguration.ExportModel);
                     }
                    /* Step2: Calcul the targeted Column */
 
@@ -60,9 +62,10 @@ namespace JLSMobileApplication.Services
                     {
                         if (ExportConfigurationModel != null)
                         {
-                            if (ExportConfigurationModel.Contains(item.Name))
+                            var temp = ExportConfigurationModel.Where(p => p.Name == item.Name).FirstOrDefault();
+                            if (temp != null)
                             {
-                                targetColumns.Add(item.Name);
+                                targetColumns.Add(temp.Name);
                             }
                         }
                         else
@@ -78,7 +81,15 @@ namespace JLSMobileApplication.Services
                     int columnsCounter = 0;
                     foreach (var item in targetColumns)
                     {
-                        header.CreateCell(columnsCounter).SetCellValue(item);
+                        if (ExportConfigurationModel!=null)
+                        {
+                            var temp = ExportConfigurationModel.Where(p => p.Name == item).Select(p => p.DisplayName).FirstOrDefault();
+                            header.CreateCell(columnsCounter).SetCellValue(temp != null ? temp : item);
+                        }
+                        else
+                        {
+                            header.CreateCell(columnsCounter).SetCellValue(item);
+                        }
                         columnsCounter++;
                     }
                     /*Step5: Add body */
@@ -91,7 +102,6 @@ namespace JLSMobileApplication.Services
                         foreach (var column in targetColumns)
                         {
                             string valueFormatted = null;
-                            // todo add condition: date, price, text, url ... 
                             var value = item.GetType().GetProperty(column).GetValue(item,null);
                             if (value != null)
                             {
@@ -108,6 +118,10 @@ namespace JLSMobileApplication.Services
                                 if (column.Contains("Path"))
                                 {
                                     value = _httpContextAccessor.HttpContext.Request.Host  + _httpContextAccessor.HttpContext.Request.PathBase + "/"+ value;
+                                }
+                                if (column.Contains("Price"))
+                                {
+                                    value = value + "€";
                                 }
                             }
                             else
