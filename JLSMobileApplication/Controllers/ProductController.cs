@@ -258,11 +258,11 @@ namespace JLSMobileApplication.Controllers
         
 
         [HttpGet]
-        public async Task<JsonResult> GetProductById(long ProductId, string Lang)
+        public async Task<JsonResult> GetProductById(long ProductId, string Lang, int? UserId)
         {
             try
             {
-                var data = await _productRepository.GetProductById(ProductId, Lang);
+                var data = await _productRepository.GetProductById(ProductId, Lang, UserId);
                 return Json(data);
             }
             catch (Exception e)

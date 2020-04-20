@@ -554,7 +554,7 @@ namespace JLSDataAccess.Repositories
         }
 
 
-        public async Task<dynamic> GetProductById(long Id, string Lang)
+        public async Task<dynamic> GetProductById(long Id,string Lang, int? UserId)
         {
 
             var result = await (from ri in db.ReferenceItem
@@ -564,6 +564,11 @@ namespace JLSDataAccess.Repositories
                                 {
                                     ProductId = p.Id,
                                     IsFavorite = db.ProductFavorite.Where(p => p.ProductId == Id).FirstOrDefault()!=null? true : false,
+                                    HasBought = (from o in db.OrderInfo
+                                                 join op in db.OrderProduct on o.Id equals op.OrderId 
+                                                 join riStatus in db.ReferenceItem on o.StatusReferenceItemId equals riStatus.Id
+                                                 where o.UserId == UserId && riStatus.Code == "OrderStatus_Valid" && op.ReferenceId == ri.Id
+                                                 select o).FirstOrDefault()!=null? true: false,
                                     MainCategoryId = (from riMain in db.ReferenceItem
                                                       join riSecond in db.ReferenceItem on riMain.Id equals riSecond.ParentId
                                                       where riSecond.Id == ri.ParentId

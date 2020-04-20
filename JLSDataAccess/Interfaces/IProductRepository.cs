@@ -44,7 +44,7 @@ namespace JLSDataAccess.Interfaces
         Task<long> SaveProductInfo(long ProductId, long ReferenceId, int? QuantityPerBox, int? MinQuantity, float? Price, long? TaxRate, string Description, string Color, string Material, string Size, int? CreatedOrUpdatedBy);
 
         Task<ListViewModelWithCount<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection, string filter);
-        Task<dynamic> GetProductById(long id,string Lang);
+        Task<dynamic> GetProductById(long id,string Lang, int? UserId);
         Task<int> RemoveImageById(long id);
         Task<List<ProductsListViewModel>> SearchProducts(string lang, string filter);
 
