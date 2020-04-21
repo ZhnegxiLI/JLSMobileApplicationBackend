@@ -17,9 +17,6 @@ namespace JLSMobileApplication.Services
 {
     public class ExportService : IExportService
         {
-        /// <summary>
-        /// 只用于测试目的请勿在生产环境中放入此代码
-        /// </summary>
         private readonly AppSettings _appSettings;
         private readonly JlsDbContext db;
         private readonly IHttpContextAccessor _httpContextAccessor;
