@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace JLSDataModel.Models
+{
+    public class EmailTemplate: BaseObject
+    {
+        public string Name { get; set; }
+
+        public string Title { get; set; }
+        public string Body { get; set; }
+    }
+}

@@ -230,9 +230,7 @@ namespace JLSMobileApplication.Controllers
             public int? PriceIntervalLower { get; set; }
             public int? PriceIntervalUpper { get; set; }
             public int? MinQuantity { get; set; }
-            public string OrderBy_PublishDate { get; set; }
-            public string OrderBy_SalesPerformance { get; set; }
-            public string OrderBy_Price { get; set; }
+            public string OrderBy { get; set; }
             public string Lang { get; set; }
 
             public int Begin { get; set; }
@@ -243,7 +241,7 @@ namespace JLSMobileApplication.Controllers
         {
             try
             {
-                var result = await _productRepository.AdvancedProductSearchClient(criteria.SearchText,criteria.MainCategory,criteria.SecondCategory,criteria.PriceIntervalLower,criteria.PriceIntervalUpper,criteria.MinQuantity,criteria.OrderBy_PublishDate,criteria.OrderBy_PublishDate,criteria.OrderBy_Price, criteria.Lang);
+                var result = await _productRepository.AdvancedProductSearchClient(criteria.SearchText,criteria.MainCategory,criteria.SecondCategory,criteria.PriceIntervalLower,criteria.PriceIntervalUpper,criteria.MinQuantity,criteria.OrderBy, criteria.Lang);
                 return Json(new
                 {
                    TotalCount = result.Count,

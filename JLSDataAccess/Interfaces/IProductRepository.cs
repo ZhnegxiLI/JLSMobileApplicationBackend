@@ -33,7 +33,7 @@ namespace JLSDataAccess.Interfaces
         Task<long> RemoveProductCommentById(long ProductCommentId);
 
         Task<List<dynamic>> SimpleProductSearch(string SearchText, string Lang);
-        Task<List<dynamic>> AdvancedProductSearchClient(string SearchText, long? MainCategory, long? SecondCategory, int? PriceIntervalLower, int? PriceIntervalUpper, int? MinQuantity, string OrderBy_PublishDate, string OrderBy_SalesPerformance, string OrderBy_Price, string Lang);
+        Task<List<dynamic>> AdvancedProductSearchClient(string SearchText, long? MainCategory, long? SecondCategory, int? PriceIntervalLower, int? PriceIntervalUpper, int? MinQuantity, string OrderBy, string Lang);
 
         Task<long> SaveProductComment(long ProductId, string Title, string Body, int Level, int UserId);
         /*

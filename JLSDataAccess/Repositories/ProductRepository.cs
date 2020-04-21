@@ -417,7 +417,7 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-        public async Task<List<dynamic>> AdvancedProductSearchClient(string SearchText,long? MainCategory, long? SecondCategory,int? PriceIntervalLower, int? PriceIntervalUpper, int? MinQuantity, string OrderBy_PublishDate, string OrderBy_SalesPerformance, string OrderBy_Price, string Lang)
+        public async Task<List<dynamic>> AdvancedProductSearchClient(string SearchText,long? MainCategory, long? SecondCategory,int? PriceIntervalLower, int? PriceIntervalUpper, int? MinQuantity, string OrderBy, string Lang)
         {
             var result = (from riProduct in db.ReferenceItem
                                 join p in db.Product on riProduct.Id equals p.ReferenceItemId
@@ -433,6 +433,10 @@ namespace JLSDataAccess.Repositories
                             &&(MinQuantity==null || p.MinQuantity<=MinQuantity)
                                 select new
                                 {
+                                    CreatedOn = p.CreatedOn,
+                                    SalesQuantity = (from op in db.OrderProduct
+                                                     where op.ReferenceId == riProduct.Id
+                                                     select op.Id).Count(),
                                     ReferenceId = p.ReferenceItemId,
                                     ProductId = p.Id,
                                     Code = riProduct.Code,
@@ -447,6 +451,21 @@ namespace JLSDataAccess.Repositories
                                                         select pp.Path).FirstOrDefault()
                                 });
 
+            switch (OrderBy)
+            {
+                case "Price_Increase":
+                    result = result.OrderBy(p => p.Price);
+                    break;
+                case "Price_Decrease":
+                    result = result.OrderByDescending(p => p.Price);
+                    break;
+                case "PublishDate_Recent":
+                    result = result.OrderByDescending(p=>p.CreatedOn);
+                    break;
+                case "Porpularity_More":
+                    result = result.OrderByDescending(p => p.SalesQuantity);
+                    break;
+            }
             return await result.ToListAsync<dynamic>();
         }
 

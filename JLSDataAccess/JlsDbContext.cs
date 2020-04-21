@@ -69,5 +69,7 @@ namespace JLSDataAccess
         public virtual DbSet<UserCountInfo> UserCountInfo { get; set; }
 
         public virtual DbSet<ExportConfiguration> ExportConfiguration { get; set; }
+        public virtual DbSet<EmailTemplate> EmailTemplate { get; set; }
+        
     }
 }
