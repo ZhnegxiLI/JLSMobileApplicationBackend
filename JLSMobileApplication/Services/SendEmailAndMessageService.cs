@@ -1,4 +1,5 @@
 ﻿using JLSDataAccess;
+using JLSDataAccess.Interfaces;
 using JLSDataModel.Models;
 using JLSDataModel.Models.Message;
 using JLSDataModel.Models.User;
@@ -16,22 +17,24 @@ using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Services
 {
-    public class SendEmailAndMessageService
+    public class SendEmailAndMessageService: ISendEmailAndMessageService
     {
         private readonly AppSettings _appSettings;
         private readonly JlsDbContext db;
         private readonly IEmailService _email;
         private readonly UserManager<User> _userManager;
+        private readonly IMessageRepository _messageRepository;
 
-        public SendEmailAndMessageService(IOptions<AppSettings> appSettings, JlsDbContext context,IEmailService email, UserManager<User> userManager)
+        public SendEmailAndMessageService(IOptions<AppSettings> appSettings, JlsDbContext context,IEmailService email, UserManager<User> userManager, IMessageRepository messageRepository)
         {
             _appSettings = appSettings.Value;
             db = context;
             _email = email;
             _userManager = userManager;
+            _messageRepository = messageRepository;
         }
 
-        public long CreateOrUpdateOrder(long OrderId, string Type)
+        public async Task<long> CreateOrUpdateOrderAsync(long OrderId, string Type)
         {
             var adminEmails = (from u in db.Users
                                join ur in db.UserRoles on u.Id equals ur.UserId
@@ -49,32 +52,54 @@ namespace JLSMobileApplication.Services
                 if (customerInfo !=null )
                 {
                     // TODO : Replace the email here
+                    var messageClientTemplate = emailModelClient.MessageBody;
                     var emailClientTemplate = emailModelClient.Body;
                     var emailAdminTemplate = emailModelAdmin.Body;
                     if (Type == "CreateNewOrder")
                     {
-                        // todo
+                        /* Replace client email */
+                        emailClientTemplate = emailClientTemplate.Replace("{numerodecommande}", order.Id.ToString());
+                        emailClientTemplate = emailClientTemplate.Replace("{username}", customerInfo.Email);
+                        /* Replace admin email */
+                        emailAdminTemplate = emailAdminTemplate.Replace("{numerodecommande}", order.Id.ToString());
+
+                        /* Replace client notice*/
+                        messageClientTemplate = messageClientTemplate.Replace("{numerodecommande} ", order.Id.ToString());
+
+
                     }
                     else if (Type == "UpdateOrder" )
                     {
-                        // todo replace
+                        /* Replace client email */
+                        emailClientTemplate = emailClientTemplate.Replace("{numerodecommande}", order.Id.ToString());
+                        emailClientTemplate = emailClientTemplate.Replace("{username}", customerInfo.Email);
+                        /* Replace admin email */
+                        emailAdminTemplate = emailAdminTemplate.Replace("{numerodecommande}", order.Id.ToString());
+
+                        /* Replace client notice*/
+                        messageClientTemplate = messageClientTemplate.Replace("{numerodecommande} ", order.Id.ToString());
                     }
 
                     // todo 客户自下单,发送信息至后台
                     if (orderType.Code == "OrderType_External")
                     {
-          
+                        var Message = new Message();
+                        Message.Title = emailModelClient.Title;
+                        Message.Body = messageClientTemplate;
+                        Message.IsReaded = false;
+                        await this._messageRepository.CreateMessage(Message,null, order.UserId);
                     }
+                    // todo: 改变发送逻辑, 目前的发送方式导致下单过慢,可加入一表格中之后定时发送
                     // 发送邮件
                     /* 1.发给客户 */
-                    if (customerInfo.Email!=null)
+                    if (customerInfo.Email != null)
                     {
                         _email.SendEmail(customerInfo.Email, emailModelClient.Title, emailClientTemplate);
                     }
                     /* 2.发给内部人员 */
-                    foreach(var admin in adminEmails)
+                    foreach (var admin in adminEmails)
                     {
-                        if (admin!=null)
+                        if (admin != null)
                         {
                             _email.SendEmail(admin, emailModelAdmin.Title, emailAdminTemplate);
                         }

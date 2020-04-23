@@ -9,6 +9,7 @@ using JLSDataModel.Models.Adress;
 using JLSDataModel.Models.Order;
 using JLSDataModel.Models.User;
 using JLSDataModel.ViewModels;
+using JLSMobileApplication.Services;
 using LjWebApplication.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -27,14 +28,16 @@ namespace JLSMobileApplication.Controllers
         private readonly IAdressRepository _adressRepository;
         private readonly IMapper _mapper;
         private readonly IProductRepository _productRepository;
+        private readonly ISendEmailAndMessageService _sendEmailAndMessageService;
 
-        public OrderController(IMapper mapper, IOrderRepository order, IAdressRepository adress, UserManager<User> userManager, IProductRepository product)
+        public OrderController(IMapper mapper, IOrderRepository order, IAdressRepository adress, UserManager<User> userManager, IProductRepository product, ISendEmailAndMessageService sendEmailAndMessageService)
         {
             _userManager = userManager;
             _orderRepository = order;
             _adressRepository = adress;
             _mapper = mapper;
             _productRepository = product;
+            _sendEmailAndMessageService = sendEmailAndMessageService;
         }
         public class SaveOrderCriteria{
             public SaveOrderCriteria()
@@ -132,10 +135,11 @@ namespace JLSMobileApplication.Controllers
                                                      Quantity = ri.Quantity,
                                                      ReferenceId = ri.ReferenceId
                                                  }).ToList();
-
+                    var orderId = await _orderRepository.SaveOrder(FormatedReferenceList, shippingAddressId, criteria.FacturationAdressId, criteria.UserId, ClientRemarkId, CustomerId);
+                    await _sendEmailAndMessageService.CreateOrUpdateOrderAsync(orderId, "CreateNewOrder");
                     return Json(new ApiResult()
                     {
-                        Data = await _orderRepository.SaveOrder(FormatedReferenceList, shippingAddressId, criteria.FacturationAdressId, criteria.UserId, ClientRemarkId, CustomerId),
+                        Data = orderId,
                         Msg = "OK",
                         Success = true,
                         DataExt = User.Email

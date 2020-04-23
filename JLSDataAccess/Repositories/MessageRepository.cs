@@ -23,7 +23,7 @@ namespace JLSDataAccess.Repositories
         public async Task<long> CreateMessage(Message message, int? FromUser, int? ToUser)
         {
             message.CreatedOn = DateTime.Now;
-            await db.AddAsync(message);
+            db.Add(message);
             await db.SaveChangesAsync();
             if (message.Id >0 && (FromUser!=null || ToUser!=null ))
             {

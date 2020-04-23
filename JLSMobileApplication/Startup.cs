@@ -71,6 +71,8 @@ namespace JLSMobileApplication
             services.AddTransient<IEmailService, EmailService>();
             //配置导出excel
             services.AddTransient<IExportService, ExportService>();
+            // 配置邮件及信息发送器
+            services.AddTransient<ISendEmailAndMessageService, SendEmailAndMessageService>();
 
             services.Configure<IdentityOptions>(options =>
             {

@@ -51,7 +51,7 @@ namespace JLSMobileApplication.Controllers
                 return  Json(new
                 {
                     TotalCount = result.Count,
-                    List = result
+                    List = result.Skip(Begin * Step).Take(Step).ToList()
                 });
             }
             catch (Exception exc)
