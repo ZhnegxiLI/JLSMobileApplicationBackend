@@ -9,6 +9,7 @@ using JLSDataModel.Models;
 using JLSDataModel.Models.Adress;
 using JLSDataModel.Models.Order;
 using JLSDataModel.ViewModels;
+using JLSMobileApplication.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,13 +26,15 @@ namespace JLSMobileApplication.Controllers.AdminService
         private readonly IMapper _mapper;
         private readonly IAdressRepository _adressRepository;
         private readonly JlsDbContext db;
+        private readonly ISendEmailAndMessageService _sendEmailAndMessageService;
 
-        public OrderController(IOrderRepository orderRepository, IMapper mapper, IAdressRepository adressRepository, JlsDbContext context)
+        public OrderController(IOrderRepository orderRepository, IMapper mapper, IAdressRepository adressRepository, JlsDbContext context, ISendEmailAndMessageService sendEmailAndMessageService)
         {
             this._orderRepository = orderRepository;
             _mapper = mapper;
             _adressRepository = adressRepository;
             db = context;
+            _sendEmailAndMessageService = sendEmailAndMessageService;
         }
 
         public class AdvancedOrderSearchCriteria
@@ -248,6 +251,8 @@ namespace JLSMobileApplication.Controllers.AdminService
 
                 await db.SaveChangesAsync();
 
+
+                await _sendEmailAndMessageService.CreateOrUpdateOrderAsync(orderToUpdate.Id, criteria.Orderinfo.Id == 0 ? "CreateNewOrder" : "UpdateOrder");
                 return Json(orderToUpdate.Id);
             }
             catch (Exception e)

@@ -70,6 +70,6 @@ namespace JLSDataAccess
 
         public virtual DbSet<ExportConfiguration> ExportConfiguration { get; set; }
         public virtual DbSet<EmailTemplate> EmailTemplate { get; set; }
-        
+        public virtual DbSet<EmailToSend> EmailToSend { get; set; }
     }
 }

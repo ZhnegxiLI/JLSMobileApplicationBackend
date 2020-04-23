@@ -23,15 +23,17 @@ namespace JLSMobileApplication.Controllers
         private JlsDbContext db;
         private readonly IEmailService _emailService;
         private readonly IAdressRepository _adressRepository;
+        private readonly ISendEmailAndMessageService _sendEmailAndMessageService;
         private readonly IMapper _mapper;
 
-        public AccountController(UserManager<User> userManager, JlsDbContext dbContext, IMapper mapper, IEmailService emailService, IAdressRepository adressRepository)
+        public AccountController(UserManager<User> userManager, JlsDbContext dbContext, IMapper mapper, IEmailService emailService, IAdressRepository adressRepository, ISendEmailAndMessageService sendEmailAndMessageService)
         {
             _mapper = mapper;
             _userManager = userManager;
             db = dbContext;
             _emailService = emailService;
             _adressRepository = adressRepository;
+            _sendEmailAndMessageService = sendEmailAndMessageService;
         }
     
 
@@ -109,14 +111,12 @@ namespace JLSMobileApplication.Controllers
                 // Step6: 发送确认邮件
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(userIdentity);
                 var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = userIdentity.Id, code = code }, HttpContext.Request.Scheme);
-                string body = "Please confirm your email:" + callbackUrl;
-                //Email service 
-                var r = _emailService.SendEmail(userIdentity.Email, "Confirmation votre compte", body);
 
+                _sendEmailAndMessageService.ResetPasswordOuConfirmEmailLinkAsync(userIdentity.Id, callbackUrl, "EmailConfirmation");
                 return Json(new ApiResult()
                 {
                     DataExt = userIdentity.Email,
-                    Data= r,
+                    Data= 1,
                     Msg = "OK",
                     Success = true
                 });
@@ -151,6 +151,8 @@ namespace JLSMobileApplication.Controllers
             {
                 return new JsonResult("ERROR"); // cannot find the user
             }
+
+            _sendEmailAndMessageService.AfterResetPasswordOuConfirmEmailLinkAsync(user.Id, "AfterEmailConfirmation");
             if (user.EmailConfirmed)
             {
                 return Redirect("/login"); //  
@@ -193,6 +195,7 @@ namespace JLSMobileApplication.Controllers
                       (userIdentity, obj.Token, obj.Password).Result;
             if (result.Succeeded)
             {
+                _sendEmailAndMessageService.AfterResetPasswordOuConfirmEmailLinkAsync(userIdentity.Id, "AfterResetPassword");
                 ViewBag.Message = "Password reset successful!";
                 return View("Success");
             }
@@ -225,11 +228,7 @@ namespace JLSMobileApplication.Controllers
             var resetLink = Url.Action("ResetPassword",
                 "Account", new { token = token },HttpContext.Request.Scheme);
 
-            string body = "Click this link to reset the password:" + resetLink;
-            //Email service 
-            var r = _emailService.SendEmail(username, "Confirmation votre compte", body);
-
-
+            _sendEmailAndMessageService.ResetPasswordOuConfirmEmailLinkAsync(user.Id, resetLink, "ResetPassword");
             return Json(new ApiResult()
             {
                 Data = username,

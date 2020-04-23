@@ -9,8 +9,10 @@ namespace JLSMobileApplication.Services
     {
         Task<long> CreateOrUpdateOrderAsync(long OrderId, string Type);
 
-        int ResetPasswordOuConfirmEmailLink(int UserId, string Link, string Type);
-        int AfterResetPasswordOuConfirmEmailLink(int UserId, string Type);
+        Task<int> ResetPasswordOuConfirmEmailLinkAsync(int UserId, string Link, string Type);
+        Task<int> AfterResetPasswordOuConfirmEmailLinkAsync(int UserId, string Type);
         int SendAdvertisement(string Type);
+
+        void SendEmailInDb();
     }
 }

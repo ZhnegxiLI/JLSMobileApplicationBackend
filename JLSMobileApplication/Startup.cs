@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
 using Microsoft.AspNetCore.Http;
+using Hangfire;
 
 namespace JLSMobileApplication
 {
@@ -132,6 +133,8 @@ namespace JLSMobileApplication
                     });
             });
 
+            services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnectionString")));
+
             /* 注入数据操作类 */
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
@@ -145,7 +148,7 @@ namespace JLSMobileApplication
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, JlsDbContext context, UserManager<User> userManager)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, JlsDbContext context, UserManager<User> userManager, ISendEmailAndMessageService timerEmailService)
         {
 
             if (env.IsDevelopment())
@@ -153,7 +156,11 @@ namespace JLSMobileApplication
                 app.UseDeveloperExceptionPage();
             }
 
-           app.UseCors("_myAllowSpecificOrigins");
+            app.UseHangfireServer();
+            app.UseHangfireDashboard();
+            RecurringJob.AddOrUpdate(() => timerEmailService.SendEmailInDb(), Cron.Minutely);
+
+            app.UseCors("_myAllowSpecificOrigins");
 
             var cachePeriod = env.IsDevelopment() ? "600" : "604800"; // Todo add into the appsettings缓存时间 
 

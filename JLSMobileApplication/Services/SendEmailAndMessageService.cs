@@ -94,14 +94,16 @@ namespace JLSMobileApplication.Services
                     /* 1.发给客户 */
                     if (customerInfo.Email != null)
                     {
-                        _email.SendEmail(customerInfo.Email, emailModelClient.Title, emailClientTemplate);
+                        //_email.SendEmail(customerInfo.Email, emailModelClient.Title, emailClientTemplate);
+                        await PushEmailIntoDb(customerInfo.Email, emailModelClient.Title, emailClientTemplate);
                     }
                     /* 2.发给内部人员 */
                     foreach (var admin in adminEmails)
                     {
                         if (admin != null)
                         {
-                            _email.SendEmail(admin, emailModelAdmin.Title, emailAdminTemplate);
+                            await PushEmailIntoDb(admin, emailModelAdmin.Title, emailAdminTemplate);
+                            //_email.SendEmail(admin, emailModelAdmin.Title, emailAdminTemplate);
                         }
                     }
                     return order.Id;
@@ -110,7 +112,7 @@ namespace JLSMobileApplication.Services
             return 0;
         }
 
-        public int ResetPasswordOuConfirmEmailLink(int UserId, string Link, string Type)
+        public async Task<int> ResetPasswordOuConfirmEmailLinkAsync(int UserId, string Link, string Type)
         {
             EmailTemplate emailModelClient = null;
 
@@ -128,15 +130,15 @@ namespace JLSMobileApplication.Services
                 {
                     // TODO: replace email here 
                 }
-
-                _email.SendEmail(user.Email, emailModelClient.Title, emailClientTemplate);
+                await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate);
+                //_email.SendEmail(user.Email, emailModelClient.Title, emailClientTemplate);
                 return user.Id;
             }
             return 0;
         }
 
 
-        public int AfterResetPasswordOuConfirmEmailLink(int UserId,string Type)
+        public async Task<int> AfterResetPasswordOuConfirmEmailLinkAsync(int UserId,string Type)
         {
             EmailTemplate emailModelClient = null;
 
@@ -157,7 +159,8 @@ namespace JLSMobileApplication.Services
                 // todo send internal message
                 var Message = new Message();
 
-                _email.SendEmail(user.Email, emailModelClient.Title, emailClientTemplate);
+                await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate);
+                //_email.SendEmail(user.Email, emailModelClient.Title, emailClientTemplate);
                 return user.Id;
             }
             return 0;
@@ -188,6 +191,35 @@ namespace JLSMobileApplication.Services
                 return 1;
             }
             return 0;
+        }
+
+        public async Task<int> PushEmailIntoDb(string ToEmail, string Title, string Body)
+        {
+            var Email = new EmailToSend();
+            Email.ToEmail = ToEmail;
+            Email.Title = Title;
+            Email.Body = Body;
+            Email.IsSended = false;
+            await db.AddAsync(Email);
+            await db.SaveChangesAsync();
+
+            return 1;
+        }
+
+        public void SendEmailInDb()
+        {
+            var EmailsToSend = db.EmailToSend.Where(p => p.IsSended == false || p.IsSended == null).ToList();
+            if (EmailsToSend.Count()>0)
+            {
+                foreach (var Email in EmailsToSend)
+                {
+                    _email.SendEmail(Email.ToEmail, Email.Title, Email.Body);
+                    Email.IsSended = true;
+                    db.Update(Email);
+                }
+                db.SaveChanges();
+            }
+       
         }
 
 

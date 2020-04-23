@@ -4,14 +4,16 @@ using JLSDataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace JLSDataAccess.Migrations
 {
     [DbContext(typeof(JlsDbContext))]
-    partial class JlsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200423175825_AddEmailToSendTable")]
+    partial class AddEmailToSendTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -197,37 +199,6 @@ namespace JLSDataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EmailTemplate");
-                });
-
-            modelBuilder.Entity("JLSDataModel.Models.EmailToSend", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Attachment");
-
-                    b.Property<string>("Body");
-
-                    b.Property<string>("CcEmail");
-
-                    b.Property<long?>("CreatedBy");
-
-                    b.Property<DateTime?>("CreatedOn");
-
-                    b.Property<bool?>("IsSended");
-
-                    b.Property<string>("Title");
-
-                    b.Property<string>("ToEmail");
-
-                    b.Property<long?>("UpdatedBy");
-
-                    b.Property<DateTime?>("UpdatedOn");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EmailToSend");
                 });
 
             modelBuilder.Entity("JLSDataModel.Models.ExportConfiguration", b =>
