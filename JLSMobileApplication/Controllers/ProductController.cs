@@ -305,30 +305,6 @@ namespace JLSMobileApplication.Controllers
 
         /******************************** ZOOM Service with authentification *******************************/
         [Authorize]
-        [HttpGet]
-        public async Task<JsonResult> GetProductListBySecondCategoryWithAuth(long SecondCategoryReferenceId, string Lang, int Begin, int Step)
-        {
-            try
-            {
-                var productList = await _productRepository.GetProductListBySecondCategory(SecondCategoryReferenceId, Lang, Begin, Step);
-                // var result = _mapper.Map<ProductListViewModelWithAuth>(productList.ProductListData);
-                return Json(new ApiResult()
-                {
-                    Data = new
-                    {
-                        ProductListData = productList.ProductListData,
-                        TotalCount = productList.TotalCount
-                    },
-                    Msg = "OK",
-                    Success = true
-                });
-            }
-            catch (Exception exc)
-            {
-                throw exc;
-            }
-        }
-
         [HttpPost]
         public async Task<JsonResult> SaveProductComment([FromBody] ProductComment comment)
         {

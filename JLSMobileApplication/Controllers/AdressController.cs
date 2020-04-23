@@ -7,11 +7,13 @@ using JLSDataAccess.Interfaces;
 using JLSDataAccess.Repositories;
 using JLSDataModel.Models.Adress;
 using LjWebApplication.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JLSMobileApplication.Controllers
 {
+    [Authorize]
     [Route("api/[controller]/{action}/{id?}")]
     [ApiController]
     public class AdressController : Controller

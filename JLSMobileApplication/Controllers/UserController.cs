@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using JLSDataAccess.Interfaces;
 using LjWebApplication.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +30,9 @@ namespace JLSMobileApplication.Controllers
             return await _userRepository.CheckUserIsAlreadyExist(Username);
         }
 
+
+        /* Auth zoom */
+        [Authorize]
         [HttpGet]
         public async Task<JsonResult> GetUserById(int UserId)
         {
@@ -42,6 +46,7 @@ namespace JLSMobileApplication.Controllers
                 throw e;
             }
         }
+
         public class UpdateUserInfoCriteria
         {
             public int UserId { get; set; }
@@ -52,6 +57,7 @@ namespace JLSMobileApplication.Controllers
 
             public string PhoneNumber { get; set; }
         }
+        [Authorize]
         [HttpPost]
         public async Task<JsonResult> UpdateUserInfo(UpdateUserInfoCriteria criteria)
         {

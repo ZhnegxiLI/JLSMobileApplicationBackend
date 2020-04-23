@@ -182,13 +182,17 @@ namespace JLSMobileApplication.Auth
 
         private TokenModel CreateRefreshToken(string clientId, int userId)
         {
+            var role = (from u in _db.Users
+                        join ur in _db.UserRoles on u.Id equals ur.UserId
+                        join r in _db.Roles on ur.RoleId equals r.Id
+                        select r.Name).FirstOrDefault();
             return new TokenModel()
             {
                 ClientId = clientId,
                 UserId = userId,
                 Value = Guid.NewGuid().ToString("N"),
                 CreatedDate = DateTime.UtcNow,
-                ExpiryTime = DateTime.UtcNow.AddDays(1)
+                ExpiryTime = (role==null || role.Contains("Admin")) ? DateTime.UtcNow.AddDays(1) : DateTime.UtcNow.AddDays(15)
             };
         }
 

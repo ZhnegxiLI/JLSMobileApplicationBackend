@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using JLSDataAccess.Interfaces;
 using JLSDataModel.Models.Message;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JLSMobileApplication.Controllers
 {
+    [Authorize]
     [Route("api/[controller]/{action}/{id?}")]
     [ApiController]
     public class MessageController : Controller
@@ -79,6 +81,7 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
+
 
         [HttpGet]
         public async Task<int> GetNoReadMessageCount(int UserId)
