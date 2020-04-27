@@ -79,14 +79,14 @@ namespace JLSMobileApplication.Auth
                 {
                     ModelState.AddModelError(string.Empty, "User Has not Confirmed Email.");
 
-                    return Unauthorized(new { LoginError = "We sent you an Confirmation Email. Please Confirm Your Registration With Techhowdy.com To Log in." });
+                    return Unauthorized(new { LoginError = "Msg_EmailNotValide" });
                 }
 
                 if (user.Validity == false)
                 {
                     ModelState.AddModelError(string.Empty, "Account is locked");
 
-                    return Unauthorized(new { LoginError = "Your account is locked, please contact admin for more information" });
+                    return Unauthorized(new { LoginError = "Msg_AccountBloque" });
                 }
 
                 // username & password matches: create the refresh token
@@ -119,7 +119,7 @@ namespace JLSMobileApplication.Auth
             }
 
             ModelState.AddModelError("", "Username/Password was not Found");
-            return Unauthorized(new { LoginError = "Please Check the Login Credentials - Ivalid Username/Password was entered" });
+            return Unauthorized(new { LoginError = "Msg_PasswordNotCorrect" });
 
 
         }
