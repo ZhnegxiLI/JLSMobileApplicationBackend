@@ -27,6 +27,6 @@ namespace JLSDataAccess.Interfaces
         Task<dynamic> CreateOrUpdateUser(int UserId, string Email, string Password, int RoleId, bool Validity);
 
 
-        Task<long> UpdateUserInfo(int UserId, string EntrepriseName, string Siret, string PhoneNumber);
+        Task<long> UpdateUserInfo(int UserId, string EntrepriseName, string Siret, string PhoneNumber, long? DefaultShippingAddressId);
     }
 }

@@ -106,6 +106,7 @@ namespace JLSDataAccess.Repositories
                                     ShippingAdress = (from a in db.Adress
                                                       join ua in db.UserShippingAdress on a.Id equals ua.ShippingAdressId
                                                       where ua.UserId == UserId
+                                                      orderby a.IsDefaultAdress == true
                                                       select a).ToList(),
                                     FacturationAdress = (from a in db.Adress
                                                          join u in db.Users on a.Id equals u.FacturationAdressId
@@ -169,7 +170,7 @@ namespace JLSDataAccess.Repositories
         }
 
 
-        public async Task<long> UpdateUserInfo(int UserId, string EntrepriseName, string Siret, string PhoneNumber)
+        public async Task<long> UpdateUserInfo(int UserId, string EntrepriseName, string Siret, string PhoneNumber, long? DefaultShippingAddressId)
         {
             var user = db.Users.Find(UserId);
             if (user != null)
@@ -181,6 +182,22 @@ namespace JLSDataAccess.Repositories
                 db.Update(user);
 
                 await db.SaveChangesAsync();
+                if (DefaultShippingAddressId!=null)
+                {
+                    var previousDefaultShippingAddress = (from ua in db.UserShippingAdress
+                                                          join a in db.Adress on ua.ShippingAdressId equals a.Id
+                                                          where ua.UserId == user.Id && a.IsDefaultAdress == true
+                                                          select a).FirstOrDefault();
+                    if (previousDefaultShippingAddress!=null)
+                    {
+                        previousDefaultShippingAddress.IsDefaultAdress = false;
+                    }
+                    var defaultShippingAddress = db.Adress.Where(p => p.Id == DefaultShippingAddressId).FirstOrDefault();
+                    defaultShippingAddress.IsDefaultAdress = true;
+
+                    db.Update(defaultShippingAddress);
+                    db.SaveChanges();
+                }
                 return user.Id;
             }
             return 0;

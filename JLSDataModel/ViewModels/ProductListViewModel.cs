@@ -24,6 +24,7 @@ namespace JLSDataModel.ViewModels
         {
             this.PhotoPath = new List<ProductListPhotoPath>();
         }
+        public int? NumberOfComment { get; set; }
         public long ReferenceId { get; set; }
         public long ProductId { get; set; }
         public string Code { get; set; }

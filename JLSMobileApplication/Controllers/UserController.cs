@@ -56,6 +56,8 @@ namespace JLSMobileApplication.Controllers
             public string Siret { get; set; }
 
             public string PhoneNumber { get; set; }
+
+            public long? DefaultShippingAddressId { get; set; }
         }
         [Authorize]
         [HttpPost]
@@ -63,7 +65,7 @@ namespace JLSMobileApplication.Controllers
         {
             try
             {
-                var result = await _userRepository.UpdateUserInfo(criteria.UserId, criteria.EntrepriseName, criteria.Siret, criteria.PhoneNumber);
+                var result = await _userRepository.UpdateUserInfo(criteria.UserId, criteria.EntrepriseName, criteria.Siret, criteria.PhoneNumber, criteria.DefaultShippingAddressId);
                 return Json(result);
             }
             catch (Exception e)

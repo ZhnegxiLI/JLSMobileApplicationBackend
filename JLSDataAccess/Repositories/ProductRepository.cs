@@ -68,6 +68,9 @@ namespace JLSDataAccess.Repositories
                                 where rc.ShortLabel == "Product" && ri.Validity == true && rl.Lang == Lang &&       ri.ParentId == SecondCategoryReferenceId
                                 select new ProductListData()
                                 {
+                                    NumberOfComment = (from pc in db.ProductComment
+                                                       where pc.ProductId == product.Id
+                                                       select pc.Id).Count(),
                                     ProductId = product.Id,
                                     ReferenceId = ri.Id,
                                     Code = ri.Code,
@@ -115,6 +118,9 @@ namespace JLSDataAccess.Repositories
                           orderby ri.CreatedOn descending, rc.Id, rl.Label
                           select new ProductListData()
                           {
+                              NumberOfComment = (from pc in db.ProductComment
+                                                 where pc.ProductId == product.Id
+                                                 select pc.Id).Count(),
                               ProductId = product.Id,
                               ReferenceId = ri.Id,
                               Code = ri.Code,
@@ -170,6 +176,9 @@ namespace JLSDataAccess.Repositories
             var result1 = (from r in productList
                            select new
                            {
+                               NumberOfComment = (from pc in db.ProductComment
+                                                  where pc.ProductId == r.ProductId
+                                                  select pc.Id).Count(),
                                ReferenceId = r.ReferenceId,
                                ProductId = r.ProductId,
                                Code = r.Code,
@@ -204,6 +213,9 @@ namespace JLSDataAccess.Repositories
                                 orderby ri.CreatedOn descending, rc.Id, rl.Label
                                 select new
                                 {
+                                    NumberOfComment = (from pc in db.ProductComment
+                                                       where pc.ProductId == product.Id
+                                                       select pc.Id).Count(),
                                     ProductId = product.Id,
                                     ReferenceId = ri.Id,
                                     Code = ri.Code,
@@ -364,7 +376,10 @@ namespace JLSDataAccess.Repositories
                                 && (SecondCategoryReferenceId.Count()== 0 || SecondCategoryReferenceId.Contains(riSecond.Id))
                                 && (Validity == null ||ri.Validity == Validity)
                                 && rl.Lang == Lang && rc.ShortLabel == "Product"
-                                select new { 
+                                select new {
+                                    NumberOfComment = (from pc in db.ProductComment
+                                                       where pc.ProductId == p.Id
+                                                       select pc.Id).Count(),
                                     CreatedOn = p.CreatedOn,
                                     ReferenceId = ri.Id,
                                     ProductId = p.Id,
@@ -400,6 +415,9 @@ namespace JLSDataAccess.Repositories
                                 join rlMain in db.ReferenceLabel on riMain.Id equals rlMain.ReferenceItemId
                                 where riProduct.Validity == true && riSecond.Validity == true && riMain.Validity == true && rlProduct.Lang == Lang && rlSecond.Lang == Lang && rlMain.Lang == Lang && (rlMain.Label.Contains(SearchText) || rlSecond.Label.Contains(SearchText) || rlProduct.Label.Contains(SearchText) || p.Description.Contains(SearchText) || riProduct.Code.Contains(SearchText)) 
                                 select new {
+                                    NumberOfComment = (from pc in db.ProductComment
+                                                       where pc.ProductId == p.Id
+                                                       select pc.Id).Count(),
                                     ReferenceId = p.ReferenceItemId,
                                     ProductId = p.Id,
                                     Code = riProduct.Code,
@@ -433,6 +451,9 @@ namespace JLSDataAccess.Repositories
                             &&(MinQuantity==null || p.MinQuantity<=MinQuantity)
                                 select new
                                 {
+                                    NumberOfComment = (from pc in db.ProductComment
+                                                       where pc.ProductId == p.Id
+                                                       select pc.Id).Count(),
                                     CreatedOn = p.CreatedOn,
                                     SalesQuantity = (from op in db.OrderProduct
                                                      where op.ReferenceId == riProduct.Id
@@ -480,6 +501,9 @@ namespace JLSDataAccess.Repositories
                           orderby p.Price 
                           select new
                           {
+                              NumberOfComment = (from pc in db.ProductComment
+                                                 where pc.ProductId == p.Id
+                                                 select pc.Id).Count(),
                               ReferenceId = p.ReferenceItemId,
                               ProductId = p.Id,
                               Code = riProduct.Code,
@@ -696,16 +720,40 @@ namespace JLSDataAccess.Repositories
             return 1;
         }
 
-        // TODO change
 
-        public Task<ListViewModelWithCount<ProductsListViewModel>> GetAllProduct(string lang, int intervalCount, int size, string orderActive, string orderDirection, string filter)
+        public async Task<List<dynamic>>  GetCategoryForWebSite(string Lang)
         {
-            throw new NotImplementedException();
-        }
+            var result = await (from riMain in db.ReferenceItem
+                               join rlMain in db.ReferenceLabel on riMain.Id equals rlMain.ReferenceItemId
+                               join rcMain in db.ReferenceCategory on riMain.ReferenceCategoryId equals rcMain.Id
+                               where riMain.Validity == true && rcMain.ShortLabel == "MainCategory" && rlMain.Lang == Lang
+                               orderby riMain.Order
+                               select new
+                               {
+                                   Id = riMain.Id,
+                                   Code = riMain.Code,
+                                   Label = rlMain.Label,
+                                   CategoryId = rcMain.Id,
+                                   SecondCategory = (from riSecond in db.ReferenceItem
+                                                     join rlSecond in db.ReferenceLabel on riSecond.Id equals rlSecond.ReferenceItemId
+                                                     join rcSecond in db.ReferenceCategory on riSecond.ReferenceCategoryId equals rcSecond.Id
+                                                     where riSecond.ParentId == riMain.Id && riSecond.Validity == true && rlSecond.Lang == Lang && rcSecond.ShortLabel == "SecondCategory"
+                                                     orderby riSecond.Order
+                                                     select new
+                                                     {
+                                                         NumberOfProduct = (from p in db.Product
+                                                                            join riProduct in db.ReferenceItem on p.ReferenceItemId equals riProduct.Id
+                                                                            where riProduct.Validity == true && riProduct.ParentId == riSecond.Id
+                                                                            select p.Id
+                                                                            ).Count(),
+                                                         Id = riSecond.Id,
+                                                         Code = riSecond.Code,
+                                                         Label = rlSecond.Label,
+                                                         CategoryId = rcSecond.Id
+                                                     }).Distinct().ToList()
+                               }).Distinct().ToListAsync<dynamic>();
 
-        public Task<List<ProductsListViewModel>> SearchProducts(string lang, string filter)
-        {
-            throw new NotImplementedException();
+            return result;
         }
     }
 }

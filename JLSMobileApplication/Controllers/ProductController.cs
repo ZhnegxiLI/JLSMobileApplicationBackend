@@ -322,5 +322,47 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
+
+        /* Only for web site */
+        [HttpGet]
+        public async Task<JsonResult> GetCategoryForWebSite(int NumberOfCateogry, string Lang)
+        {
+            try
+            {
+                var result =await _productRepository.GetCategoryForWebSite(Lang);
+                if (NumberOfCateogry != -1)
+                {
+                    result = result.Take(NumberOfCateogry).ToList();
+                }
+                return Json(result);
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+        [HttpGet]
+        public async Task<JsonResult> GetMainPageForWebSite(string Lang)
+        {
+            int Step = 10;
+            int Begin = 0;
+            try
+            {
+                var productByPublishDate = await _productRepository.GetProductListByPublishDate(Lang, Begin, Step);
+                var productBySalesPerformance = await _productRepository.GetProductListBySalesPerformance(Lang, Begin, Step);
+                var productByPrice = (await _productRepository.GetProductByPrice(Lang)).Take(Step).ToList();
+
+
+                return Json(new {
+                    resultByPublishDate = productByPublishDate,
+                    resultBySalesPerformance = productBySalesPerformance,
+                    resultByPrice = productByPrice
+                });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
     }
 }
