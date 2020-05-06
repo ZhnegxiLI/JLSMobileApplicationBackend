@@ -11,6 +11,7 @@ using System.Linq.Expressions;
 using JLSDataModel.ViewModels;
 using Microsoft.Extensions.Configuration;
 using JLSDataModel.AdminViewModel;
+using JLSDataModel.Models.Website;
 
 namespace JLSDataAccess.Repositories
 {
@@ -275,7 +276,12 @@ namespace JLSDataAccess.Repositories
 
             return result!=null ? true : false;
         }
+        public async Task<List<WebsiteSlide>> GetWbesiteslides()
+        {
+            var result = await db.WebsiteSlide.ToListAsync();
 
+            return result;
+        }
 
         public Task<ListViewModelWithCount<ReferenceItemViewModel>> GetReferenceItemWithInterval(int intervalCount, int size, string orderActive, string orderDirection, string filter)
         {

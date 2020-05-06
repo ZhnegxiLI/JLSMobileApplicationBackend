@@ -4,14 +4,16 @@ using JLSDataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace JLSDataAccess.Migrations
 {
     [DbContext(typeof(JlsDbContext))]
-    partial class JlsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200501204155_addWebsiteSlider")]
+    partial class addWebsiteSlider
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -978,27 +980,6 @@ namespace JLSDataAccess.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserShippingAdress");
-                });
-
-            modelBuilder.Entity("JLSDataModel.Models.Website.SubscribeEmail", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long?>("CreatedBy");
-
-                    b.Property<DateTime?>("CreatedOn");
-
-                    b.Property<string>("Email");
-
-                    b.Property<long?>("UpdatedBy");
-
-                    b.Property<DateTime?>("UpdatedOn");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SubscribeEmail");
                 });
 
             modelBuilder.Entity("JLSDataModel.Models.Website.WebsiteSlide", b =>

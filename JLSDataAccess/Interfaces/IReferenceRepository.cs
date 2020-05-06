@@ -1,5 +1,6 @@
 ﻿using JLSDataModel.AdminViewModel;
 using JLSDataModel.Models;
+using JLSDataModel.Models.Website;
 using JLSDataModel.ViewModels;
 using JLSMobileApplication.Resources;
 using System;
@@ -49,6 +50,6 @@ namespace JLSDataAccess.Interfaces
         Task<int> CreatorUpdateCategory(ReferenceCategory category);
 
         Task<bool> CheckReferenceCodeExists(string Code);
-
+        Task<List<WebsiteSlide>> GetWbesiteslides();
     }
 }

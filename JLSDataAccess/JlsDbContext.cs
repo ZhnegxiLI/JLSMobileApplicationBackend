@@ -5,6 +5,7 @@ using JLSDataModel.Models.Message;
 using JLSDataModel.Models.Order;
 using JLSDataModel.Models.Product;
 using JLSDataModel.Models.User;
+using JLSDataModel.Models.Website;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -71,5 +72,8 @@ namespace JLSDataAccess
         public virtual DbSet<ExportConfiguration> ExportConfiguration { get; set; }
         public virtual DbSet<EmailTemplate> EmailTemplate { get; set; }
         public virtual DbSet<EmailToSend> EmailToSend { get; set; }
+        public virtual DbSet<WebsiteSlide> WebsiteSlide { get; set; }
+        public virtual DbSet<SubscribeEmail> SubscribeEmail { get; set; }
+        
     }
 }

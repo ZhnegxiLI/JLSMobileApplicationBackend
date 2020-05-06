@@ -444,8 +444,8 @@ namespace JLSDataAccess.Repositories
                                 join riMain in db.ReferenceItem on riSecond.ParentId equals riMain.Id
                                 where riProduct.Validity == true && riSecond.Validity == true && riMain.Validity == true && rlProduct.Lang == Lang 
                             && ( SearchText==null || SearchText=="" || rlProduct.Label.Contains(SearchText))
-                            &&(MainCategory == null || riMain.ReferenceCategoryId == MainCategory)
-                            &&(SecondCategory == null || riSecond.ReferenceCategoryId == SecondCategory)
+                            &&(MainCategory == null || riMain.Id == MainCategory)
+                            &&(SecondCategory == null || riSecond.Id == SecondCategory)
                             &&(PriceIntervalLower==null || p.Price >= PriceIntervalLower)
                             &&(PriceIntervalUpper==null || p.Price<= PriceIntervalUpper)
                             &&(MinQuantity==null || p.MinQuantity<=MinQuantity)
@@ -734,6 +734,7 @@ namespace JLSDataAccess.Repositories
                                    Code = riMain.Code,
                                    Label = rlMain.Label,
                                    CategoryId = rcMain.Id,
+                                   CategoryShortLabel = rcMain.ShortLabel,
                                    SecondCategory = (from riSecond in db.ReferenceItem
                                                      join rlSecond in db.ReferenceLabel on riSecond.Id equals rlSecond.ReferenceItemId
                                                      join rcSecond in db.ReferenceCategory on riSecond.ReferenceCategoryId equals rcSecond.Id
@@ -749,7 +750,8 @@ namespace JLSDataAccess.Repositories
                                                          Id = riSecond.Id,
                                                          Code = riSecond.Code,
                                                          Label = rlSecond.Label,
-                                                         CategoryId = rcSecond.Id
+                                                         CategoryId = rcSecond.Id,
+                                                         CategoryShortLabel = rcSecond.ShortLabel
                                                      }).Distinct().ToList()
                                }).Distinct().ToListAsync<dynamic>();
 
