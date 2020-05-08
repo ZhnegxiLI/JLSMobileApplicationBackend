@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JLSDataModel.Models.Product;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -23,6 +24,8 @@ namespace JLSDataModel.ViewModels
         public ProductListData()
         {
             this.PhotoPath = new List<ProductListPhotoPath>();
+
+            this.Comments = new List<ProductComment>();
         }
         public int? NumberOfComment { get; set; }
         public long ReferenceId { get; set; }
@@ -37,6 +40,8 @@ namespace JLSDataModel.ViewModels
         public int? MinQuantity { get; set; }
 
         public string DefaultPhotoPath { get; set; }
+
+        public List<ProductComment> Comments { get; set; }
 
         public List<ProductListPhotoPath> PhotoPath { get; set; }
     }

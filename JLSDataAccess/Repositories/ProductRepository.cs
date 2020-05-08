@@ -68,9 +68,6 @@ namespace JLSDataAccess.Repositories
                                 where rc.ShortLabel == "Product" && ri.Validity == true && rl.Lang == Lang &&       ri.ParentId == SecondCategoryReferenceId
                                 select new ProductListData()
                                 {
-                                    NumberOfComment = (from pc in db.ProductComment
-                                                       where pc.ProductId == product.Id
-                                                       select pc.Id).Count(),
                                     ProductId = product.Id,
                                     ReferenceId = ri.Id,
                                     Code = ri.Code,
@@ -118,9 +115,9 @@ namespace JLSDataAccess.Repositories
                           orderby ri.CreatedOn descending, rc.Id, rl.Label
                           select new ProductListData()
                           {
-                              NumberOfComment = (from pc in db.ProductComment
-                                                 where pc.ProductId == product.Id
-                                                 select pc.Id).Count(),
+                              Comments = (from pc in db.ProductComment
+                                          where pc.ProductId == product.Id
+                                          select pc).ToList(),
                               ProductId = product.Id,
                               ReferenceId = ri.Id,
                               Code = ri.Code,
@@ -176,9 +173,9 @@ namespace JLSDataAccess.Repositories
             var result1 = (from r in productList
                            select new
                            {
-                               NumberOfComment = (from pc in db.ProductComment
-                                                  where pc.ProductId == r.ProductId
-                                                  select pc.Id).Count(),
+                               Comments = (from pc in db.ProductComment
+                                           where pc.ProductId == r.ProductId
+                                           select pc).ToList(),
                                ReferenceId = r.ReferenceId,
                                ProductId = r.ProductId,
                                Code = r.Code,
@@ -213,9 +210,9 @@ namespace JLSDataAccess.Repositories
                                 orderby ri.CreatedOn descending, rc.Id, rl.Label
                                 select new
                                 {
-                                    NumberOfComment = (from pc in db.ProductComment
-                                                       where pc.ProductId == product.Id
-                                                       select pc.Id).Count(),
+                                    Comments = (from pc in db.ProductComment
+                                                where pc.ProductId == product.Id
+                                                select pc).ToList(),
                                     ProductId = product.Id,
                                     ReferenceId = ri.Id,
                                     Code = ri.Code,
@@ -377,9 +374,9 @@ namespace JLSDataAccess.Repositories
                                 && (Validity == null ||ri.Validity == Validity)
                                 && rl.Lang == Lang && rc.ShortLabel == "Product"
                                 select new {
-                                    NumberOfComment = (from pc in db.ProductComment
+                                    Comments = (from pc in db.ProductComment
                                                        where pc.ProductId == p.Id
-                                                       select pc.Id).Count(),
+                                                       select pc).ToList(),
                                     CreatedOn = p.CreatedOn,
                                     ReferenceId = ri.Id,
                                     ProductId = p.Id,
@@ -415,9 +412,6 @@ namespace JLSDataAccess.Repositories
                                 join rlMain in db.ReferenceLabel on riMain.Id equals rlMain.ReferenceItemId
                                 where riProduct.Validity == true && riSecond.Validity == true && riMain.Validity == true && rlProduct.Lang == Lang && rlSecond.Lang == Lang && rlMain.Lang == Lang && (rlMain.Label.Contains(SearchText) || rlSecond.Label.Contains(SearchText) || rlProduct.Label.Contains(SearchText) || p.Description.Contains(SearchText) || riProduct.Code.Contains(SearchText)) 
                                 select new {
-                                    NumberOfComment = (from pc in db.ProductComment
-                                                       where pc.ProductId == p.Id
-                                                       select pc.Id).Count(),
                                     ReferenceId = p.ReferenceItemId,
                                     ProductId = p.Id,
                                     Code = riProduct.Code,
@@ -451,9 +445,9 @@ namespace JLSDataAccess.Repositories
                             &&(MinQuantity==null || p.MinQuantity<=MinQuantity)
                                 select new
                                 {
-                                    NumberOfComment = (from pc in db.ProductComment
+                                    Comments = (from pc in db.ProductComment
                                                        where pc.ProductId == p.Id
-                                                       select pc.Id).Count(),
+                                                       select pc).ToList(),
                                     CreatedOn = p.CreatedOn,
                                     SalesQuantity = (from op in db.OrderProduct
                                                      where op.ReferenceId == riProduct.Id
@@ -501,9 +495,9 @@ namespace JLSDataAccess.Repositories
                           orderby p.Price 
                           select new
                           {
-                              NumberOfComment = (from pc in db.ProductComment
+                              Comments = (from pc in db.ProductComment
                                                  where pc.ProductId == p.Id
-                                                 select pc.Id).Count(),
+                                                 select pc).ToList(),
                               ReferenceId = p.ReferenceItemId,
                               ProductId = p.Id,
                               Code = riProduct.Code,
