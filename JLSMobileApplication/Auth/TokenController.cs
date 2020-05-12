@@ -170,7 +170,8 @@ namespace JLSMobileApplication.Auth
                 refresh_token = refreshToken,
                 roles = roles[0],
                 username = user.UserName,
-                userId = user.Id
+                userId = user.Id,
+                entrepriseName = user.EntrepriseName
                 };
             }
             catch (Exception e)

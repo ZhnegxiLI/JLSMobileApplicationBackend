@@ -18,7 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JLSMobileApplication.Controllers
 {
-    [Authorize] 
+    //[Authorize] 
     [Route("api/[controller]/{action}/{id?}")]
     [ApiController]
     public class OrderController : Controller
@@ -162,14 +162,19 @@ namespace JLSMobileApplication.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetOrdersListByUserId(int UserId, string StatusCode, string Lang)
+        public async Task<JsonResult> GetOrdersListByUserId(int UserId, string StatusCode, string Lang, int? Step, int? Begin)
         {
             try
             {
-               
+                var result = await _orderRepository.GetOrdersListByUserId(UserId, StatusCode, Lang);
+                if (Step!=null && Step>0 &&Begin!= null && Begin>= 0)
+                {
+                    result = result.Skip((int)Begin * (int)Step).Take((int)Step).ToList();
+                }
+           
                 return Json(new ApiResult()
                 {
-                    Data = await _orderRepository.GetOrdersListByUserId(UserId, StatusCode, Lang),
+                    Data = result,
                     Msg = "OK",
                     Success = true
                 });

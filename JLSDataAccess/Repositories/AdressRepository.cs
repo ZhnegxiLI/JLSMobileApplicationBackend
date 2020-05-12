@@ -109,5 +109,12 @@ namespace JLSDataAccess.Repositories
                           select a);
             return await result.FirstOrDefaultAsync();
         }
+
+        public async Task<Adress> GetAddressById(long AddressId)
+        {
+            var result = await db.Adress.Where(p => p.Id == AddressId).FirstOrDefaultAsync();
+            return result;
+        }
+        
     }
 }

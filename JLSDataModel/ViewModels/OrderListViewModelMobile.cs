@@ -19,5 +19,7 @@ namespace JLSDataModel.ViewModels
         public Adress ShippingAdress { get; set; }
         public string StatusCode { get; set; }
         public string StatusLabel { get; set; }
+
+        public int? NumberOfProduct { get; set; }
     }
 }

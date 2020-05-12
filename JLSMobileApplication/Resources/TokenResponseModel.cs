@@ -10,5 +10,7 @@ namespace JLSMobileApplication.Resources
         public string username { get; set; } // user name
 
         public int userId { get; set; }
+
+        public string entrepriseName { get; set; }
     }
 }

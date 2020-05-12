@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JLSMobileApplication.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]/{action}/{id?}")]
     [ApiController]
     public class AdressController : Controller
@@ -101,7 +101,23 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-        
+        [HttpGet]
+        public async Task<JsonResult> GetAddressById(long AddressId)
+        {
+            try
+            {
+                return Json(new ApiResult()
+                {
+                    Data = await _adress.GetAddressById(AddressId),
+                    Msg = "OK",
+                    Success = true
+                });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
 
         [HttpGet]
         public async Task<JsonResult> GetUserShippingAdress(int UserId)

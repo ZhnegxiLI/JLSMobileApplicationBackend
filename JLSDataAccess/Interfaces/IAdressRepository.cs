@@ -16,5 +16,7 @@ namespace JLSDataAccess.Interfaces
         Task<Adress> GetAdressByIdAsync(long Id);
         Task<List<Adress>> GetUserShippingAdress(int userId);
         Task<Adress> GetUserDefaultShippingAdress(int userId);
+
+        Task<Adress> GetAddressById(long AddressId);
     }
 }

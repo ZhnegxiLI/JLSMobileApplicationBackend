@@ -225,6 +225,7 @@ namespace JLSDataAccess.Repositories
                                     Id = o.Id,
                                     CreatedOn = o.CreatedOn,
                                     TotalPrice = o.TotalPrice,
+                                    NumberOfProduct = db.OrderProduct.Where(p=>p.OrderId == o.Id).Sum(p=>p.Quantity),
                                     ShippingAdressId = o.ShippingAdressId,
                                     ShippingAdress = (from a in db.Adress
                                                     where a.Id == o.ShippingAdressId

@@ -636,7 +636,15 @@ namespace JLSDataAccess.Repositories
                                                   select new { path.Id, path.Path }).ToList(),
                                     Comments = (from c in db.ProductComment
                                                 where c.ProductId == p.Id
-                                                select c).ToList(),
+                                                select new { 
+                                                    Id = c.Id,
+                                                    CreatedOn = c.CreatedOn,
+                                                    CreatedBy = c.CreatedBy,
+                                                    Email = db.Users.Where(p=>p.Id == c.UserId).Select(p=>p.Email).FirstOrDefault(),
+                                                    Body = c.Body,
+                                                    Title = c.Title,
+                                                    Level = c.Level
+                                                }).ToList(),
                                     Color = p.Color,
                                     Material = p.Material,
                                     Size = p.Size,
