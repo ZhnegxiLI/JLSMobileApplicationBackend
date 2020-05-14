@@ -102,6 +102,19 @@ namespace JLSMobileApplication.Controllers
         }
 
         [HttpGet]
+        public async Task<int> RemoveShippingAddress(long AddressId)
+        {
+            try
+            {
+                return await _adress.RemoveShippingAddress(AddressId);
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+
+        [HttpGet]
         public async Task<JsonResult> GetAddressById(long AddressId)
         {
             try

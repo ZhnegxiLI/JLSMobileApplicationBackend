@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using JLSDataAccess.Interfaces;
+using JLSDataModel.Models.User;
 using LjWebApplication.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JLSMobileApplication.Controllers
@@ -16,12 +18,14 @@ namespace JLSMobileApplication.Controllers
     [ApiController]
     public class UserController : Controller
     {
+        private readonly UserManager<User> _userManager;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public UserController(IMapper mapper, IUserRepository user)
+        public UserController(UserManager<User> userManager,IMapper mapper, IUserRepository user)
         {
             _mapper = mapper;
             _userRepository = user;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -67,6 +71,47 @@ namespace JLSMobileApplication.Controllers
             {
                 var result = await _userRepository.UpdateUserInfo(criteria.UserId, criteria.EntrepriseName, criteria.Siret, criteria.PhoneNumber, criteria.DefaultShippingAddressId);
                 return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
+        public  class UpdatePasswordCriteria
+        {
+            public int UserId { get; set; }
+            public string PreviousPassword { get; set; }
+
+            public string NewPassword { get; set; }
+        }
+        [HttpPost]
+        public async Task<int> UpdatePassword(UpdatePasswordCriteria criteria)
+        {
+            try
+            {
+                User user = _userManager.FindByIdAsync(criteria.UserId.ToString()).Result;
+                if (user != null && await _userManager.CheckPasswordAsync(user, criteria.PreviousPassword))
+                {
+
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                    var result = await _userManager.ResetPasswordAsync(user, token, criteria.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                  
+                }
+                else
+                {
+                    return 0;
+                }
             }
             catch (Exception e)
             {

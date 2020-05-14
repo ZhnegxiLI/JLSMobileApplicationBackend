@@ -271,16 +271,21 @@ namespace JLSMobileApplication.Controllers
 
 
         [HttpGet]
-        public async Task<JsonResult> GetFavoriteListByUserId(int UserId, string Lang, int Step, int Begin)
+        public async Task<JsonResult> GetFavoriteListByUserId(int UserId, string Lang, int? Step, int? Begin)
         {
             try
             {
                 var favoriteProductList = await _productRepository.GetFavoriteListByUserId(UserId, Lang);
                 var totalCount = favoriteProductList.Count();
+                var result = favoriteProductList;
+                if (Step!=null && Begin!=null)
+                {
+                    result = favoriteProductList.Skip((int)Begin * (int)Step).Take((int)Step).ToList();
+                }
                 return Json(new
                 {
                     TotalCount = totalCount,
-                    List = favoriteProductList.Skip(Begin * Step).Take(Step).ToList()
+                    List = result
                 });
             }
             catch (Exception exc)

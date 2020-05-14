@@ -115,6 +115,25 @@ namespace JLSDataAccess.Repositories
             var result = await db.Adress.Where(p => p.Id == AddressId).FirstOrDefaultAsync();
             return result;
         }
-        
+
+
+        public async Task<int> RemoveShippingAddress(long AddressId)
+        {
+            var address = await db.Adress.Where(p => p.Id == AddressId).FirstOrDefaultAsync();
+            var userAddress = await db.UserShippingAdress.Where(p => p.ShippingAdressId == AddressId).FirstOrDefaultAsync();
+            if (address != null && userAddress!= null)
+            {
+                db.Remove(address);
+                db.Remove(userAddress);
+
+                await db.SaveChangesAsync();
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+           
+        }
     }
 }

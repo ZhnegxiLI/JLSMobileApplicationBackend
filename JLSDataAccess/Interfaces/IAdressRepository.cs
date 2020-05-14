@@ -18,5 +18,7 @@ namespace JLSDataAccess.Interfaces
         Task<Adress> GetUserDefaultShippingAdress(int userId);
 
         Task<Adress> GetAddressById(long AddressId);
+
+        Task<int> RemoveShippingAddress(long AddressId);
     }
 }
