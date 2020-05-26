@@ -102,7 +102,7 @@ namespace JLSDataAccess.Repositories
             }
             return 0;
         }
-        public async Task<ProductListViewModel> GetProductListByPublishDate(string Lang, int begin, int step)
+        public async Task<ProductListViewModel> GetProductListByPublishDate(string Lang, long? MainCategoryId, int begin, int step)
         {
             var result = (from ri in db.ReferenceItem
                           join riSecond in db.ReferenceItem on ri.ParentId equals riSecond.Id
@@ -111,7 +111,7 @@ namespace JLSDataAccess.Repositories
                           join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
                           join product in db.Product on ri.Id equals product.ReferenceItemId
                           where rc.ShortLabel == "Product" && ri.Validity == true && rl.Lang == Lang
-                          && riSecond.Validity == true && riMain.Validity == true
+                          && riSecond.Validity == true && riMain.Validity == true && (MainCategoryId== null || riMain.Id == MainCategoryId)
                           orderby ri.CreatedOn descending, rc.Id, rl.Label
                           select new ProductListData()
                           {
@@ -196,7 +196,56 @@ namespace JLSDataAccess.Repositories
             };
         }
 
-        public async Task<List<dynamic>> GetFavoriteListByUserId(int UserId,string Lang)
+        public async Task<List<dynamic>> GetProductListByNote(string Lang)
+        {
+            var result = (from ri in db.ReferenceItem
+                          join riSecond in db.ReferenceItem on ri.ParentId equals riSecond.Id
+                          join riMain in db.ReferenceItem on riSecond.ParentId equals riMain.Id
+                          join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                          join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
+                          join product in db.Product on ri.Id equals product.ReferenceItemId
+                          from pc in db.ProductComment.Where(p => p.ProductId  == product.Id).DefaultIfEmpty()
+                          where rc.ShortLabel == "Product" && ri.Validity == true && rl.Lang == Lang
+                          && riSecond.Validity == true && riMain.Validity == true
+                          group pc by new { ri.Id, productId = product.Id, ri.ParentId, ri.Code, ri.Value, rl.Label, product.Price, product.QuantityPerBox, product.MinQuantity, pc.ProductId } into g
+                          orderby g.Sum(x => x.Level) descending
+                          select new
+                          {
+                              ReferenceId = g.Key.Id,
+                              ProductId = g.Key.productId,
+                              Code = g.Key.Code,
+                              ParentId = g.Key.ParentId,
+                              Value = g.Key.Value,
+                              Label = g.Key.Label,
+                              Price = g.Key.Price,
+                              QuantityPerBox = g.Key.QuantityPerBox,
+                              MinQuantity = g.Key.MinQuantity
+                          });
+            var productList = await result.ToListAsync();
+
+            var result1 = (from r in productList
+                           select new
+                           {
+                               Comments = (from pc in db.ProductComment
+                                           where pc.ProductId == r.ProductId
+                                           select pc).ToList(),
+                               ReferenceId = r.ReferenceId,
+                               ProductId = r.ProductId,
+                               Code = r.Code,
+                               ParentId = r.ParentId,
+                               Value = r.Value,
+                               Label = r.Label,
+                               Price = r.Price,
+                               QuantityPerBox = r.QuantityPerBox,
+                               MinQuantity = r.MinQuantity,
+                               DefaultPhotoPath = (from pp in db.ProductPhotoPath
+                                                   where pp.ProductId == r.ProductId
+                                                   select pp.Path).FirstOrDefault()
+                           }).ToList<dynamic>();
+            return result1;
+        }
+
+        public async Task<List<dynamic>> GetFavoriteListByUserId(int UserId, string Lang)
         {
             var result = await (from ri in db.ReferenceItem
                                 join riSecond in db.ReferenceItem on ri.ParentId equals riSecond.Id
@@ -229,6 +278,7 @@ namespace JLSDataAccess.Repositories
                                 }).ToListAsync<dynamic>();
             return result;
         }
+
 
         public async Task<long> AddIntoProductFavoriteList(int UserId, long ProductId, bool? IsFavorite)
         {
@@ -484,14 +534,14 @@ namespace JLSDataAccess.Repositories
             return await result.ToListAsync<dynamic>();
         }
 
-        public async Task<List<dynamic>> GetProductByPrice(string Lang)
+        public async Task<List<dynamic>> GetProductByPrice(string Lang, long? MainCategoryId)
         {
             var result = (from riProduct in db.ReferenceItem
                           join p in db.Product on riProduct.Id equals p.ReferenceItemId
                           join rlProduct in db.ReferenceLabel on riProduct.Id equals rlProduct.ReferenceItemId
                           join riSecond in db.ReferenceItem on riProduct.ParentId equals riSecond.Id
                           join riMain in db.ReferenceItem on riSecond.ParentId equals riMain.Id
-                          where riProduct.Validity == true && riSecond.Validity == true && riMain.Validity == true && rlProduct.Lang == Lang
+                          where riProduct.Validity == true && riSecond.Validity == true && riMain.Validity == true && rlProduct.Lang == Lang && (MainCategoryId == null || riMain.Id == MainCategoryId)
                           orderby p.Price 
                           select new
                           {

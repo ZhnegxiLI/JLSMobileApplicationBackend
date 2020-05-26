@@ -18,7 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JLSMobileApplication.Controllers
 {
-    //[Authorize] 
+    [Authorize] 
     [Route("api/[controller]/{action}/{id?}")]
     [ApiController]
     public class OrderController : Controller
@@ -186,7 +186,7 @@ namespace JLSMobileApplication.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetOrdersListByOrderId(long OrderId, string Lang)
+        public async Task<JsonResult> GetOrdersListByOrderId(long OrderId , string Lang)
         {
             try
             {

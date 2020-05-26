@@ -36,7 +36,7 @@ namespace JLSMobileApplication.Controllers
 
 
         /* Auth zoom */
-        //[Authorize]
+        [Authorize]
         [HttpGet]
         public async Task<JsonResult> GetUserById(int UserId)
         {
@@ -63,7 +63,7 @@ namespace JLSMobileApplication.Controllers
 
             public long? DefaultShippingAddressId { get; set; }
         }
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<JsonResult> UpdateUserInfo(UpdateUserInfoCriteria criteria)
         {
@@ -86,6 +86,7 @@ namespace JLSMobileApplication.Controllers
 
             public string NewPassword { get; set; }
         }
+        [Authorize]
         [HttpPost]
         public async Task<int> UpdatePassword(UpdatePasswordCriteria criteria)
         {

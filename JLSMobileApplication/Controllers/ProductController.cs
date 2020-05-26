@@ -66,11 +66,11 @@ namespace JLSMobileApplication.Controllers
 
 
         [HttpGet]
-        public async Task<JsonResult> GetProductByPrice(string Lang, int Begin, int Step)
+        public async Task<JsonResult> GetProductByPrice(string Lang, long? MainCategoryId, int Begin, int Step)
         {
             try
             {
-                var result = await _productRepository.GetProductByPrice(Lang);
+                var result = await _productRepository.GetProductByPrice(Lang, MainCategoryId);
 
                 return Json(new
                 {
@@ -85,13 +85,13 @@ namespace JLSMobileApplication.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetProductListByPublishDate(string Lang, int Begin, int Step)
+        public async Task<JsonResult> GetProductListByPublishDate(string Lang, long? MainCategoryId, int Begin, int Step)
         {
             try
             {
                 return Json(new ApiResult()
                 {
-                    Data = await _productRepository.GetProductListByPublishDate(Lang, Begin, Step),
+                    Data = await _productRepository.GetProductListByPublishDate(Lang, MainCategoryId, Begin, Step),
                     Msg = "OK",
                     Success = true
                 });
@@ -253,7 +253,25 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
-        
+
+        [HttpGet]
+        public async Task<JsonResult> GetProductListByNote(string Lang, int Begin, int Step)
+        {
+            try
+            {
+                var result = await _productRepository.GetProductListByNote(Lang);
+                return Json(new
+                {
+                    TotalCount = result.Count(),
+                    List = result.Skip(Begin * Step).Take(Step).ToList()
+                });
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
+
 
         [HttpGet]
         public async Task<JsonResult> GetProductById(long ProductId, string Lang, int? UserId)
@@ -353,9 +371,9 @@ namespace JLSMobileApplication.Controllers
             int Begin = 0;
             try
             {
-                var productByPublishDate = await _productRepository.GetProductListByPublishDate(Lang, Begin, Step);
+                var productByPublishDate = await _productRepository.GetProductListByPublishDate(Lang,null, Begin, Step);
                 var productBySalesPerformance = await _productRepository.GetProductListBySalesPerformance(Lang, Begin, Step);
-                var productByPrice = (await _productRepository.GetProductByPrice(Lang)).Take(Step).ToList();
+                var productByPrice = (await _productRepository.GetProductByPrice(Lang,null)).Take(Step).ToList();
 
 
                 return Json(new {

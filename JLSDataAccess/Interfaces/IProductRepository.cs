@@ -11,7 +11,7 @@ namespace JLSDataAccess.Interfaces
     public interface IProductRepository
     {
         Task<List<ProductCategoryViewModel>> GetProductMainCategory(string Lang);
-        Task<List<dynamic>> GetProductByPrice(string Lang);
+        Task<List<dynamic>> GetProductByPrice(string Lang, long? MainCategoryId);
         Task<List<ProductCategoryViewModel>> GetProductSecondCategory(long MainCategoryReferenceId, string Lang);
 
         Task<ProductListViewModel> GetProductListBySecondCategory(long SecondCategoryReferenceId, string Lang, int begin, int step);
@@ -24,8 +24,9 @@ namespace JLSDataAccess.Interfaces
 
         Task<long> SavePhotoPath(long ProductId, string Path);
 
-        Task<ProductListViewModel> GetProductListByPublishDate(string Lang, int begin, int step);
+        Task<ProductListViewModel> GetProductListByPublishDate(string Lang, long? MainCategoryId, int begin, int step);
 
+        Task<List<dynamic>> GetProductListByNote(string Lang);
 
         Task<List<ProductComment>> GetAllProductCommentList(int begin, int step);
         Task<List<ProductCommentViewModel>> GetProductCommentListByCriteria(long? ProductId, long? UserId, string Lang);

@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JLSMobileApplication.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]/{action}/{id?}")]
     [ApiController]
     public class AdressController : Controller
