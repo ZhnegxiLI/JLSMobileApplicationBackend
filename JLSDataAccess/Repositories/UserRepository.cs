@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using JLSDataModel.Models.User;
 using Microsoft.AspNetCore.Identity;
 using System.Data.SqlClient;
+using JLSDataModel.Models.Website;
 
 namespace JLSDataAccess.Repositories
 {
@@ -21,6 +22,20 @@ namespace JLSDataAccess.Repositories
         {
             db = jlsDbContext;
             _userManager = userManager;
+        }
+        public async Task<long> InsertSubscribeEmail(string Email)
+        {
+            var result = db.SubscribeEmail.Where(p => p.Email == Email).FirstOrDefault();
+            if (result == null )
+            {
+                var EmailToInsert = new SubscribeEmail();
+                EmailToInsert.Email = Email;
+                db.Add(EmailToInsert);
+                await db.SaveChangesAsync();
+                return EmailToInsert.Id;
+            }
+            return 0;
+
         }
         public async Task<Adress> GetUserFacturationAdress(int userId)
         {

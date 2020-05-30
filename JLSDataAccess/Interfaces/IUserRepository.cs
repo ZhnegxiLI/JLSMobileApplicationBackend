@@ -9,7 +9,7 @@ namespace JLSDataAccess.Interfaces
 {
     public interface IUserRepository
     {
-
+        Task<long> InsertSubscribeEmail(string Email);
         Task<bool> CheckUserIsAlreadyExist(string Username);
 
         Task<Adress> GetUserFacturationAdress(int userId);

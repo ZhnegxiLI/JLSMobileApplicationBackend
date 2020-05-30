@@ -33,7 +33,11 @@ namespace JLSMobileApplication.Controllers
         {
             return await _userRepository.CheckUserIsAlreadyExist(Username);
         }
-
+        [HttpGet]
+        public async Task<long> InsertSubscribeEmail(string Email)
+        {
+            return await _userRepository.InsertSubscribeEmail(Email);
+        }
 
         /* Auth zoom */
         [Authorize]

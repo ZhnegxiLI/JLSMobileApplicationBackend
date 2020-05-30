@@ -32,6 +32,7 @@ namespace JLSMobileApplication.Controllers
 
             public Message Message { get; set; }
         }
+        [AllowAnonymous]
         [HttpPost]
         public async Task<long> SaveMessage([FromBody]SaveMessageCriteria criteria)
         {
