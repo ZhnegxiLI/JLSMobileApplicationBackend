@@ -116,21 +116,14 @@ namespace JLSMobileApplication.Services
         {
             EmailTemplate emailModelClient = null;
 
-            db.EmailTemplate.Where(p => p.Name == Type).FirstOrDefault();
+            emailModelClient = db.EmailTemplate.Where(p => p.Name == Type).FirstOrDefault();
             var user = db.Users.Find(UserId);
 
             if (emailModelClient!=null && user != null && user.Email !=null)
             {
                 var emailClientTemplate = emailModelClient.Body;
-                if (Type== "ResetPassword")
-                {
-                    // TODO: replace email here 
-                }
-                else if (Type == "EmailConfirmation")
-                {
-                    // TODO: replace email here 
-                }
-                await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate);
+                emailClientTemplate = emailClientTemplate.Replace("{Link}", "http://" + Link);
+                    await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate);
                 //_email.SendEmail(user.Email, emailModelClient.Title, emailClientTemplate);
                 return user.Id;
             }

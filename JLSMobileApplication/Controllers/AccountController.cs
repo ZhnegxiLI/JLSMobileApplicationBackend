@@ -4,12 +4,14 @@ using JLSDataAccess.Interfaces;
 using JLSDataModel.Models;
 using JLSDataModel.Models.Adress;
 using JLSDataModel.Models.User;
+using JLSMobileApplication.Heplers;
 using JLSMobileApplication.Resources;
 using JLSMobileApplication.Services;
 using LjWebApplication.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -26,7 +28,8 @@ namespace JLSMobileApplication.Controllers
         private readonly ISendEmailAndMessageService _sendEmailAndMessageService;
         private readonly IMapper _mapper;
 
-        public AccountController(UserManager<User> userManager, JlsDbContext dbContext, IMapper mapper, IEmailService emailService, IAdressRepository adressRepository, ISendEmailAndMessageService sendEmailAndMessageService)
+        private readonly AppSettings _appSettings;
+        public AccountController(UserManager<User> userManager, JlsDbContext dbContext, IMapper mapper, IEmailService emailService, IAdressRepository adressRepository, ISendEmailAndMessageService sendEmailAndMessageService, IOptions<AppSettings> appSettings)
         {
             _mapper = mapper;
             _userManager = userManager;
@@ -34,6 +37,7 @@ namespace JLSMobileApplication.Controllers
             _emailService = emailService;
             _adressRepository = adressRepository;
             _sendEmailAndMessageService = sendEmailAndMessageService;
+            _appSettings = appSettings.Value;
         }
     
 
@@ -187,7 +191,7 @@ namespace JLSMobileApplication.Controllers
 
 
         [HttpPost("[action]")]
-        public IActionResult ResetPassword(ResetPasswordViewModel  obj)
+        public bool ResetPassword(ResetPasswordViewModel  obj)
         {
             User userIdentity = _userManager.FindByNameAsync(obj.UserName).Result;
 
@@ -197,12 +201,12 @@ namespace JLSMobileApplication.Controllers
             {
                 _sendEmailAndMessageService.AfterResetPasswordOuConfirmEmailLinkAsync(userIdentity.Id, "AfterResetPassword");
                 ViewBag.Message = "Password reset successful!";
-                return View("Success");
+                return true;
             }
             else
             {
                 ViewBag.Message = "Error while resetting the password!";
-                return View("Error");
+                return false;
             }
         }
 
@@ -225,12 +229,13 @@ namespace JLSMobileApplication.Controllers
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            var resetLink = Url.Action("ResetPassword",
-                "Account", new { token = token },HttpContext.Request.Scheme);
-
-            _sendEmailAndMessageService.ResetPasswordOuConfirmEmailLinkAsync(user.Id, resetLink, "ResetPassword");
+            //var resetLink = Url.Action("ResetPassword",
+            //    "Account", new { token = token },HttpContext.Request.Scheme);
+            var resetLink = _appSettings.WebSiteUrl + "/account/resetPassword?Token=" + token+"&Username="+ user.UserName;
+           await _sendEmailAndMessageService.ResetPasswordOuConfirmEmailLinkAsync(user.Id, resetLink, "ResetPassword");
             return Json(new ApiResult()
             {
+                DataExt = resetLink,
                 Data = username,
                 Msg = "OK",
                 Success = true
