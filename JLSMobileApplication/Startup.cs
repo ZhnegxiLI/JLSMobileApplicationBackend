@@ -26,6 +26,7 @@ using Microsoft.Extensions.FileProviders;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Hangfire;
+using JLSMobileApplication.hubs;
 
 namespace JLSMobileApplication
 {
@@ -133,6 +134,9 @@ namespace JLSMobileApplication
                     });
             });
 
+            /*注入实时通信类*/
+            services.AddSignalR();
+
             services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnectionString")));
 
             /* 注入数据操作类 */
@@ -178,6 +182,7 @@ namespace JLSMobileApplication
                 }
             });
 
+
             Initialization.AddAdminUser(userManager, context);
 
             app.UseErrorHandling();
@@ -185,6 +190,11 @@ namespace JLSMobileApplication
             app.UseAuthentication();
 
             app.UseStaticFiles();
+
+            app.UseSignalR(options =>
+            {
+                options.MapHub<MessageHub>("/MessageHub");
+            });
 
             app.UseMvc(routes =>
             {
