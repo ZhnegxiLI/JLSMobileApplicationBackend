@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -124,6 +125,10 @@ namespace JLSMobileApplication.Services
                             else
                             {
                                 value = "";
+                            }
+                            if (value is IList && value.GetType().IsGenericType)
+                            {
+                                valueFormatted = "";
                             }
 
                             datarow.CreateCell(columnsCounter).SetCellValue(valueFormatted!=null? valueFormatted: value);
