@@ -10,6 +10,7 @@ using JLSDataModel.Models.User;
 using Microsoft.AspNetCore.Identity;
 using System.Data.SqlClient;
 using JLSDataModel.Models.Website;
+using JLSDataModel.Models;
 
 namespace JLSDataAccess.Repositories
 {
@@ -23,6 +24,92 @@ namespace JLSDataAccess.Repositories
             db = jlsDbContext;
             _userManager = userManager;
         }
+
+        public async Task<long> UpdateReadedDialog(int UserId)
+        {
+            var dialogs = await db.Dialog.Where(p => p.FromUserId == UserId).ToListAsync();
+
+            foreach (var item in dialogs)
+            {
+                item.IsReaded = true;
+                db.Update(item);
+            }
+          
+            await db.SaveChangesAsync();
+
+            return 1;
+        }
+
+        public async Task<long> InsertDialog(string Message, int FromUserId, int? ToUserId)
+        {
+            var dialog = new Dialog();
+
+            dialog.Message = Message;
+            dialog.FromUserId = FromUserId;
+            dialog.ToUserId = ToUserId;
+
+            await db.AddAsync(dialog);
+            await db.SaveChangesAsync();
+
+            return dialog.Id;
+        }
+
+        public async Task<List<dynamic>> GetNoReadedDialog(int UserId)
+        {
+            var result = await (from d in db.Dialog
+                                where   d.IsReaded == false && d.FromUserId!= UserId
+                                group d by d.FromUserId into g
+                                select new
+                                {
+                                    UserId = g.Key,
+                                    NumberOfNoReadMessage = g.Count()
+                                }).Distinct().ToListAsync<dynamic>();
+            return result;
+        }
+
+        public async Task<List<dynamic>> GetChatDialog(int UserId, int AdminUserId)
+        {
+            var result = await (from d in db.Dialog
+                                where d.FromUserId == UserId || (d.ToUserId == UserId && d.FromUserId == AdminUserId)
+                                orderby d.CreatedOn
+                                select new  {
+                                    MessageId = d.Id,
+                                    Body = d.Message,
+                                    CreatedOn = d.CreatedOn,
+                                    FromUserId = d.FromUserId,
+                                    FromUserName = (from u in db.Users
+                                                where u.Id == d.FromUserId
+                                                select u.Email).FirstOrDefault()
+                                }).Distinct().ToListAsync <dynamic>();
+            return result;
+        }
+
+        public async Task<List<dynamic>> GetChatedUser(int UserId)
+        {
+            var result = await (from u in db.Users
+                                join d in db.Dialog on u.Id equals d.FromUserId
+                                where u.Id != UserId
+                                orderby d.CreatedOn descending
+                                select u.Id).Distinct().ToListAsync<int>();
+            var result1 = (from r in result
+                           join u in db.Users on r equals u.Id
+                           select new
+                           {
+                               UserId = r,
+                               Username = u.UserName,
+                               LastMessage = (from d in db.Dialog
+                                              where d.FromUserId == r
+                                              orderby d.CreatedOn descending
+                                              select new
+                                              {
+                                                  CreatedOn = d.CreatedOn,
+                                                  Body = d.Message,
+                                                  IsReaded = d.IsReaded
+                                              }).FirstOrDefault()
+                           }).ToList<dynamic>();
+            return result1;
+        }
+
         public async Task<long> InsertSubscribeEmail(string Email)
         {
             var result = db.SubscribeEmail.Where(p => p.Email == Email).FirstOrDefault();

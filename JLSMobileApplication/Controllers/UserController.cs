@@ -38,6 +38,7 @@ namespace JLSMobileApplication.Controllers
         {
             return await _userRepository.InsertSubscribeEmail(Email);
         }
+     
 
         /* Auth zoom */
         [Authorize]

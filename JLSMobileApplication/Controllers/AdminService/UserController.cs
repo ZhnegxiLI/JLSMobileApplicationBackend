@@ -90,6 +90,32 @@ namespace JLSMobileApplication.Controllers.AdminService
         }
 
         [HttpGet]
+        public async Task<List<dynamic>> GetChatedUser(int UserId)
+        {
+            return await _userRepository.GetChatedUser(UserId);
+        }
+
+        [HttpGet]
+        public async Task<List<dynamic>> GetChatDialog(int UserId, int AdminUserId)
+        {
+            return await _userRepository.GetChatDialog(UserId, AdminUserId);
+        }
+
+        [HttpGet]
+        public async Task<long> UpdateReadedDialog(int UserId)
+        {
+            return await _userRepository.UpdateReadedDialog(UserId);
+        }
+
+        [HttpGet]
+        public async Task<List<dynamic>> GetNoReadedDialog(int UserId)
+        {
+            return await _userRepository.GetNoReadedDialog(UserId);
+        }
+
+
+
+        [HttpGet]
         public async Task<JsonResult> GetUserById(int UserId)
         {
             try

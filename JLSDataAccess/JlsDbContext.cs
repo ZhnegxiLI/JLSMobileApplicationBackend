@@ -74,6 +74,7 @@ namespace JLSDataAccess
         public virtual DbSet<EmailToSend> EmailToSend { get; set; }
         public virtual DbSet<WebsiteSlide> WebsiteSlide { get; set; }
         public virtual DbSet<SubscribeEmail> SubscribeEmail { get; set; }
+        public virtual DbSet<Dialog> Dialog { get; set; }
         
     }
 }
