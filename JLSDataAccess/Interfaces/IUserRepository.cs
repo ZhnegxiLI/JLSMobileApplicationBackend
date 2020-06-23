@@ -13,9 +13,11 @@ namespace JLSDataAccess.Interfaces
         Task<bool> CheckUserIsAlreadyExist(string Username);
         Task<long> UpdateReadedDialog(int UserId);
         Task<List<dynamic>> GetNoReadedDialog(int UserId);
+
+        Task<List<dynamic>> GetNoReadedDialogClient(int UserId);
         Task<long> InsertDialog(string Message, int FromUserId, int? ToUserId);
         Task<List<dynamic>> GetChatedUser(int UserId);
-        Task<List<dynamic>> GetChatDialog(int UserId, int AdminUserId);
+        Task<List<dynamic>> GetChatDialog(int UserId, int? AdminUserId);
         Task<Adress> GetUserFacturationAdress(int userId);
 
         Task<List<Adress>> GetUserShippingAdress(int userId);

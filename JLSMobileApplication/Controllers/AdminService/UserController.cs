@@ -96,7 +96,7 @@ namespace JLSMobileApplication.Controllers.AdminService
         }
 
         [HttpGet]
-        public async Task<List<dynamic>> GetChatDialog(int UserId, int AdminUserId)
+        public async Task<List<dynamic>> GetChatDialog(int UserId, int? AdminUserId)
         {
             return await _userRepository.GetChatDialog(UserId, AdminUserId);
         }

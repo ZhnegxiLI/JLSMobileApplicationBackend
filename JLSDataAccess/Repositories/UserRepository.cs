@@ -67,10 +67,23 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-        public async Task<List<dynamic>> GetChatDialog(int UserId, int AdminUserId)
+        public async Task<List<dynamic>> GetNoReadedDialogClient(int UserId)
         {
             var result = await (from d in db.Dialog
-                                where d.FromUserId == UserId || (d.ToUserId == UserId && d.FromUserId == AdminUserId)
+                                where d.IsReaded == false && d.ToUserId == UserId
+                                group d by d.FromUserId into g
+                                select new
+                                {
+                                    UserId = g.Key,
+                                    NumberOfNoReadMessage = g.Count()
+                                }).Distinct().ToListAsync<dynamic>();
+            return result;
+        }
+
+        public async Task<List<dynamic>> GetChatDialog(int UserId, int? AdminUserId)
+        {
+            var result = await (from d in db.Dialog
+                                where d.FromUserId == UserId || (d.ToUserId == UserId && (AdminUserId ==null || d.FromUserId == AdminUserId))
                                 orderby d.CreatedOn
                                 select new  {
                                     MessageId = d.Id,

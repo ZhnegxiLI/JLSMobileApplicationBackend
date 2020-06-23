@@ -38,7 +38,25 @@ namespace JLSMobileApplication.Controllers
         {
             return await _userRepository.InsertSubscribeEmail(Email);
         }
-     
+       
+        [HttpGet]
+         public async Task<List<dynamic>> GetNoReadedDialogClient(int UserId)
+        {
+            return await _userRepository.GetNoReadedDialogClient(UserId);
+        }
+        [HttpGet]
+        public async Task<long> UpdateReadedDialog(int UserId)
+        {
+            return await _userRepository.UpdateReadedDialog(UserId);
+        }
+        
+
+        [HttpGet]
+        public async Task<List<dynamic>> GetChatDialog(int UserId)
+        {
+            return await _userRepository.GetChatDialog(UserId,null);
+        }
+        
 
         /* Auth zoom */
         [Authorize]

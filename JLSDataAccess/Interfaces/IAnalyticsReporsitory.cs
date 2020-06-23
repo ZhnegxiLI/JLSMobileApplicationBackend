@@ -9,5 +9,11 @@ namespace JLSDataAccess.Interfaces
     public interface IAnalyticsReporsitory
     {
         Task<List<dynamic>> GetAdminSalesPerformanceDashboard(string Lang);
+
+        Task<List<dynamic>> GetTeamMemberSalesPerformance();
+
+        Task<List<dynamic>> GetInternalExternalSalesPerformance(string Lang);
+
+        Task<List<dynamic>> GetSalesPerformanceByStatus(string Lang);
     }
 }

@@ -40,5 +40,50 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<JsonResult> GetInternalExternalSalesPerformance(string Lang)
+        {
+            try
+            {
+                var result = await _analytics.GetInternalExternalSalesPerformance(Lang);
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetSalesPerformanceByStatus(string Lang)
+        {
+            try
+            {
+                var result = await _analytics.GetSalesPerformanceByStatus(Lang);
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetTeamMemberSalesPerformance()
+        {
+            try
+            {
+                var result = await _analytics.GetTeamMemberSalesPerformance();
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
     }
 }

@@ -19,6 +19,78 @@ namespace JLSDataAccess.Repositories
             db = context;
         }
 
+        public class TeamMemberSalesPerformance
+        {
+            public int UserId { get; set; }
+            public int? Year { get; set; }
+            public int? Month { get; set; }
+            public float? Sum { get; set; }
+        }
+        public async Task<List<dynamic>> GetTeamMemberSalesPerformance()
+        {
+            var adminRoleIds = await db.Roles.Where(p => p.Name == "Admin" || p.Name == "SuperAdmin").Select(p=>p.Id).ToListAsync();
+            var salesPerformance = await (from p in db.OrderInfo
+                                    join ur in db.UserRoles on p.UserId equals ur.UserId
+                                    where adminRoleIds.Contains(ur.RoleId) && p.CreatedOn>= DateTime.Now.AddYears(-1) // last 1 year 
+                                    group p by  new { p.UserId, p.CreatedOn.Value.Month, p.CreatedOn.Value.Year } into g
+                                    orderby g.Key.Year, g.Key.Month descending
+                                    select new TeamMemberSalesPerformance()
+                                    {
+                                        UserId = g.Key.UserId,
+                                        Year = g.Key.Year,
+                                        Month = g.Key.Month,
+                                        Sum = g.Sum(p => p.TotalPrice)
+                                    }).ToListAsync();
+            var userList = await (from u in db.Users
+                            join ur in db.UserRoles on u.Id equals ur.UserId
+                            select new
+                            {
+                                UserId = u.Id,
+                                Performance = (from s in salesPerformance
+                                               where s.UserId == u.Id
+                                               select s),
+                                Username = u.UserName,
+                                CreatedOn = u.CreatedOn
+                            }).ToListAsync<dynamic>();
+
+            return userList;
+        }
+
+        public async Task<List<dynamic>> GetInternalExternalSalesPerformance(string Lang)
+        {
+            var riValidAndProgressing = await db.ReferenceItem.Where(p => p.Code == "OrderStatus_Valid" || p.Code == "OrderStatus_Progressing").Select(p => p.Id).ToListAsync();
+            var result = await (from ri in db.ReferenceItem
+                              join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
+                              where (ri.Code == "OrderType_Internal" || ri.Code == "OrderType_External") && rl.Lang == Lang
+                              select new
+                              {
+                                  Id = ri.Id,
+                                  Code = ri.Code,
+                                  Label = rl.Label,
+                                  OrderCount = db.OrderInfo.Where(p=>p.OrderTypeId == ri.Id && riValidAndProgressing.Contains(p.StatusReferenceItemId)).Count(),
+                                  OrderSum = db.OrderInfo.Where(p => p.OrderTypeId == ri.Id && riValidAndProgressing.Contains(p.StatusReferenceItemId)).Sum(p=>p.TotalPrice),
+                              }).ToListAsync<dynamic>();
+            
+            return result;
+        }
+
+        public async Task<List<dynamic>> GetSalesPerformanceByStatus(string Lang)
+        {
+            var statusCategoryId = db.ReferenceCategory.Where(p => p.ShortLabel == "OrderStatus").Select(p => p.Id).FirstOrDefault();
+            var result = await (from ri in db.ReferenceItem
+                                join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
+                                where ri.ReferenceCategoryId == statusCategoryId && rl.Lang == Lang
+                                select new
+                                {
+                                    Id = ri.Id,
+                                    Code = ri.Code,
+                                    Label = rl.Label,
+                                    OrderCount = db.OrderInfo.Where(p => p.StatusReferenceItemId == ri.Id).Count()
+                                }).ToListAsync<dynamic>();
+
+            return result;
+        }
+
         public async Task<List<dynamic>> GetAdminSalesPerformanceDashboard(string Lang)
         {
            // var riStatusId = db.ReferenceItem.Where(p => p.Code == "OrderStatus_Valid").Select(p => p.Id).FirstOrDefault();
@@ -57,9 +129,6 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-        private object await(IQueryable<object> queryable)
-        {
-            throw new NotImplementedException();
-        }
+
     }
 }
