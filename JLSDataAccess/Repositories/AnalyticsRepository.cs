@@ -91,6 +91,23 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
+
+        public async Task<List<dynamic>> GetSalesPerformanceByYearMonth()
+        {
+            var riValidAndProgressing = await db.ReferenceItem.Where(p => p.Code == "OrderStatus_Valid" || p.Code == "OrderStatus_Progressing").Select(p => p.Id).ToListAsync();
+            var result = await (from o in db.OrderInfo
+                          where riValidAndProgressing.Contains(o.StatusReferenceItemId)
+                          group o by new { o.CreatedOn.Value.Year, o.CreatedOn.Value.Month } into g
+                          select new
+                          {
+                              Year = g.Key.Year,
+                              Month = g.Key.Month,
+                              Sum = g.Sum(p => p.TotalPrice)
+                          }).ToListAsync<dynamic>();
+
+            return result;
+        }
+
         public async Task<List<dynamic>> GetAdminSalesPerformanceDashboard(string Lang)
         {
            // var riStatusId = db.ReferenceItem.Where(p => p.Code == "OrderStatus_Valid").Select(p => p.Id).FirstOrDefault();

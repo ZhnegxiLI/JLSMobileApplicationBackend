@@ -19,10 +19,14 @@ namespace JLSMobileApplication.Controllers
     public class AnalyticsController : Controller
     {
         private readonly IAnalyticsReporsitory  _analytics;
+        private readonly IOrderRepository _orderRepository;
+        private readonly JlsDbContext db;
 
-        public AnalyticsController(IAnalyticsReporsitory analyticsRepository)
+        public AnalyticsController(IOrderRepository orderRepository, IAnalyticsReporsitory analyticsRepository, JlsDbContext context)
         {
             _analytics = analyticsRepository;
+            this._orderRepository = orderRepository;
+            db = context;
         }
 
         [HttpGet]
@@ -39,6 +43,47 @@ namespace JLSMobileApplication.Controllers
                 throw e;
             }
         }
+        /* 前端加入 */
+        [HttpGet]
+        public async Task<JsonResult> GetRecentOrderInfo(string Lang)
+        {
+            try
+            {
+                var statusIdProgressingId = db.ReferenceItem.Where(p => p.Code == "OrderStatus_Progressing").Select(p => p.Id).FirstOrDefault();
+                // last 10 days 
+                var progressingList = (await _orderRepository.AdvancedOrderSearchByCriteria(Lang, null, DateTime.Now.AddDays(-10),DateTime.Today, null, statusIdProgressingId)).Skip(0).Take(10);
+
+                var statusIdValidedId = db.ReferenceItem.Where(p => p.Code == "OrderStatus_Valid").Select(p => p.Id).FirstOrDefault();
+                // last 10 days 
+                var validedList = (await _orderRepository.AdvancedOrderSearchByCriteria(Lang, null, DateTime.Now.AddDays(-10), DateTime.Today, null, statusIdValidedId)).Skip(0).Take(10);
+
+                return Json(new
+                {
+                    ProgressingOrderList = progressingList,
+                    ValidedOrderList = validedList
+                });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+        /* 前端加入 */
+        [HttpGet]
+        public async Task<JsonResult> GetSalesPerformanceByYearMonth()
+        {
+            try
+            {
+                var result = await _analytics.GetSalesPerformanceByYearMonth();
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+        
 
         [HttpGet]
         public async Task<JsonResult> GetInternalExternalSalesPerformance(string Lang)

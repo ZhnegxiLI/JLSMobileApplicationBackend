@@ -15,5 +15,7 @@ namespace JLSDataAccess.Interfaces
         Task<List<dynamic>> GetInternalExternalSalesPerformance(string Lang);
 
         Task<List<dynamic>> GetSalesPerformanceByStatus(string Lang);
+
+        Task<List<dynamic>> GetSalesPerformanceByYearMonth();
     }
 }
