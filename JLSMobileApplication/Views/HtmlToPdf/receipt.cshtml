@@ -45,7 +45,27 @@
         <text>NO：@Model.Data.OrderId</text>
         <text style="float: right;margin-right: 6%;">交易时间：@Model.Data.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss")</text>
     </p>
-
+    <h3  style="margin-left: 5%; margin-top: 1%;">Client info</h3>
+    <table width="90%" style="margin-left: 5%; margin-top: 1%;">
+        <thead>
+            <tr>
+                <th>Entreprise</th>
+                <th>Phone</th>
+                <th>Username</th>
+                <th>Siret</th>
+ 
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.Data.Entreprise</td>
+                <td>@Model.Data.PhoneNumber</td>
+                <td>@Model.Data.Username</td>
+                <td>@Model.Data.Siret</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3  style="margin-left: 5%; margin-top: 1%;">Products</h3>
     <table width="90%" style="margin-left: 5%; margin-top: 1%;">
         <thead>
             <tr>
@@ -60,14 +80,14 @@
             @foreach (var item in Model.Data.ProductList)
             {
                 double totalPrice = @item.Price * @item.Quantity;
-            <tr>
-                <td>@item.Code</td>
-                <td>@item.Label</td>
-                <td>@item.Quantity</td>
-                <td>@item.Price €</td>
-                <td>@totalPrice €</td>
+                <tr>
+                    <td>@item.Code</td>
+                    <td>@item.Label</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Price €</td>
+                    <td>@totalPrice €</td>
 
-            </tr>
+                </tr>
             }
 
 
@@ -82,39 +102,36 @@
 
         </tbody>
     </table>
+    <div style="margin-left: 5%; margin-top: 1%;width:90%; ">
+        <div style="width:48%;border: 1px solid; float:left; height:160px;padding-left:5px;">
+            <h3>Facturation address</h3>
+            <div class="address-card__name">@Model.Data.FacturationAddress.ContactFirstName  @Model.Data.FacturationAddress.ContactLastName</div>
+            <div class="address-card__row">
 
-    @*<table width="90%" style="margin-left: 5%; margin-top: 1%;">
-            <tr style="font-size: 1rem;">
-                <td style="text-align: center; width: 11%;">交款姓名</td>
-                <td colspan="2">@Model.Data.Name</td>
-                <td style="text-align: center; width: 13%;">身份证号码</td>
-                <td colspan="3">@Model.Data.IdNo</td>
-            </tr>
-            <tr style="font-size: 1rem;">
-                <td style="text-align: center">交易金额</td>
-                <td colspan="6">
-                    <span>￥：@Model.Data.Amount</span>
-                    <span style="padding: 0 2% 0 2%;">人民币(大写):</span>
-                    <span>@Model.Data.UppercaseAmount</span>
-                </td>
-            </tr>
-            <tr style="font-size: 1rem;">
-                <td style="text-align: center">收款方式</td>
-                <td colspan="2">@Model.Data.PaymentMethod</td>
-                <td style="text-align: center; width: 13%;">交易状态</td>
-                <td colspan="3">@Model.Data.TradeStatus</td>
-            </tr>
+                @Model.Data.FacturationAddress.ZipCode }},  @Model.Data.FacturationAddress.City <br>
+                @Model.Data.FacturationAddress.FirstLineAddress <br>
+                @Model.Data.FacturationAddress.SecondLineAddress 
+            </div>
+            <div class="address-card__row">
+                <div class="address-card__row-title">Phone number: @Model.Data.FacturationAddress.ContactTelephone </div>
+            </div>
+        
+        </div>
+        <div style="width:48%;border: 1px solid; float:right; height:160px;padding-left:5px;">
+            <h3>Shipping address</h3>
+            <div class="address-card__name">@Model.Data.ShipmentAddress.ContactFirstName  @Model.Data.ShipmentAddress.ContactLastName</div>
+            <div class="address-card__row">
 
-            <tr style="font-size: 1rem;">
-                <td style="text-align: center">收款事由</td>
-                <td style="width: 22.3%;">@Model.Data.Remark</td>
-                <td style="text-align: center; width: 11%;">入学年级</td>
-                <td style="width: 22.3%;" colspan="2">@Model.Data.Grade</td>
-                <td style="text-align: center; width: 11%;">专业</td>
-                <td style="width: 22.3%;">@Model.Data.Profession</td>
-            </tr>
+                @Model.Data.ShipmentAddress.ZipCode }},  @Model.Data.ShipmentAddress.City <br>
+                @Model.Data.ShipmentAddress.FirstLineAddress <br>
+                @Model.Data.ShipmentAddress.SecondLineAddress
+            </div>
+            <div class="address-card__row">
+                <div class="address-card__row-title">Phone number: @Model.Data.ShipmentAddress.ContactTelephone</div>
+            </div>
 
+        </div>
+    </div>
 
-        </table>*@
 </body>
 </html>
