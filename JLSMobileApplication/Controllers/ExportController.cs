@@ -91,5 +91,16 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
+
+        [HttpPost]
+        public async Task<ActionResult> ExportPdf(long OrderId)
+        {
+            string fileName = await this._exportService.ExportPdf(OrderId, "Fr");
+
+            /* Download file function */
+            byte[] fileBytes = System.IO.File.ReadAllBytes(fileName);
+            return File(fileBytes, "application/x-msdownload", DateTime.Now.ToString() + "_Invoice.pdf");
+
+        }
     }
 }
