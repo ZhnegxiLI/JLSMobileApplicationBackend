@@ -25,13 +25,16 @@ namespace JLSMobileApplication.Services
         private readonly UserManager<User> _userManager;
         private readonly IMessageRepository _messageRepository;
 
-        public SendEmailAndMessageService(IOptions<AppSettings> appSettings, JlsDbContext context,IEmailService email, UserManager<User> userManager, IMessageRepository messageRepository)
+        public readonly IExportService _exportService;
+
+        public SendEmailAndMessageService(IOptions<AppSettings> appSettings, JlsDbContext context,IEmailService email, UserManager<User> userManager, IMessageRepository messageRepository, IExportService export)
         {
             _appSettings = appSettings.Value;
             db = context;
             _email = email;
             _userManager = userManager;
             _messageRepository = messageRepository;
+            _exportService = export;
         }
 
         public async Task<long> CreateOrUpdateOrderAsync(long OrderId, string Type)
@@ -89,20 +92,24 @@ namespace JLSMobileApplication.Services
                         Message.IsReaded = false;
                         await this._messageRepository.CreateMessage(Message,null, order.UserId);
                     }
+
+                    // Generate invoice pdf 
+                    string pdfPath = await _exportService.ExportPdf(order.Id, "Fr"); // todo make language configurable 
+                    
                     // todo: 改变发送逻辑, 目前的发送方式导致下单过慢,可加入一表格中之后定时发送
                     // 发送邮件
                     /* 1.发给客户 */
                     if (customerInfo.Email != null)
                     {
                         //_email.SendEmail(customerInfo.Email, emailModelClient.Title, emailClientTemplate);
-                        await PushEmailIntoDb(customerInfo.Email, emailModelClient.Title, emailClientTemplate);
+                        await PushEmailIntoDb(customerInfo.Email, emailModelClient.Title, emailClientTemplate, pdfPath); 
                     }
                     /* 2.发给内部人员 */
                     foreach (var admin in adminEmails)
                     {
                         if (admin != null)
                         {
-                            await PushEmailIntoDb(admin, emailModelAdmin.Title, emailAdminTemplate);
+                            await PushEmailIntoDb(admin, emailModelAdmin.Title, emailAdminTemplate, pdfPath);
                             //_email.SendEmail(admin, emailModelAdmin.Title, emailAdminTemplate);
                         }
                     }
@@ -123,7 +130,7 @@ namespace JLSMobileApplication.Services
             {
                 var emailClientTemplate = emailModelClient.Body;
                 emailClientTemplate = emailClientTemplate.Replace("{Link}", "http://" + Link);
-                    await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate);
+                    await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate, null);
                 //_email.SendEmail(user.Email, emailModelClient.Title, emailClientTemplate);
                 return user.Id;
             }
@@ -152,7 +159,7 @@ namespace JLSMobileApplication.Services
                 // todo send internal message
                 var Message = new Message();
 
-                await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate);
+                await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate,null);
                 //_email.SendEmail(user.Email, emailModelClient.Title, emailClientTemplate);
                 return user.Id;
             }
@@ -179,19 +186,20 @@ namespace JLSMobileApplication.Services
                 var Message = new Message();
                 foreach (var c in clients)
                 {
-                    _email.SendEmail(c, emailModelClient.Title, emailClientTemplate);
+                    _email.SendEmail(c, emailModelClient.Title, emailClientTemplate, null);
                 }
                 return 1;
             }
             return 0;
         }
 
-        public async Task<int> PushEmailIntoDb(string ToEmail, string Title, string Body)
+        public async Task<int> PushEmailIntoDb(string ToEmail, string Title, string Body, string AttachmentPath)
         {
             var Email = new EmailToSend();
             Email.ToEmail = ToEmail;
             Email.Title = Title;
             Email.Body = Body;
+            Email.Attachment = AttachmentPath;
             Email.IsSended = false;
             await db.AddAsync(Email);
             await db.SaveChangesAsync();
@@ -206,7 +214,7 @@ namespace JLSMobileApplication.Services
             {
                 foreach (var Email in EmailsToSend)
                 {
-                    _email.SendEmail(Email.ToEmail, Email.Title, Email.Body);
+                    _email.SendEmail(Email.ToEmail, Email.Title, Email.Body, Email.Attachment);
                     Email.IsSended = true;
                     db.Update(Email);
                 }
