@@ -19,8 +19,7 @@ namespace JLSMobileApplication.Controllers
 
         public IActionResult EmailConfirmed(int userId, string code)
         {
-            ViewData["WebsiteUrl"] = _appSettings.WebSiteUrl;
-            // TODO: 之后美化页面,设置如果已经被验证过就直接跳转到登录页
+            ViewData["WebSiteUrl"] = _appSettings.WebSiteUrl;
             return View();
         }
     }
