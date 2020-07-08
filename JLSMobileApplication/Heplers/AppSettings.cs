@@ -8,10 +8,13 @@
         public string EmailPassword { get; set; }
         public string MyAllowSpecificOrigins { get; set; }
 
+        public string WebsiteUrl { get; set; }
+
         public string JwtSecret { get; set; }
         public string JwtIssuer { get; set; }
         public string JwtAudience { get; set; }
 
+        public string AllowedOrigins { get; set; }
 
         // Properties for JWT Token Signature
         public string Site { get; set; }

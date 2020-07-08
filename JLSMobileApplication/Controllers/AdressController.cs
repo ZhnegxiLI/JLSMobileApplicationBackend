@@ -24,6 +24,10 @@ namespace JLSMobileApplication.Controllers
         {
             _adress = adressrepository;
         }
+
+        /*
+         * Create or update address according to the type 
+         */
         public class CreateOrUpdateAdressCriteria
         {
             public CreateOrUpdateAdressCriteria()
@@ -34,7 +38,6 @@ namespace JLSMobileApplication.Controllers
             public int userId { get; set; }
             public string type { get; set; }
         }
-
         [HttpPost]
         public async Task<JsonResult> CreateOrUpdateAdress([FromBody]CreateOrUpdateAdressCriteria criteria)
         {

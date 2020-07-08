@@ -75,47 +75,6 @@ namespace JLSMobileApplication.Controllers.AdminService
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetUserRoleList()
-        {
-            try
-            {
-                var result = await _userRepository.GetUserRoleList();
-                return Json(result);
-            }
-            catch (Exception e)
-            {
-
-                throw e;
-            }
-        }
-
-        [HttpGet]
-        public async Task<List<dynamic>> GetChatedUser(int UserId)
-        {
-            return await _userRepository.GetChatedUser(UserId);
-        }
-
-        [HttpGet]
-        public async Task<List<dynamic>> GetChatDialog(int UserId, int? AdminUserId)
-        {
-            return await _userRepository.GetChatDialog(UserId, AdminUserId);
-        }
-
-        [HttpGet]
-        public async Task<long> UpdateReadedDialog(int UserId)
-        {
-            return await _userRepository.UpdateReadedDialog(UserId);
-        }
-
-        [HttpGet]
-        public async Task<List<dynamic>> GetNoReadedDialog(int UserId)
-        {
-            return await _userRepository.GetNoReadedDialog(UserId);
-        }
-
-
-
-        [HttpGet]
         public async Task<JsonResult> GetUserById(int UserId)
         {
             try
@@ -155,6 +114,7 @@ namespace JLSMobileApplication.Controllers.AdminService
                     UserToCreateOrUpdate.CreatedOn = DateTime.Now;
                     UserToCreateOrUpdate.Email = criteria.Email;
                     UserToCreateOrUpdate.UserName = criteria.Email;
+                    /* Admin user not need to verify email */
                     if (role.Name == "Admin")
                     {
                         UserToCreateOrUpdate.EmailConfirmed = true;
@@ -205,6 +165,47 @@ namespace JLSMobileApplication.Controllers.AdminService
                 throw e;
             }
         }
+
+        [HttpGet]
+        public async Task<JsonResult> GetUserRoleList()
+        {
+            try
+            {
+                var result = await _userRepository.GetUserRoleList();
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
+        /* Chat service start */
+        [HttpGet]
+        public async Task<List<dynamic>> GetChatedUser(int UserId)
+        {
+            return await _userRepository.GetChatedUser(UserId);
+        }
+
+        [HttpGet]
+        public async Task<List<dynamic>> GetChatDialog(int UserId, int? AdminUserId)
+        {
+            return await _userRepository.GetChatDialog(UserId, AdminUserId);
+        }
+
+        [HttpGet]
+        public async Task<long> UpdateReadedDialog(int UserId)
+        {
+            return await _userRepository.UpdateReadedDialog(UserId);
+        }
+
+        [HttpGet]
+        public async Task<List<dynamic>> GetNoReadedDialog(int UserId)
+        {
+            return await _userRepository.GetNoReadedDialog(UserId);
+        }
+        /* Chat service end */
 
     }
 }
