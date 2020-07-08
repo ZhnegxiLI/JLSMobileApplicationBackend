@@ -25,6 +25,8 @@
         public string GrantType { get; set; }
         public string ClientId { get; set; }
         public string WebSiteUrl { get; set; }
+        public string SuperAdminList { get; set; }
+        public string AdminInitialPassword { get; set; }
 
     }
 }
