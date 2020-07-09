@@ -116,7 +116,7 @@ namespace JLSMobileApplication.Controllers
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(userIdentity);
                 var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = userIdentity.Id, code = code }, HttpContext.Request.Scheme);
 
-                _sendEmailAndMessageService.ResetPasswordOuConfirmEmailLinkAsync(userIdentity.Id, callbackUrl, "EmailConfirmation");
+                await _sendEmailAndMessageService.ResetPasswordOuConfirmEmailLinkAsync(userIdentity.Id, callbackUrl, "EmailConfirmation");
                 return Json(new ApiResult()
                 {
                     DataExt = userIdentity.Email,
@@ -156,10 +156,10 @@ namespace JLSMobileApplication.Controllers
                 return new JsonResult("ERROR"); // cannot find the user
             }
 
-            _sendEmailAndMessageService.AfterResetPasswordOuConfirmEmailLinkAsync(user.Id, "AfterEmailConfirmation");
+            await _sendEmailAndMessageService.AfterResetPasswordOuConfirmEmailLinkAsync(user.Id, "AfterEmailConfirmation");
             if (user.EmailConfirmed)
             {
-                return Redirect("/login"); //  
+                return Redirect("/login"); // todo   
             }
             var result = await _userManager.ConfirmEmailAsync(user, code);
 

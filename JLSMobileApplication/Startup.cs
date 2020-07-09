@@ -127,7 +127,7 @@ namespace JLSMobileApplication
                 options.AddPolicy("_myAllowSpecificOrigins",
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:8080", "ionic://localhost", "http://localhost", "http://localhost:8100", "http://localhost:4200", "http://localhost:4201", "http://localhost:81", "http://jlsadmin.europetechs.com", "http://192.168.0.21:4200") // todo change 
+                        builder.WithOrigins("http://localhost:8080", "ionic://localhost", "http://localhost", "http://localhost:8100", "http://localhost:4200", "http://localhost:4201", "http://localhost:81", "http://jlsadmin.europetechs.com", "http://prod.jlsadmin.europetechs.com", "http://prod.jlswebsite.europetechs.com", "http://192.168.0.21:4200") // todo change 
                             .AllowAnyHeader()
                             .WithMethods()
                             .AllowCredentials();

@@ -129,7 +129,9 @@ namespace JLSMobileApplication.Services
             if (emailModelClient!=null && user != null && user.Email !=null)
             {
                 var emailClientTemplate = emailModelClient.Body;
-                emailClientTemplate = emailClientTemplate.Replace("{Link}", "http://" + Link);
+                emailClientTemplate = emailClientTemplate.Replace("{email}", user.Email);
+                emailClientTemplate = emailClientTemplate.Replace("{username}", user.Email);
+                emailClientTemplate = emailClientTemplate.Replace("{Link}", Link);
                     await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate, null);
                 //_email.SendEmail(user.Email, emailModelClient.Title, emailClientTemplate);
                 return user.Id;
