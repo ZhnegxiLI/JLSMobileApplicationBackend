@@ -159,7 +159,7 @@ namespace JLSMobileApplication.Controllers
             await _sendEmailAndMessageService.AfterResetPasswordOuConfirmEmailLinkAsync(user.Id, "AfterEmailConfirmation");
             if (user.EmailConfirmed)
             {
-                return Redirect("/login"); // todo   
+                 return Redirect(_appSettings.WebSiteUrl); // 
             }
             var result = await _userManager.ConfirmEmailAsync(user, code);
 

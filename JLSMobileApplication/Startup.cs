@@ -39,23 +39,30 @@ namespace JLSMobileApplication
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            /* Init autoMapper: map the relation for object */
             services.AddAutoMapper();
 
+            /* Init mvc */
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddJsonOptions(options =>
             {
+                /* Configure the json output date format */
                 options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
             });
 
+            /* Init dbContext */
             services.AddDbContext<JlsDbContext>(
-             options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"),
-                 builder => builder.UseRowNumberForPaging()) // IMPORTANT : use of ef function take() Skip()
+             /* Get connections string from config */
+             options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"), 
+                 /* Configure the pagination (take() skip())*/
+                 builder => builder.UseRowNumberForPaging()) 
              );
+
+            /* Init identity */
             services.AddDefaultIdentity<User>()
-            .AddRoles<IdentityRole<int>>()
+            .AddRoles<IdentityRole<int>>() // user id: int
             .AddEntityFrameworkStores<JlsDbContext>();
 
             // Configure strongly typed settings objects
@@ -63,19 +70,20 @@ namespace JLSMobileApplication
             services.Configure<AppSettings>(appSettingsSection);
 
 
-            /* Configure the log with serilog */
+            /* Init  serilog */
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
                 .CreateLogger();
             Log.Information("Start logging");
 
-            //配置邮件发送
+            // Inject email service (send email function)
             services.AddTransient<IEmailService, EmailService>();
-            //配置导出excel
+            // Inject export service  
             services.AddTransient<IExportService, ExportService>();
-            // 配置邮件及信息发送器
+            // Inject format email and message service 
             services.AddTransient<ISendEmailAndMessageService, SendEmailAndMessageService>();
 
+            /* Init identity password option */
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings.
@@ -85,23 +93,16 @@ namespace JLSMobileApplication
                 options.Password.RequireUppercase = false;
                 options.Password.RequiredLength = 6;
                 options.Password.RequiredUniqueChars = 1;
-
-                // Lockout settings.
-                //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                //options.Lockout.MaxFailedAccessAttempts = 5;
-                //options.Lockout.AllowedForNewUsers = true;
-
-                // User settings.
+                options.User.RequireUniqueEmail = true;
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-                //Email settings
-                options.User.RequireUniqueEmail = true;
             });
 
-            //配置JWT 密钥
+            // Init jwt credential 
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
+            /* Init jwt authorization */
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = "JwtBearer";
@@ -114,32 +115,32 @@ namespace JLSMobileApplication
                      ValidateIssuerSigningKey = true,
                      ValidateIssuer = false,
                      ValidateAudience = false,
-                    // ValidIssuer = appSettings.Site,
-                     //ValidAudience = appSettings.Audience,
                      IssuerSigningKey = new SymmetricSecurityKey(key),
-                     ClockSkew = TimeSpan.Zero//TimeSpan.FromMinutes(5)
+                     ClockSkew = TimeSpan.FromMinutes(5)
                  };
              });
 
-            // 配置跨域
+            /* Init cors: todo place the allowed origins in the appsettings */
+            var origins = appSettings.AllowedOrigins.Split(";");
             services.AddCors(options =>
             {
                 options.AddPolicy("_myAllowSpecificOrigins",
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:8080", "ionic://localhost", "http://localhost", "http://localhost:8100", "http://localhost:4200", "http://localhost:4201", "http://localhost:81", "http://jlsadmin.europetechs.com", "http://prod.jlsadmin.europetechs.com", "http://prod.jlswebsite.europetechs.com", "http://192.168.0.21:4200") // todo change 
+                        builder.WithOrigins(origins)
                             .AllowAnyHeader()
                             .WithMethods()
                             .AllowCredentials();
                     });
             });
 
-            /*注入实时通信类*/
+            /* Init signalR (use for realtime data exchange, use for chat)*/
             services.AddSignalR();
 
+            /* Init handFire (timer: trigger some action in some periode, use for send email) */
             services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnectionString")));
 
-            /* 注入数据操作类 */
+            /* Inject different reporsitory */
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
@@ -160,42 +161,48 @@ namespace JLSMobileApplication
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            /* Configure Hangfire trigger */
             app.UseHangfireServer();
             app.UseHangfireDashboard();
+            /* Running time: 1min, Action: SendEmailInDb */
             RecurringJob.AddOrUpdate(() => timerEmailService.SendEmailInDb(), Cron.Minutely);
 
+            /* Apply cors rule */
             app.UseCors("_myAllowSpecificOrigins");
 
-            var cachePeriod = env.IsDevelopment() ? "600" : "604800"; // Todo add into the appsettings缓存时间 
+            /* Set cache time : todo place into appsettings */
+            var cachePeriod = env.IsDevelopment() ? "600" : "604800";
 
-            app.UseStaticFiles(new StaticFileOptions //TODO, if not exists create配置静态文件夹
+
+            /* This function will create new folder if folder not exist and return current folder if exists */
+            System.IO.Directory.CreateDirectory("/images");
+            /* Configure staticFiles path /images */
+            app.UseStaticFiles(new StaticFileOptions 
             {
                 FileProvider = new PhysicalFileProvider(
                    Path.Combine(Directory.GetCurrentDirectory(), "images")),// Todo add into the configure
                 RequestPath = "/images",
                 OnPrepareResponse = ctx =>
                 {
-                    // Requires the following import:
-                    // using Microsoft.AspNetCore.Http;
                     ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={cachePeriod}");
                 }
             });
 
-
+            /* Initialization action: create a super admin in database */
             Initialization.AddAdminUser(userManager, context);
 
             app.UseErrorHandling();
 
+            /* JWT authorization */
             app.UseAuthentication();
 
-            app.UseStaticFiles();
-
+            /* Configure router path of signalR */
             app.UseSignalR(options =>
             {
                 options.MapHub<MessageHub>("/MessageHub");
             });
 
+            /* Configure mvc model */
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

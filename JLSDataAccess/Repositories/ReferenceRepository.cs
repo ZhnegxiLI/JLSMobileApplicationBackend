@@ -25,14 +25,7 @@ namespace JLSDataAccess.Repositories
             db = context;
         }
 
-        /*
-         *  Mobile Zoom
-         */
-        public Task<List<ReferenceItem>> GetReferenceItemsByCategoryIds(string categoryIds, string lang)
-        {
-            throw new NotImplementedException();
-        }
-
+       
         public async Task<ReferenceCategory> GetReferenceCategoryByShortLabel(string ShortLabel)
         {
             return await db.ReferenceCategory.Where(p => p.ShortLabel == ShortLabel).FirstOrDefaultAsync();
@@ -124,9 +117,6 @@ namespace JLSDataAccess.Repositories
 
         }
 
-
-
-
         public async Task<List<ReferenceCategory>> GetAllCategoryList()
         {
             var result = await db.ReferenceCategory.ToListAsync();
@@ -198,21 +188,9 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-        public Task<List<ReferenceItem>> GetReferenceItemsByCode(string referencecode, string lang)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<ReferenceItem>> GetReferenceItemsById(long referenceId, string lang)
-        {
-            throw new NotImplementedException();
-        }
-
         /*
          * Admin Zoom
          */
-
-        // TODO Merge with the mobile version
         public async Task<List<ReferenceItemViewModel>> GetReferenceItemsByCategoryLabelsAdmin(string shortLabels, string lang)
         {
             List<string> referenceLabelList = new List<string>(shortLabels.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries));
@@ -243,49 +221,25 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-        public async Task<List<ReferenceCategory>> GetAllValidityReferenceCategory()
-        {
-            var result = await (from rc in db.ReferenceCategory
-                                where rc.Validity == true
-                                select rc).ToListAsync();
 
-            return result;
-        }
-
-
-        public async Task<int> CreatorUpdateCategory(ReferenceCategory category)
-        {
-            if (category.Id == 0)
-            {
-                db.ReferenceCategory.Add(category);
-            }
-            else
-            {
-                db.ReferenceCategory.Update(category);
-            }
-
-            await db.SaveChangesAsync();
-
-            return 1;
-        }
-
-
+        /*
+         * Check code of referenceitem is not used yet (todo: add a constraint sql server side)
+         */
         public async Task<bool> CheckReferenceCodeExists(string Code)
         {
             var result = await db.ReferenceItem.Where(p => p.Code == Code).FirstOrDefaultAsync();
 
             return result!=null ? true : false;
         }
+
+        /*
+         * Get website and mobile slide from db
+         */
         public async Task<List<WebsiteSlide>> GetWbesiteslides()
         {
             var result = await db.WebsiteSlide.ToListAsync();
 
             return result;
-        }
-
-        public Task<ListViewModelWithCount<ReferenceItemViewModel>> GetReferenceItemWithInterval(int intervalCount, int size, string orderActive, string orderDirection, string filter)
-        {
-            throw new NotImplementedException();
         }
     }
 }

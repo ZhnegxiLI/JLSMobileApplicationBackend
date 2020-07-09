@@ -12,6 +12,7 @@
         public string JwtIssuer { get; set; }
         public string JwtAudience { get; set; }
 
+        public string AllowedOrigins { get; set; }
 
         // Properties for JWT Token Signature
         public string Site { get; set; }
@@ -24,6 +25,8 @@
         public string GrantType { get; set; }
         public string ClientId { get; set; }
         public string WebSiteUrl { get; set; }
+        public string SuperAdminList { get; set; }
+        public string AdminInitialPassword { get; set; }
 
     }
 }
