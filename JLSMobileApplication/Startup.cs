@@ -100,6 +100,8 @@ namespace JLSMobileApplication
 
             // Init jwt credential 
             var appSettings = appSettingsSection.Get<AppSettings>();
+
+            Initialization._appSettings = appSettings;
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
             /* Init jwt authorization */
