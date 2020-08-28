@@ -14,12 +14,6 @@ namespace JLSDataAccess.Interfaces
     {
         Task<List<dynamic>> GetReferenceItemsByCategoryLabels(List<string> shortLabels, string lang);
 
-        Task<List<ReferenceItem>> GetReferenceItemsByCategoryIds(string categoryIds, string lang);
-
-        Task<List<ReferenceItem>> GetReferenceItemsById(long referenceId, string lang);
-
-        Task<List<ReferenceItem>> GetReferenceItemsByCode(string referencecode, string lang);
-
 
         Task<ReferenceCategory> GetReferenceCategoryByShortLabel(string ShortLabel);
 
@@ -38,16 +32,9 @@ namespace JLSDataAccess.Interfaces
         Task<List<dynamic>> GetAllReferenceItemWithChildren(string Lang);
 
         Task<List<ReferenceItemViewModel>> GetReferenceItemsByCategoryLabelsAdmin(string shortLabels, string lang);
-        Task<ListViewModelWithCount<ReferenceItemViewModel>> GetReferenceItemWithInterval(int intervalCount, int size, string orderActive, string orderDirection, string filter);
-
-
+    
         Task<List<ReferenceCategory>> GetAllReferenceCategory();
 
-        Task<List<ReferenceCategory>> GetAllValidityReferenceCategory();
-
- 
-
-        Task<int> CreatorUpdateCategory(ReferenceCategory category);
 
         Task<bool> CheckReferenceCodeExists(string Code);
         Task<List<WebsiteSlide>> GetWbesiteslides();

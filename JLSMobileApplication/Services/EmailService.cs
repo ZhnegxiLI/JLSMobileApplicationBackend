@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Net.Mime;
 using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Services
@@ -19,13 +20,14 @@ namespace JLSMobileApplication.Services
         {
             _appSettings = appSettings.Value;
         }
-        public string SendEmail(string ToEmail,string Subjet, string Message)
+        public string SendEmail(string ToEmail,string Subjet, string Message, string AttachmentPath)
         {
 
             try
             {
                 // Credentials
                 var credentials = new NetworkCredential(_appSettings.EmailAccount , _appSettings.EmailPassword);
+
                 // Mail message
                 var mail = new MailMessage()
                 {
@@ -35,6 +37,12 @@ namespace JLSMobileApplication.Services
                 };
                 mail.IsBodyHtml = true;
                 mail.To.Add(new MailAddress(ToEmail));
+                /* If has attachment */
+                if (AttachmentPath != null)
+                {
+                    Attachment data = new Attachment(AttachmentPath, MediaTypeNames.Application.Octet);
+                    mail.Attachments.Add(data);
+                }
                 // Smtp client
                 var client = new SmtpClient()
                 {

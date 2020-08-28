@@ -58,7 +58,7 @@ namespace JLSMobileApplication.Controllers
         }
         
 
-        /* Auth zoom */
+        /* Auth zoom  start */
         [Authorize]
         [HttpGet]
         public async Task<JsonResult> GetUserById(int UserId)
@@ -73,7 +73,6 @@ namespace JLSMobileApplication.Controllers
                 throw e;
             }
         }
-
         public class UpdateUserInfoCriteria
         {
             public int UserId { get; set; }
@@ -143,5 +142,6 @@ namespace JLSMobileApplication.Controllers
                 throw e;
             }
         }
+        /* Auth zoom  end */
     }
 }

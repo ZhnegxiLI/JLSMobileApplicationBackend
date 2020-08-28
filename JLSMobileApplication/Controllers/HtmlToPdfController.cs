@@ -12,6 +12,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace JLSMobileApplication.Controllers
 {
+    /* Todo remove: migration to export controller, please teste */
     [Route("api/[controller]/{action}/{id?}")]
     [ApiController]
     public class HtmlToPdfController : Controller

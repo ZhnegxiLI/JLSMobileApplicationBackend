@@ -1,6 +1,7 @@
 ﻿using JLSDataAccess;
 using JLSDataModel.Models.User;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,29 +11,33 @@ namespace JLSMobileApplication.Heplers
 {
     public class Initialization
     {
- 
+        public static  AppSettings _appSettings;
 
-        public Initialization()
+        public Initialization(IOptions<AppSettings> appSettings)
         {
+            _appSettings = appSettings.Value;
         }
 
         public static void  AddAdminUser(UserManager<User> userManager, JlsDbContext db)
         {
-            var adminUser = db.Users.Where(p => p.UserName == "Admin@jls.com").FirstOrDefault();
-            if (adminUser == null)
+            var superAdminList = _appSettings.SuperAdminList.Split(';').ToList(); ; 
+            foreach (var item in superAdminList)
             {
-                User u = new User();
-                u.UserName = "Admin@jls.com";
-                u.Email = "Admin@jls.com";
-                u.EmailConfirmed = true;
-
-                u.Validity = true;
-                var result = userManager.CreateAsync(u,"12345678").Result; // only for test use
-                if (result.Succeeded)
+                var adminUser = db.Users.Where(p => p.UserName == item).FirstOrDefault();
+                if (adminUser == null)
                 {
-                    userManager.AddToRoleAsync(u, "SuperAdmin").Wait();
+                    User u = new User();
+                    u.UserName = item;
+                    u.Email = item;
+                    u.EmailConfirmed = true;
+
+                    u.Validity = true;
+                    var result = userManager.CreateAsync(u, _appSettings.AdminInitialPassword).Result; 
+                    if (result.Succeeded)
+                    {
+                        userManager.AddToRoleAsync(u, "SuperAdmin").Wait();
+                    }
                 }
-            
             }
 
         }

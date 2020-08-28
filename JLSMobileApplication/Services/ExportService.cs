@@ -161,7 +161,7 @@ namespace JLSMobileApplication.Services
         public async Task<string> ExportPdf(long OrderId, string Lang)
         {
             /* File name */
-            string fileName = "Exports/" + DateTime.Now.Second.ToString() + "_Invoice.pdf";
+            string fileName = "Exports/" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_Invoice.pdf";
             /* Get template path */
             var tplPath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "HtmlToPdf",
              "receipt.cshtml");
