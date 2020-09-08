@@ -4,19 +4,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Mail;
-using System.Net.Mime;
+using MailKit.Net.Smtp;
+using MimeKit;
+
 using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Services
 {
-    public class EmailService:IEmailService
+    public class MailkitEmailService : IEmailService
         {
-        /// <summary>
-        /// 只用于测试目的请勿在生产环境中放入此代码
-        /// </summary>
+    
         private readonly AppSettings _appSettings;
-        public EmailService(IOptions<AppSettings> appSettings)
+        public MailkitEmailService(IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings.Value;
         }
@@ -25,35 +24,38 @@ namespace JLSMobileApplication.Services
 
             try
             {
-                // Credentials
-                var credentials = new NetworkCredential(_appSettings.EmailAccount , _appSettings.EmailPassword);
 
-                // Mail message
-                var mail = new MailMessage()
-                {
-                    From = new MailAddress(_appSettings.EmailAccount),
-                    Subject = Subjet,
-                    Body = Message
-                };
-                mail.IsBodyHtml = true;
-                mail.To.Add(new MailAddress(ToEmail));
-                /* If has attachment */
+
+                MimeMessage message = new MimeMessage();
+
+                MailboxAddress from = new MailboxAddress("JLS IMPORT",
+                _appSettings.EmailAccount);
+                message.From.Add(from);
+
+                MailboxAddress to = new MailboxAddress(ToEmail,
+                ToEmail);
+                message.To.Add(to);
+
+                message.Subject = Subjet;
+                BodyBuilder bodyBuilder = new BodyBuilder();
+                bodyBuilder.HtmlBody = Message;
+               
                 if (AttachmentPath != null)
                 {
-                    Attachment data = new Attachment(AttachmentPath, MediaTypeNames.Application.Octet);
-                    mail.Attachments.Add(data);
+                    bodyBuilder.Attachments.Add(AttachmentPath);
                 }
-                // Smtp client
-                var client = new SmtpClient()
-                {
-                    Port = 587,
-                    DeliveryMethod = SmtpDeliveryMethod.Network,
-                    UseDefaultCredentials = false,
-                    Host = "smtp.gmail.com",
-                    EnableSsl = true,
-                    Credentials = credentials
-                };
-                client.Send(mail);
+
+                message.Body = bodyBuilder.ToMessageBody();
+
+
+                SmtpClient client = new SmtpClient();
+                client.Connect(_appSettings.EmailHost, _appSettings.EmailPort, true);
+                client.Authenticate(_appSettings.EmailAccount, _appSettings.EmailPassword);
+
+                client.Send(message);
+                client.Disconnect(true);
+                client.Dispose();
+            
                 return "Email Sent Successfully!"; //todo change to code 
             }
             catch (System.Exception e)

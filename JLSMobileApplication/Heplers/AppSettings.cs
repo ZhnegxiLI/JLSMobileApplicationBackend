@@ -7,7 +7,8 @@
         public string EmailAccount { get; set; }
         public string EmailPassword { get; set; }
         public string MyAllowSpecificOrigins { get; set; }
-
+        public int EmailPort { get; set; }
+        public string EmailHost { get; set; }
         public string JwtSecret { get; set; }
         public string JwtIssuer { get; set; }
         public string JwtAudience { get; set; }

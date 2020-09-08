@@ -42,16 +42,16 @@
         @Model.Title
     </p>
     <p style="color: #333; font-size: 1.2rem; margin-left: 5%; margin-top: 1%;">
-        <text>NO：@Model.Data.OrderId</text>
-        <text style="float: right;margin-right: 6%;">交易时间：@Model.Data.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss")</text>
+        <text>Numéro de commande：@Model.Data.OrderId</text>
+        <text style="float: right;margin-right: 6%;">Dqte de transaction：@Model.Data.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss")</text>
     </p>
     <h3  style="margin-left: 5%; margin-top: 1%;">Client info</h3>
     <table width="90%" style="margin-left: 5%; margin-top: 1%;">
         <thead>
             <tr>
                 <th>Entreprise</th>
-                <th>Phone</th>
-                <th>Username</th>
+                <th>Numéro de téléphone</th>
+                <th>Compte</th>
                 <th>Siret</th>
  
             </tr>
@@ -69,11 +69,11 @@
     <table width="90%" style="margin-left: 5%; margin-top: 1%;">
         <thead>
             <tr>
-                <th>Code</th>
-                <th>Label</th>
-                <th>Quantity</th>
-                <th>Unit price</th>
-                <th>Total price</th>
+                <th>Reference</th>
+                <th>Nom De Produit</th>
+                <th>Quantité</th>
+                <th>Prix Unitaire</th>
+                <th>Prix Total</th>
             </tr>
         </thead>
         <tbody>
@@ -96,7 +96,7 @@
                 <td>@Model.Data.Tax €</td>
             </tr>
             <tr style="border: solid 1px;">
-                <td colspan="4" style="text-align: left;padding-left: 7%;">Total Price</td>
+                <td colspan="4" style="text-align: left;padding-left: 7%;">Prix Total</td>
                 <td>@Model.Data.TotalPrice €</td>
             </tr>
 
@@ -104,7 +104,7 @@
     </table>
     <div style="margin-left: 5%; margin-top: 1%;width:90%; ">
         <div style="width:48%;border: 1px solid; float:left; height:160px;padding-left:5px;">
-            <h3>Facturation address</h3>
+            <h3>Addresse De Facturation</h3>
             <div class="address-card__name">@Model.Data.FacturationAddress.ContactFirstName  @Model.Data.FacturationAddress.ContactLastName</div>
             <div class="address-card__row">
 
@@ -113,12 +113,12 @@
                 @Model.Data.FacturationAddress.SecondLineAddress 
             </div>
             <div class="address-card__row">
-                <div class="address-card__row-title">Phone number: @Model.Data.FacturationAddress.ContactTelephone </div>
+                <div class="address-card__row-title">Numéro De Téléphone: @Model.Data.FacturationAddress.ContactTelephone </div>
             </div>
         
         </div>
         <div style="width:48%;border: 1px solid; float:right; height:160px;padding-left:5px;">
-            <h3>Shipping address</h3>
+            <h3>Addresse De Livraison</h3>
             <div class="address-card__name">@Model.Data.ShipmentAddress.ContactFirstName  @Model.Data.ShipmentAddress.ContactLastName</div>
             <div class="address-card__row">
 
@@ -127,7 +127,7 @@
                 @Model.Data.ShipmentAddress.SecondLineAddress
             </div>
             <div class="address-card__row">
-                <div class="address-card__row-title">Phone number: @Model.Data.ShipmentAddress.ContactTelephone</div>
+                <div class="address-card__row-title">Numéro De Téléphone: @Model.Data.ShipmentAddress.ContactTelephone</div>
             </div>
 
         </div>

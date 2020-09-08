@@ -27,6 +27,7 @@ using System.IO;
 using Microsoft.AspNetCore.Http;
 using Hangfire;
 using JLSMobileApplication.hubs;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
 
 namespace JLSMobileApplication
 {
@@ -77,7 +78,7 @@ namespace JLSMobileApplication
             Log.Information("Start logging");
 
             // Inject email service (send email function)
-            services.AddTransient<IEmailService, EmailService>();
+            services.AddTransient<IEmailService, MailkitEmailService>();
             // Inject export service  
             services.AddTransient<IExportService, ExportService>();
             // Inject format email and message service 
@@ -153,6 +154,8 @@ namespace JLSMobileApplication
 
             services.AddScoped<TokenModel>();
 
+            // razor to string
+            services.AddScoped<IViewRenderService, ViewRenderService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -163,6 +166,8 @@ namespace JLSMobileApplication
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseDeveloperExceptionPage();
             /* Configure Hangfire trigger */
             app.UseHangfireServer();
             app.UseHangfireDashboard();
@@ -204,6 +209,7 @@ namespace JLSMobileApplication
                 options.MapHub<MessageHub>("/MessageHub");
             });
 
+
             /* Configure mvc model */
             app.UseMvc(routes =>
             {
@@ -211,6 +217,121 @@ namespace JLSMobileApplication
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
             });
+
+            app.Map("/admin", client =>
+            {
+                if (env.IsDevelopment())
+                {
+                    StaticFileOptions clientApp2Dist = new StaticFileOptions()
+                    {
+                        FileProvider = new PhysicalFileProvider(
+                                Path.Combine(
+                                    Directory.GetCurrentDirectory(),
+                                    "Angular/Admin"
+                                )
+                            )
+                    };
+                    client.UseSpaStaticFiles(clientApp2Dist);
+                    client.UseSpa(spa =>
+                    {
+                        spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
+                        spa.Options.SourcePath = "Angular/Admin";
+
+                        // it will use package.json & will search for start command to run
+                        //spa.UseAngularCliServer(npmScript: "start");
+
+                        spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
+                    });
+
+                }
+                else
+                {
+                    // Each map gets its own physical path
+                    // for it to map the static files to. 
+                    StaticFileOptions clientApp2Dist = new StaticFileOptions()
+                    {
+                        FileProvider = new PhysicalFileProvider(
+                                Path.Combine(
+                                    Directory.GetCurrentDirectory(),
+                                    @"Angular/Admin/dist"
+                                )
+                            )
+                    };
+
+                    // Each map its own static files otherwise
+                    // it will only ever serve index.html no matter the filename 
+                    client.UseSpaStaticFiles(clientApp2Dist);
+
+                    // Each map will call its own UseSpa where
+                    // we give its own sourcepath
+                    client.UseSpa(spa =>
+                    {
+                        spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
+                        spa.Options.SourcePath = "Angular/Admin";
+                        spa.Options.DefaultPageStaticFileOptions = clientApp2Dist;
+                    });
+
+                }
+
+            });
+
+            // for each angular client we want to host. 
+         
+                if (env.IsDevelopment())
+                {
+                    StaticFileOptions clientApp2Dist = new StaticFileOptions()
+                    {
+                        FileProvider = new PhysicalFileProvider(
+                                Path.Combine(
+                                    Directory.GetCurrentDirectory(),
+                                    "Angular/Website"
+                                )
+                            )
+                    };
+                app.UseSpaStaticFiles(clientApp2Dist);
+                app.UseSpa(spa =>
+                    {
+                        spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
+                        spa.Options.SourcePath = "Angular/Website";
+
+                        // it will use package.json & will search for start command to run
+                        // spa.UseAngularCliServer(npmScript: "start");
+                        spa.UseProxyToSpaDevelopmentServer("http://localhost:4201");
+                    });
+
+                }
+                else
+                {
+                    // Each map gets its own physical path
+                    // for it to map the static files to. 
+                    StaticFileOptions clientApp2Dist = new StaticFileOptions()
+                    {
+                        FileProvider = new PhysicalFileProvider(
+                                Path.Combine(
+                                    Directory.GetCurrentDirectory(),
+                                    @"Angular/Website/dist"
+                                )
+                            )
+                    };
+
+                    // Each map its own static files otherwise
+                    // it will only ever serve index.html no matter the filename 
+                    app.UseSpaStaticFiles(clientApp2Dist);
+
+                // Each map will call its own UseSpa where
+                // we give its own sourcepath
+                app.UseSpa(spa =>
+                    {
+                        spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
+                        spa.Options.SourcePath = "Angular/Website";
+                        spa.Options.DefaultPageStaticFileOptions = clientApp2Dist;
+                    });
+
+                }
+
+            
+            
+
         }
     }
 }

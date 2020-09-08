@@ -7,6 +7,7 @@ using JLSDataModel.Models.User;
 using JLSMobileApplication.Heplers;
 using JLSMobileApplication.Resources;
 using JLSMobileApplication.Services;
+using JLSMobileApplication.Services.EmailTemplateModel;
 using LjWebApplication.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -28,8 +29,10 @@ namespace JLSMobileApplication.Controllers
         private readonly ISendEmailAndMessageService _sendEmailAndMessageService;
         private readonly IMapper _mapper;
 
+        private IViewRenderService _view = null;
+
         private readonly AppSettings _appSettings;
-        public AccountController(UserManager<User> userManager, JlsDbContext dbContext, IMapper mapper, IEmailService emailService, IAdressRepository adressRepository, ISendEmailAndMessageService sendEmailAndMessageService, IOptions<AppSettings> appSettings)
+        public AccountController(UserManager<User> userManager, JlsDbContext dbContext, IMapper mapper, IEmailService emailService, IAdressRepository adressRepository, ISendEmailAndMessageService sendEmailAndMessageService, IOptions<AppSettings> appSettings, IViewRenderService view)
         {
             _mapper = mapper;
             _userManager = userManager;
@@ -38,6 +41,8 @@ namespace JLSMobileApplication.Controllers
             _adressRepository = adressRepository;
             _sendEmailAndMessageService = sendEmailAndMessageService;
             _appSettings = appSettings.Value;
+
+            this._view = view;
         }
     
 
@@ -241,6 +246,8 @@ namespace JLSMobileApplication.Controllers
                 Success = true
             });
         }
+
+ 
 
     }
 }

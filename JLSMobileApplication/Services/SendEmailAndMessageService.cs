@@ -4,6 +4,7 @@ using JLSDataModel.Models;
 using JLSDataModel.Models.Message;
 using JLSDataModel.Models.User;
 using JLSMobileApplication.Heplers;
+using JLSMobileApplication.Services.EmailTemplateModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -27,7 +28,9 @@ namespace JLSMobileApplication.Services
 
         public readonly IExportService _exportService;
 
-        public SendEmailAndMessageService(IOptions<AppSettings> appSettings, JlsDbContext context,IEmailService email, UserManager<User> userManager, IMessageRepository messageRepository, IExportService export)
+        private IViewRenderService _view = null;
+
+        public SendEmailAndMessageService(IOptions<AppSettings> appSettings, JlsDbContext context,IEmailService email, UserManager<User> userManager, IMessageRepository messageRepository, IExportService export, IViewRenderService view)
         {
             _appSettings = appSettings.Value;
             db = context;
@@ -35,6 +38,8 @@ namespace JLSMobileApplication.Services
             _userManager = userManager;
             _messageRepository = messageRepository;
             _exportService = export;
+
+            _view = view;
         }
 
         public async Task<long> CreateOrUpdateOrderAsync(long OrderId, string Type)
@@ -60,27 +65,48 @@ namespace JLSMobileApplication.Services
                     var emailAdminTemplate = emailModelAdmin.Body;
                     if (Type == "CreateNewOrder")
                     {
-                        /* Replace client email */
-                        emailClientTemplate = emailClientTemplate.Replace("{numerodecommande}", order.Id.ToString());
-                        emailClientTemplate = emailClientTemplate.Replace("{username}", customerInfo.Email);
-                        /* Replace admin email */
-                        emailAdminTemplate = emailAdminTemplate.Replace("{numerodecommande}", order.Id.ToString());
+                        ///* Replace client email */
+                        //emailClientTemplate = emailClientTemplate.Replace("{numerodecommande}", order.Id.ToString());
+                        //emailClientTemplate = emailClientTemplate.Replace("{username}", customerInfo.Email);
+                        ///* Replace admin email */
+                        //emailAdminTemplate = emailAdminTemplate.Replace("{numerodecommande}", order.Id.ToString());
 
-                        /* Replace client notice*/
-                        messageClientTemplate = messageClientTemplate.Replace("{numerodecommande} ", order.Id.ToString());
+                        ///* Replace client notice*/
+                        //messageClientTemplate = messageClientTemplate.Replace("{numerodecommande} ", order.Id.ToString());
+
+                        messageClientTemplate = await _view.RenderToStringAsync("EmailTemplate/NewOrderClient", new OrderEmailModel()
+                        {
+                     
+                            Username = customerInfo.Email,
+                            OrderNumber = order.Id.ToString()
+                        });
+
+
+                        emailAdminTemplate = await _view.RenderToStringAsync("EmailTemplate/NewOrderAdmin", new OrderEmailModel()
+                        {
+
+                            Username = customerInfo.Email,
+                            OrderNumber = order.Id.ToString()
+                        });
 
 
                     }
                     else if (Type == "UpdateOrder" )
                     {
                         /* Replace client email */
-                        emailClientTemplate = emailClientTemplate.Replace("{numerodecommande}", order.Id.ToString());
-                        emailClientTemplate = emailClientTemplate.Replace("{username}", customerInfo.Email);
-                        /* Replace admin email */
-                        emailAdminTemplate = emailAdminTemplate.Replace("{numerodecommande}", order.Id.ToString());
 
-                        /* Replace client notice*/
-                        messageClientTemplate = messageClientTemplate.Replace("{numerodecommande} ", order.Id.ToString());
+                        messageClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ModifyOrderClient", new OrderEmailModel()
+                        {
+
+                            Username = customerInfo.Email,
+                            OrderNumber = order.Id.ToString()
+                        });
+
+                        emailAdminTemplate = await _view.RenderToStringAsync("EmailTemplate/ModifyOrderAdmin", new OrderEmailModel()
+                        {
+                            Username = customerInfo.Email,
+                            OrderNumber = order.Id.ToString()
+                        });
                     }
 
                     // todo 客户自下单,发送信息至后台
@@ -132,7 +158,29 @@ namespace JLSMobileApplication.Services
                 emailClientTemplate = emailClientTemplate.Replace("{email}", user.Email);
                 emailClientTemplate = emailClientTemplate.Replace("{username}", user.Email);
                 emailClientTemplate = emailClientTemplate.Replace("{Link}", Link);
-                    await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate, null);
+                if (Type == "EmailConfirmation")
+                {
+                    emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ActiverMonCompte", new ActiverMonCompteModel()
+                    {
+                        ConfirmationLink = Link,
+                        Username =  user.Email,
+                        Entreprise = user.EntrepriseName,
+                        Phone = user.PhoneNumber
+                    });
+                }
+                else if (Type == "ResetPassword")
+                {
+                    emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ActiverMonCompte", new ActiverMonCompteModel()
+                    {
+                        ConfirmationLink = Link,
+                        Username = user.Email,
+                        Entreprise = user.EntrepriseName,
+                        Phone = user.PhoneNumber
+                    });
+                }
+                // todo same for reset password
+   
+                await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate, null);
                 //_email.SendEmail(user.Email, emailModelClient.Title, emailClientTemplate);
                 return user.Id;
             }
@@ -152,11 +200,11 @@ namespace JLSMobileApplication.Services
                 var emailClientTemplate = emailModelClient.Body;
                 if (Type == "AfterResetPassword")
                 {
-                    // TODO: replace email here 
+                    emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/AfterReinitialiserPassword", null);
                 }
                 else if (Type == "AfterEmailConfirmation")
                 {
-                    // TODO: replace email here 
+                    emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/AfterActiverMonCompte", null);
                 }
                 // todo send internal message
                 var Message = new Message();
