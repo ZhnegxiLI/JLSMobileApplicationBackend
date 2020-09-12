@@ -43,6 +43,7 @@ namespace JLSDataAccess.Repositories
                                     }).ToListAsync();
             var userList = await (from u in db.Users
                             join ur in db.UserRoles on u.Id equals ur.UserId
+                            where adminRoleIds.Contains(ur.RoleId)
                             select new
                             {
                                 UserId = u.Id,

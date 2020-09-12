@@ -74,7 +74,7 @@ namespace JLSMobileApplication.Services
                         ///* Replace client notice*/
                         //messageClientTemplate = messageClientTemplate.Replace("{numerodecommande} ", order.Id.ToString());
 
-                        messageClientTemplate = await _view.RenderToStringAsync("EmailTemplate/NewOrderClient", new OrderEmailModel()
+                        emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/NewOrderClient", new OrderEmailModel()
                         {
                      
                             Username = customerInfo.Email,
@@ -95,7 +95,7 @@ namespace JLSMobileApplication.Services
                     {
                         /* Replace client email */
 
-                        messageClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ModifyOrderClient", new OrderEmailModel()
+                        emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ModifyOrderClient", new OrderEmailModel()
                         {
 
                             Username = customerInfo.Email,
