@@ -72,7 +72,7 @@ namespace JLSMobileApplication.Services
                         //emailAdminTemplate = emailAdminTemplate.Replace("{numerodecommande}", order.Id.ToString());
 
                         ///* Replace client notice*/
-                        //messageClientTemplate = messageClientTemplate.Replace("{numerodecommande} ", order.Id.ToString());
+                        messageClientTemplate = messageClientTemplate.Replace("{numerodecommande} ", order.Id.ToString());
 
                         emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/NewOrderClient", new OrderEmailModel()
                         {

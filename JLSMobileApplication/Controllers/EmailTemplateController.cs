@@ -25,6 +25,7 @@ namespace JLSMobileApplication.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> Test()
         {
+            /* This function show only use for degug */
             var emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ReinitialiserPassword", new ActiverMonCompteModel()
             {
                 ConfirmationLink = "test",
@@ -33,7 +34,13 @@ namespace JLSMobileApplication.Controllers
                 Phone = "test"
             });
 
-            return View("AfterReinitialiserPassword", null);
+            return View("ActiverMonCompte", new ActiverMonCompteModel()
+            {
+                ConfirmationLink = "test",
+                Username = "test",
+                Entreprise = "test",
+                Phone = "test"
+            });
         }
     }
 }
