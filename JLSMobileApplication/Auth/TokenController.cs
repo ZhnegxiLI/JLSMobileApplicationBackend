@@ -119,7 +119,7 @@ namespace JLSMobileApplication.Auth
             }
 
             ModelState.AddModelError("", "Username/Password was not Found");
-            return Unauthorized(new { LoginError = "Msg_PasswordNotCorrect" });
+            return NotFound(new { LoginError = "Msg_PasswordNotCorrect" });
 
 
         }
