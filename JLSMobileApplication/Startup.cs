@@ -99,6 +99,9 @@ namespace JLSMobileApplication
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
             });
 
+            services.Configure<DataProtectionTokenProviderOptions>(options =>
+                options.TokenLifespan = TimeSpan.FromDays(10)); // Config into appsettings
+
             // Init jwt credential 
             var appSettings = appSettingsSection.Get<AppSettings>();
 
