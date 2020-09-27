@@ -170,7 +170,7 @@ namespace JLSMobileApplication.Services
                 }
                 else if (Type == "ResetPassword")
                 {
-                    emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ActiverMonCompte", new ActiverMonCompteModel()
+                    emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ReinitialiserPassword", new ActiverMonCompteModel()
                     {
                         ConfirmationLink = Link,
                         Username = user.Email,
@@ -259,7 +259,7 @@ namespace JLSMobileApplication.Services
 
         public void SendEmailInDb()
         {
-            var EmailsToSend = db.EmailToSend.Where(p => p.IsSended == false || p.IsSended == null).ToList();
+            var EmailsToSend = db.EmailToSend.Where(p => (p.IsSended == false || p.IsSended == null) && !p.ToEmail.Contains("@jls.com") ).ToList();
             if (EmailsToSend.Count()>0)
             {
                 foreach (var Email in EmailsToSend)

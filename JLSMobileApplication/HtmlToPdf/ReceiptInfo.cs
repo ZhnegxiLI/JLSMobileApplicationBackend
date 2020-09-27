@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace JLSMobileApplication.HtmlToPdf
 {
-    [PdfExporter(Name = "Facture")]
+    [PdfExporter(Name = "Commande")]
     public class ReceiptInfo
     {
         public ReceiptInfo()
@@ -25,9 +25,14 @@ namespace JLSMobileApplication.HtmlToPdf
         public string Entreprise { get; set; }
         public string PhoneNumber { get; set; }
         public string Siret { get; set; }
+   
+        public string Tax { get; set; }
 
-        public double Tax { get; set; }
-        public double TotalPrice { get; set; }
+        public string TotalPrice { get; set; }
+
+        public string TaxRate { get; set; }
+        [RegularExpression(@"^\d+.?\d{0,2}$", ErrorMessage = "Invalid Target Price; Maximum Two Decimal Points.")]
+        public string TotalPriceWithoutTax { get; set; }
 
         public Adress ShipmentAddress { get; set; }
         public Adress FacturationAddress { get; set; }
@@ -40,6 +45,9 @@ namespace JLSMobileApplication.HtmlToPdf
         public string Code { get; set; }
         public string Label { get; set; }
         public int Quantity { get; set; }
-        public double Price { get; set; }
+
+        public int Colissage { get; set; }
+        public string Price { get; set; }
+        public string PhotoPath { get; set; }
     }
 }

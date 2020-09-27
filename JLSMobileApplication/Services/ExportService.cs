@@ -160,77 +160,92 @@ namespace JLSMobileApplication.Services
 
         public async Task<string> ExportPdf(long OrderId, string Lang)
         {
-            /* File name */
-            string fileName = "Exports/" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_Invoice.pdf";
-            /* Get template path */
-            var tplPath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "HtmlToPdf",
-             "receipt.cshtml");
-            var tpl = System.IO.File.ReadAllText(tplPath);
-
-            /* GetOrderInfo todo change */
-            var orderInfo = await this._orderRepository.GetOrdersListByOrderId(OrderId, Lang); // todo change 
-
-            /* Get order basic info */
-            var receipt = new ReceiptInfo();
-
-            var order = orderInfo.GetType().GetProperty("OrderInfo").GetValue(orderInfo, null);
-            if (order != null)
+            try
             {
-                receipt.OrderId = order.Id;
-                receipt.CreatedOn = order.CreatedOn;
-                receipt.TotalPrice = order.TotalPrice;
-            }
-            var customer = orderInfo.GetType().GetProperty("CustomerInfo").GetValue(orderInfo, null);
-            if (customer != null)
-            {
-                receipt.Username = customer.Email;
-                receipt.PhoneNumber = customer.PhoneNumber;
-                receipt.Entreprise = customer.EntrepriseName;
-                receipt.Siret = customer.Siret;
-            }
+                /* File name */
+                string fileName = "Exports/" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_Invoice.pdf";
+                /* Get template path */
+                var tplPath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "HtmlToPdf",
+                 "receipt.cshtml");
+                var tpl = System.IO.File.ReadAllText(tplPath);
 
-            /* Get order tax info */
-            var tax = orderInfo.GetType().GetProperty("TaxRate").GetValue(orderInfo, null);
-            if (tax != null)
-            {
-                receipt.Tax = receipt.TotalPrice * double.Parse(tax.GetType().GetProperty("Value").GetValue(tax, null)) * 0.01;
-            }
+                /* GetOrderInfo todo change */
+                var orderInfo = await this._orderRepository.GetOrdersListByOrderId(OrderId, Lang); // todo change 
 
-            /* Get order product list info */
-            var productList = orderInfo.GetType().GetProperty("ProductList").GetValue(orderInfo, null);
-            if (productList != null)
-            {
-                foreach (var item in productList)
+                /* Get order basic info */
+                var receipt = new ReceiptInfo();
+
+                var order = orderInfo.GetType().GetProperty("OrderInfo").GetValue(orderInfo, null);
+                if (order != null)
                 {
-                    receipt.ProductList.Add(new ReceiptProductList()
-                    {
-                        Code = item.GetType().GetProperty("Code").GetValue(item, null),
-                        Label = item.GetType().GetProperty("Label").GetValue(item, null),
-                        Price = item.GetType().GetProperty("Price").GetValue(item, null),
-                        Quantity = item.GetType().GetProperty("Quantity").GetValue(item, null),
-                    });
+                    receipt.OrderId = order.Id;
+                    receipt.CreatedOn = order.CreatedOn;
+                    receipt.TotalPrice = Convert.ToDouble(order.TotalPrice).ToString("0.00");
                 }
-            }
+                var customer = orderInfo.GetType().GetProperty("CustomerInfo").GetValue(orderInfo, null);
+                if (customer != null)
+                {
+                    receipt.Username = customer.Email;
+                    receipt.PhoneNumber = customer.PhoneNumber;
+                    receipt.Entreprise = customer.EntrepriseName;
+                    receipt.Siret = customer.Siret;
+                }
 
-            /* Get facturation address */
-            var facturationAddress = orderInfo.GetType().GetProperty("ShippingAdress").GetValue(orderInfo, null);
-            if (facturationAddress != null)
+                /* Get order tax info */
+                var tax = orderInfo.GetType().GetProperty("TaxRate").GetValue(orderInfo, null);
+
+                receipt.TaxRate = (string)tax.GetType().GetProperty("Value").GetValue(tax, null);
+
+                /* Get order product list info */
+                var productList = orderInfo.GetType().GetProperty("ProductList").GetValue(orderInfo, null);
+                if (productList != null)
+                {
+                    foreach (var item in productList)
+                    {
+                        receipt.ProductList.Add(new ReceiptProductList()
+                        {
+                            Code = item.GetType().GetProperty("Code").GetValue(item, null),
+                            Colissage = item.GetType().GetProperty("QuantityPerBox").GetValue(item, null),
+                            PhotoPath = _appSettings.WebSiteUrl + item.GetType().GetProperty("DefaultPhotoPath").GetValue(item, null),
+                            Label = item.GetType().GetProperty("Label").GetValue(item, null),
+                            Price = Convert.ToDouble(item.GetType().GetProperty("Price").GetValue(item, null)).ToString("0.00"),
+                            Quantity = item.GetType().GetProperty("Quantity").GetValue(item, null),
+                        });
+
+                        receipt.TotalPriceWithoutTax = Convert.ToDouble(receipt.TotalPriceWithoutTax + item.GetType().GetProperty("QuantityPerBox").GetValue(item, null) * Convert.ToDouble(item.GetType().GetProperty("Price").GetValue(item, null)) * item.GetType().GetProperty("Quantity").GetValue(item, null)).ToString("0.00");
+                    }
+
+                    if (tax != null)
+                    {
+                        receipt.Tax = Convert.ToDouble((Convert.ToDouble(receipt.TotalPriceWithoutTax) * double.Parse(tax.GetType().GetProperty("Value").GetValue(tax, null)) * 0.01)).ToString("0.00");
+                    }
+                }
+
+                /* Get facturation address */
+                var facturationAddress = orderInfo.GetType().GetProperty("ShippingAdress").GetValue(orderInfo, null);
+                if (facturationAddress != null)
+                {
+                    receipt.FacturationAddress = facturationAddress;
+                }
+                /* Get shipping address */
+                var shippingAddress = orderInfo.GetType().GetProperty("FacturationAdress").GetValue(orderInfo, null);
+                if (shippingAddress != null)
+                {
+                    receipt.ShipmentAddress = shippingAddress;
+                }
+
+                /* Generate pdf */
+                var exporter = new PdfExporter();
+                var result = await exporter.ExportByTemplate(fileName, receipt
+                   , tpl);
+
+                return fileName;
+            }
+            catch(Exception e)
             {
-                receipt.FacturationAddress = facturationAddress;
+                throw e;
             }
-            /* Get shipping address */
-            var shippingAddress = orderInfo.GetType().GetProperty("FacturationAdress").GetValue(orderInfo, null);
-            if (shippingAddress != null)
-            {
-                receipt.ShipmentAddress = shippingAddress;
-            }
-
-            /* Generate pdf */
-            var exporter = new PdfExporter();
-            var result = await exporter.ExportByTemplate(fileName, receipt
-               , tpl);
-
-            return fileName;
+         
         }
     }
     }
