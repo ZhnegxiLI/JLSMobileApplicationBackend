@@ -87,12 +87,14 @@ namespace JLSDataAccess.Repositories
                     ReferenceId = r.ReferenceId,
                     UnitPrice = r.Price
                 });
-                TotalPrice = (r.Quantity * r.Price.Value) + TotalPrice;
+                TotalPrice = (r.Quantity * r.Price.Value *r.UnityQuantity) + TotalPrice;
             }
             await db.AddRangeAsync(OrderProducts);
             await db.SaveChangesAsync();
 
-            Order.TotalPrice = TotalPrice;
+            var taxRate = db.ReferenceItem.Where(p => p.Code == "TaxRate_20%").Select(p => p.Value).FirstOrDefault();
+            var tax = float.Parse(taxRate) *0.01;
+            Order.TotalPrice = (float?)(TotalPrice * (1 + (taxRate!=null ? tax : 0)));
 
             db.Update(Order);
             await db.SaveChangesAsync();
@@ -188,7 +190,7 @@ namespace JLSDataAccess.Repositories
                         reference.UnitPrice = item.Price;
                         reference.OrderId = order.Id;
                       
-                        TotalPrice = TotalPrice + (item.Price.Value * item.Quantity);
+                        TotalPrice = TotalPrice + (item.Price.Value * item.Quantity * item.UnityQuantity);
                         
                         products.Add(reference);
                     }
