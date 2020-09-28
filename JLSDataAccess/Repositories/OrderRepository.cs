@@ -85,7 +85,8 @@ namespace JLSDataAccess.Repositories
                     OrderId = Order.Id,
                     Quantity = r.Quantity,
                     ReferenceId = r.ReferenceId,
-                    UnitPrice = r.Price
+                    UnitPrice = r.Price,
+                    Colissage = r.UnityQuantity
                 });
                 TotalPrice = (r.Quantity * r.Price.Value *r.UnityQuantity) + TotalPrice;
             }
@@ -95,7 +96,7 @@ namespace JLSDataAccess.Repositories
             var taxRate = db.ReferenceItem.Where(p => p.Code == "TaxRate_20%").Select(p => p.Value).FirstOrDefault();
             var tax = float.Parse(taxRate) *0.01;
             Order.TotalPrice = (float?)(TotalPrice * (1 + (taxRate!=null ? tax : 0)));
-
+            Order.TotalPriceHT = TotalPrice;
             db.Update(Order);
             await db.SaveChangesAsync();
             // Return new orderId
@@ -198,8 +199,10 @@ namespace JLSDataAccess.Repositories
 
 
                 await db.AddRangeAsync(products);
-
-                order.TotalPrice = TotalPrice;
+                var taxRate = db.ReferenceItem.Where(p => p.Code == "TaxRate_20%").Select(p => p.Value).FirstOrDefault();
+                var tax = float.Parse(taxRate) * 0.01;
+                order.TotalPrice = (float?)(TotalPrice * (1 + (taxRate != null ? tax : 0)));
+                order.TotalPriceHT = TotalPrice;
 
                 db.Update(order);
 

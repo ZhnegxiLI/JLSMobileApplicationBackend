@@ -15,6 +15,7 @@ namespace JLSDataModel.Models.Order
         public long? AdminRemarkId { get; set; }
 
         public float? TotalPrice { get; set; }
+        public float? TotalPriceHT { get; set; }
 
         public long? TaxRateId { get; set; }
 
