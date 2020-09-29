@@ -83,6 +83,7 @@ namespace JLSDataAccess.Repositories
         {
             var result = (from a in db.Adress
                           join u in db.Users on a.Id equals u.FacturationAdressId
+                          where u.Id == userId
                           select a);
 
             return await result.FirstOrDefaultAsync();

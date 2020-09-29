@@ -180,7 +180,7 @@ namespace JLSMobileApplication.Services
                 {
                     receipt.OrderId = order.Id;
                     receipt.CreatedOn = order.CreatedOn;
-                    receipt.TotalPrice = Convert.ToDouble(order.TotalPrice).ToString("0.00");
+                    receipt.TotalPrice = order.TotalPrice;
                 }
                 var customer = orderInfo.GetType().GetProperty("CustomerInfo").GetValue(orderInfo, null);
                 if (customer != null)
@@ -194,7 +194,7 @@ namespace JLSMobileApplication.Services
                 /* Get order tax info */
                 var tax = orderInfo.GetType().GetProperty("TaxRate").GetValue(orderInfo, null);
 
-                receipt.TaxRate = (string)tax.GetType().GetProperty("Value").GetValue(tax, null);
+                receipt.TaxRate = float.Parse(tax.GetType().GetProperty("Value").GetValue(tax, null));
 
                 /* Get order product list info */
                 var productList = orderInfo.GetType().GetProperty("ProductList").GetValue(orderInfo, null);
@@ -208,16 +208,16 @@ namespace JLSMobileApplication.Services
                             Colissage = item.GetType().GetProperty("QuantityPerBox").GetValue(item, null),
                             PhotoPath = _appSettings.WebSiteUrl + item.GetType().GetProperty("DefaultPhotoPath").GetValue(item, null),
                             Label = item.GetType().GetProperty("Label").GetValue(item, null),
-                            Price = Convert.ToDouble(item.GetType().GetProperty("Price").GetValue(item, null)).ToString("0.00"),
+                            Price = (float)item.GetType().GetProperty("Price").GetValue(item, null),
                             Quantity = item.GetType().GetProperty("Quantity").GetValue(item, null),
                         });
 
-                        receipt.TotalPriceWithoutTax = Convert.ToDouble(receipt.TotalPriceWithoutTax + item.GetType().GetProperty("QuantityPerBox").GetValue(item, null) * Convert.ToDouble(item.GetType().GetProperty("Price").GetValue(item, null)) * item.GetType().GetProperty("Quantity").GetValue(item, null)).ToString("0.00");
+                        receipt.TotalPriceWithoutTax = (float)(receipt.TotalPriceWithoutTax + item.GetType().GetProperty("QuantityPerBox").GetValue(item, null) * item.GetType().GetProperty("Price").GetValue(item, null) * item.GetType().GetProperty("Quantity").GetValue(item, null));
                     }
 
                     if (tax != null)
                     {
-                        receipt.Tax = Convert.ToDouble((Convert.ToDouble(receipt.TotalPriceWithoutTax) * double.Parse(tax.GetType().GetProperty("Value").GetValue(tax, null)) * 0.01)).ToString("0.00");
+                        receipt.Tax = (float)(receipt.TotalPriceWithoutTax * float.Parse(tax.GetType().GetProperty("Value").GetValue(tax, null)) * 0.01);
                     }
                 }
 

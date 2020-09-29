@@ -22,7 +22,7 @@ namespace JLSDataModel.Models.Adress
         public string City { get; set; }
         public string Provence { get; set; }
 
-        public long? CountryId { get; set; }
+        public string Country { get; set; }
         public string EntrepriseName { get; set; }
         public bool? IsDefaultAdress { get; set; }
     }

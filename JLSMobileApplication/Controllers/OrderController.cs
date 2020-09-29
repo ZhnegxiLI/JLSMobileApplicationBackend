@@ -72,7 +72,7 @@ namespace JLSMobileApplication.Controllers
                 shippingAddressToInsert.FirstLineAddress = shippingAddress.FirstLineAddress;
                 shippingAddressToInsert.City = shippingAddress.City;
                 shippingAddressToInsert.EntrepriseName = shippingAddress.EntrepriseName;
-                shippingAddressToInsert.CountryId = shippingAddress.CountryId;
+                shippingAddressToInsert.Country = shippingAddress.Country;
                 shippingAddressToInsert.IsDefaultAdress = true;
 
                 var facturationAddressToInsert = new Adress();
@@ -85,7 +85,7 @@ namespace JLSMobileApplication.Controllers
                 facturationAddressToInsert.FirstLineAddress = facturationAddress.FirstLineAddress;
                 facturationAddressToInsert.City = facturationAddress.City;
                 facturationAddressToInsert.EntrepriseName = facturationAddress.EntrepriseName;
-                facturationAddressToInsert.CountryId = facturationAddress.CountryId;
+                facturationAddressToInsert.Country = facturationAddress.Country;
 
                 var shippingAddressId = await _adressRepository.CreateOrUpdateAdress(shippingAddressToInsert);
                 var facturationAddressId = await _adressRepository.CreateOrUpdateAdress(facturationAddressToInsert);

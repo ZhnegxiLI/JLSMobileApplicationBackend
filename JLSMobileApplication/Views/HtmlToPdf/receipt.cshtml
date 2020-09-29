@@ -82,7 +82,7 @@
         <tbody>
             @foreach (var item in Model.Data.ProductList)
             {
-                double totalPrice = Double.Parse(@item.Price) * @item.Quantity * @item.Colissage;
+                string totalPrice =  (@item.Price * @item.Quantity * @item.Colissage).ToString("0.00");
                 double TotalQuantity = @item.Quantity * @item.Colissage;
             <tr>
                 <td><img src="@item.PhotoPath" width="70"/> </td>

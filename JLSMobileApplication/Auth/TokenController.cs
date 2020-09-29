@@ -79,14 +79,14 @@ namespace JLSMobileApplication.Auth
                 {
                     ModelState.AddModelError(string.Empty, "User Has not Confirmed Email.");
 
-                    return Unauthorized(new { LoginError = "Msg_EmailNotValide" });
+                    return NotFound(new { LoginError = "Msg_EmailNotValide" });
                 }
 
                 if (user.Validity == false)
                 {
                     ModelState.AddModelError(string.Empty, "Account is locked");
 
-                    return Unauthorized(new { LoginError = "Msg_AccountBloque" });
+                    return NotFound(new { LoginError = "Msg_AccountBloque" });
                 }
 
                 // username & password matches: create the refresh token
