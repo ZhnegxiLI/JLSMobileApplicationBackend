@@ -259,6 +259,7 @@ namespace JLSDataAccess.Repositories
                                                 where u.Id == o.UserId
                                                 select u).FirstOrDefault(),
                                         TaxRateId = o.TaxRateId,
+                                        TotalPriceHT = o.TotalPriceHT,
                                         TotalPrice = o.TotalPrice,
                                         ClientRemarkId = o.ClientRemarkId,
                                         AdminRemarkId = o.AdminRemarkId,
