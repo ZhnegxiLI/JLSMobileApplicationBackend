@@ -131,7 +131,7 @@ namespace JLSMobileApplication.Controllers
                                                  join ri in criteria.References on p.ReferenceId equals ri.ReferenceId
                                                  select new OrderProductViewModelMobile()
                                                  {
-                                                     Price = p.Price * ri.Quantity, // Modify accroding to client specification 
+                                                     Price = p.Price, // Modify accroding to client specification 
                                                      UnityQuantity = (int)p.QuantityPerBox,
                                                      Quantity = ri.Quantity,
                                                      ReferenceId = ri.ReferenceId

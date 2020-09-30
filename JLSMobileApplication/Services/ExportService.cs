@@ -222,13 +222,13 @@ namespace JLSMobileApplication.Services
                 }
 
                 /* Get facturation address */
-                var facturationAddress = orderInfo.GetType().GetProperty("ShippingAdress").GetValue(orderInfo, null);
+                var facturationAddress = orderInfo.GetType().GetProperty("FacturationAdress").GetValue(orderInfo, null);
                 if (facturationAddress != null)
                 {
                     receipt.FacturationAddress = facturationAddress;
                 }
                 /* Get shipping address */
-                var shippingAddress = orderInfo.GetType().GetProperty("FacturationAdress").GetValue(orderInfo, null);
+                var shippingAddress = orderInfo.GetType().GetProperty("ShippingAdress").GetValue(orderInfo, null);
                 if (shippingAddress != null)
                 {
                     receipt.ShipmentAddress = shippingAddress;

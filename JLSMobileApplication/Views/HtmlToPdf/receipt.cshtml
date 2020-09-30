@@ -45,7 +45,7 @@
         <text>Numéro de commande：@Model.Data.OrderId</text>
         <text style="float: right;margin-right: 6%;">Date de transaction：@Model.Data.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss")</text>
     </p>
-    <h3 style="margin-left: 5%; margin-top: 1%;">Info Client</h3>
+    <h3 style="margin-left: 5%; margin-top: 1%;">Info client</h3>
     <table width="90%" style="margin-left: 5%; margin-top: 1%;">
         <thead>
             <tr>
@@ -71,7 +71,7 @@
             <tr>
                 <th>Photo</th>
                 <th>Référence</th>
-                <th>Nom De Produit</th>
+                <th>Nom de produit</th>
                 <th>Colissage</th>
                 <th>Nombre de colis</th>
                 <th>QT CDEE</th>
@@ -82,20 +82,26 @@
         <tbody>
             @foreach (var item in Model.Data.ProductList)
             {
-                string totalPrice =  (@item.Price * @item.Quantity * @item.Colissage).ToString("0.00");
+                string totalPrice = (@item.Price * @item.Quantity * @item.Colissage).ToString("0.00");
                 double TotalQuantity = @item.Quantity * @item.Colissage;
-            <tr>
-                <td><img src="@item.PhotoPath" width="70"/> </td>
-                <td>@item.Code</td>
-                <td>@item.Label</td>
-                <td>@item.Colissage </td>
-                <td>@item.Quantity</td>
-                <td>@TotalQuantity </td>
-                <td>@item.Price €</td>
-                <td>@totalPrice €</td>
+                <tr>
+                    <td><img src="@item.PhotoPath" width="70" /> </td>
+                    <td>@item.Code</td>
+                    <td>@item.Label</td>
+                    <td>@item.Colissage </td>
+                    <td>@item.Quantity</td>
+                    <td>@TotalQuantity </td>
+                    <td>@item.Price €</td>
+                    <td>@totalPrice €</td>
 
-            </tr>
+                </tr>
             }
+
+            <tr style="border: solid 1px;">
+                <td colspan="7" style="text-align: left;padding-left: 7%;">Total HT</td>
+                <td>@Model.Data.TotalPriceWithoutTax €</td>
+            </tr>
+
             <tr style="border: solid 1px;">
                 <td colspan="7" style="text-align: left;padding-left: 7%;">Tx TVA</td>
                 <td>@Model.Data.TaxRate %</td>
@@ -107,11 +113,6 @@
             </tr>
 
             <tr style="border: solid 1px;">
-                <td colspan="7" style="text-align: left;padding-left: 7%;">Total HT</td>
-                <td>@Model.Data.TotalPriceWithoutTax €</td>
-            </tr>
-       
-            <tr style="border: solid 1px;">
                 <td colspan="7" style="text-align: left;padding-left: 7%;">NET A PAYER</td>
                 <td>@Model.Data.TotalPrice €</td>
             </tr>
@@ -120,31 +121,33 @@
     </table>
     <div style="margin-left: 5%; margin-top: 1%;width:90%; ">
         <div style="width:48%;border: 1px solid; float:left; height:160px;padding-left:5px;">
-            <h3>Addresse De Facturation</h3>
+            <h3>Addresse de facturation</h3>
             <div class="address-card__name">@Model.Data.Entreprise</div> 
             @*@Model.Data.FacturationAddress.ContactFirstName  @Model.Data.FacturationAddress.ContactLastName*@
-            <div class="address-card__row">
+        <div class="address-card__row">
 
-                @Model.Data.FacturationAddress.ZipCode,  @Model.Data.FacturationAddress.City <br>
-                @Model.Data.FacturationAddress.FirstLineAddress <br>
-                @Model.Data.FacturationAddress.SecondLineAddress
-            </div>
+            
+            @Model.Data.FacturationAddress.FirstLineAddress <br>
+            @Model.Data.FacturationAddress.SecondLineAddress<br>
+            @Model.Data.FacturationAddress.ZipCode,  @Model.Data.FacturationAddress.City
+        </div>
             <div class="address-card__row">
-                <div class="address-card__row-title">Numéro De Téléphone: @Model.Data.FacturationAddress.ContactTelephone </div>
+                <div class="address-card__row-title">Numéro de téléphone: @Model.Data.FacturationAddress.ContactTelephone </div>
             </div>
 
         </div>
         <div style="width:48%;border: 1px solid; float:right; height:160px;padding-left:5px;">
-            <h3>Addresse De Livraison</h3>
+            <h3>Addresse de livraison</h3>
             <div class="address-card__name">@Model.Data.Entreprise</div>
             <div class="address-card__row">
 
-                @Model.Data.ShipmentAddress.ZipCode,  @Model.Data.ShipmentAddress.City <br>
+
                 @Model.Data.ShipmentAddress.FirstLineAddress <br>
-                @Model.Data.ShipmentAddress.SecondLineAddress
+                @Model.Data.ShipmentAddress.SecondLineAddress <br>
+                @Model.Data.ShipmentAddress.ZipCode,  @Model.Data.ShipmentAddress.City
             </div>
             <div class="address-card__row">
-                <div class="address-card__row-title">Numéro De Téléphone: @Model.Data.ShipmentAddress.ContactTelephone</div>
+                <div class="address-card__row-title">Numéro de téléphone: @Model.Data.ShipmentAddress.ContactTelephone</div>
             </div>
 
         </div>
