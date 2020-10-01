@@ -349,6 +349,7 @@ namespace JLSDataAccess.Repositories
                                                   where op.OrderId == o.Id && rc.ShortLabel == "Product" &&  rl.Lang == Lang 
                                                   select new 
                                                   {
+                                                      UnityQuantity = op.Colissage,
                                                       Quantity = op.Quantity,
                                                       ProductId = p.Id,
                                                       ReferenceId = riProduct.Id,
@@ -358,6 +359,7 @@ namespace JLSDataAccess.Repositories
                                                       Order = riProduct.Order,
                                                       Label = rl.Label,
                                                       Price = op.UnitPrice,
+                                                      TotalPrice = op.TotalPrice,
                                                       QuantityPerBox = p.QuantityPerBox,
                                                       MinQuantity = p.MinQuantity,
                                                       Size = p.Size,
