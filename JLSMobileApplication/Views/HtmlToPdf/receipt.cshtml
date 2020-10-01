@@ -126,10 +126,10 @@
             @*@Model.Data.FacturationAddress.ContactFirstName  @Model.Data.FacturationAddress.ContactLastName*@
         <div class="address-card__row">
 
-            
+
             @Model.Data.FacturationAddress.FirstLineAddress <br>
             @Model.Data.FacturationAddress.SecondLineAddress<br>
-            @Model.Data.FacturationAddress.ZipCode,  @Model.Data.FacturationAddress.City
+            @Model.Data.FacturationAddress.ZipCode,  @Model.Data.FacturationAddress.City, @Model.Data.ShipmentAddress.Country
         </div>
             <div class="address-card__row">
                 <div class="address-card__row-title">Numéro de téléphone: @Model.Data.FacturationAddress.ContactTelephone </div>
@@ -144,7 +144,7 @@
 
                 @Model.Data.ShipmentAddress.FirstLineAddress <br>
                 @Model.Data.ShipmentAddress.SecondLineAddress <br>
-                @Model.Data.ShipmentAddress.ZipCode,  @Model.Data.ShipmentAddress.City
+                @Model.Data.ShipmentAddress.ZipCode,  @Model.Data.ShipmentAddress.City, @Model.Data.ShipmentAddress.Country
             </div>
             <div class="address-card__row">
                 <div class="address-card__row-title">Numéro de téléphone: @Model.Data.ShipmentAddress.ContactTelephone</div>
