@@ -6,6 +6,7 @@ using Magicodes.ExporterAndImporter.Pdf;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
@@ -15,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Services
@@ -61,6 +63,8 @@ namespace JLSMobileApplication.Services
                     // Get columns title from first object in the list
                     var columns = List[0].GetType().GetProperties();
                     var targetColumns = new List<string>();
+                    var targetCoulmnsWithOrder = new List<ExportModel>();
+
                     foreach (var item in columns)
                     {
                         if (ExportConfigurationModel != null)
@@ -68,30 +72,45 @@ namespace JLSMobileApplication.Services
                             var temp = ExportConfigurationModel.Where(p => p.Name == item.Name).FirstOrDefault();
                             if (temp != null)
                             {
-                                targetColumns.Add(temp.Name);
+                                targetCoulmnsWithOrder.Add(temp);
                             }
+
+                         
                         }
                         else
                         {
                             targetColumns.Add(item.Name);
                         }
                     }
+                    targetCoulmnsWithOrder = targetCoulmnsWithOrder.OrderBy(x => x.Order).ToList();
+
                     /*Step3: Create Excel flow */
                     IWorkbook workbook = new XSSFWorkbook();
                     var sheet = workbook.CreateSheet(ExportName);
                     var header = sheet.CreateRow(0);
+
+                    /* Bold the title */
+                    XSSFFont headerFont = (XSSFFont)workbook.CreateFont();
+                    headerFont.Boldweight = (short)FontBoldWeight.Bold; // bold
+                    XSSFCellStyle firstTitleStyle = (XSSFCellStyle)workbook.CreateCellStyle();
+                    firstTitleStyle.SetFont(headerFont);
+
                     /*Step4: Add headers*/
                     int columnsCounter = 0;
-                    foreach (var item in targetColumns)
+                    foreach (var item in targetCoulmnsWithOrder)
                     {
+                      
                         if (ExportConfigurationModel!=null)
                         {
-                            var temp = ExportConfigurationModel.Where(p => p.Name == item).Select(p => p.DisplayName).FirstOrDefault();
-                            header.CreateCell(columnsCounter).SetCellValue(temp != null ? temp : item);
+                            var temp = ExportConfigurationModel.Where(p => p.Name == item.Name).Select(p => p.DisplayName).FirstOrDefault();
+                            var cell = header.CreateCell(columnsCounter);
+                            cell.CellStyle = firstTitleStyle;
+                            cell.SetCellValue(temp != null ? temp : item.Name);
+                           
                         }
                         else
                         {
-                            header.CreateCell(columnsCounter).SetCellValue(item);
+                            header.CreateCell(columnsCounter).SetCellValue(item.Name);
                         }
                         columnsCounter++;
                     }
@@ -102,10 +121,11 @@ namespace JLSMobileApplication.Services
                         var datarow = sheet.CreateRow(rowIndex);
 
                         columnsCounter = 0;
-                        foreach (var column in targetColumns)
+                        foreach (var column in targetCoulmnsWithOrder)
                         {
+                         
                             string valueFormatted = null;
-                            var value = item.GetType().GetProperty(column).GetValue(item,null);
+                            var value = item.GetType().GetProperty(column.Name).GetValue(item,null);
                             if (value != null)
                             {
                                 var valueType = value.GetType();
@@ -118,14 +138,15 @@ namespace JLSMobileApplication.Services
                                 {
                                     valueFormatted = value.ToString();
                                 }
-                                if (column.Contains("Path"))
+                                if (column.Name.Contains("Path"))
                                 {
                                     value = _httpContextAccessor.HttpContext.Request.Host  + _httpContextAccessor.HttpContext.Request.PathBase + "/"+ value;
                                 }
-                                if (column.Contains("Price"))
+                                if (column.Name.Contains("Price"))
                                 {
-                                    value = value + "€";
+                                    value = value + "€(HT)";
                                 }
+                             
                             }
                             else
                             {
@@ -136,12 +157,37 @@ namespace JLSMobileApplication.Services
                                 valueFormatted = "";
                             }
 
-                            datarow.CreateCell(columnsCounter).SetCellValue(valueFormatted!=null? valueFormatted: value);
+                            var cell = datarow.CreateCell(columnsCounter);
+
+                            cell.SetCellValue(valueFormatted!=null? valueFormatted: value);
+                    
                             columnsCounter++;
                         }
 
                         rowIndex++;
                     }
+                    /* Adapt the width of excel */
+                    for (int columnNum = 0; columnNum < targetCoulmnsWithOrder.Count(); columnNum++)
+                    {
+                        int columnWidth = sheet.GetColumnWidth(columnNum) / 256;
+                        //5为开始修改的行数，默认为0行开始
+                        for (int rowNum = 0; rowNum <= sheet.LastRowNum; rowNum++)
+                        {
+                            IRow currentRow = sheet.GetRow(rowNum);
+                            if (currentRow.GetCell(columnNum) != null)
+                            {
+                                ICell currentCell = currentRow.GetCell(columnNum);
+                                int length = Encoding.Default.GetBytes(currentCell.ToString()).Length + 1;
+                                if (columnWidth < length)
+                                {
+                                    columnWidth = length;
+                                }
+                            }
+                        }
+                        sheet.SetColumnWidth(columnNum, columnWidth * 256);
+                    }
+
+
                     workbook.Write(fs);
                 }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JLSDataAccess.Interfaces;
+using JLSDataModel.Models;
 using JLSMobileApplication.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -51,6 +52,7 @@ namespace JLSMobileApplication.Controllers
                         var Validity = Model.Criteria.GetValue("Validity").Value;
 
                         list = await _productRepository.AdvancedProductSearchByCriteria(ProductLabel, MainCategoryReferenceId, SecondCategoryReferenceId, Validity, Model.Lang);
+
                         break;
 
                     case "AdvancedOrderSearchByCriteria":
