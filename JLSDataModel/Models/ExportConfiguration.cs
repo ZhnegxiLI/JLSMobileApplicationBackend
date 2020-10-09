@@ -9,5 +9,6 @@ namespace JLSDataModel.Models
         public string ExportName { get; set; }
 
         public string ExportModel { get; set; }
+        public int Order { get; set; }
     }
 }

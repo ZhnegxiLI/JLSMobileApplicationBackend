@@ -423,6 +423,7 @@ namespace JLSDataAccess.Repositories
                                 && (SecondCategoryReferenceId.Count()== 0 || SecondCategoryReferenceId.Contains(riSecond.Id))
                                 && (Validity == null ||ri.Validity == Validity)
                                 && rl.Lang == Lang && rc.ShortLabel == "Product"
+                                orderby riMain.Id , riSecond.Id
                                 select new {
                                     Comments = (from pc in db.ProductComment
                                                        where pc.ProductId == p.Id
@@ -435,6 +436,11 @@ namespace JLSDataAccess.Repositories
                                     Validity = ri.Validity,
                                     CategoryId = rc.Id,
                                     CategoryLabel = rc.ShortLabel,
+                                    QuantityPerBox = p.QuantityPerBox,
+                                    BarreCode = p.BarreCode,
+                                    Size = p.Size,
+                                    Color = p.Color,
+                                    Material = p.Material,
                                     Price = p.Price,
                                     DefaultPhotoPath = (from path in db.ProductPhotoPath
                                                         where path.ProductId == p.Id

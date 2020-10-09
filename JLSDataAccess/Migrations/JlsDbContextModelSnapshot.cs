@@ -271,6 +271,8 @@ namespace JLSDataAccess.Migrations
 
                     b.Property<string>("ExportName");
 
+                    b.Property<int>("Order");
+
                     b.Property<long?>("UpdatedBy");
 
                     b.Property<DateTime?>("UpdatedOn");
