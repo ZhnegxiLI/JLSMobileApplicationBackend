@@ -11,6 +11,8 @@
     <Compile Remove="Migrations\20200310231751_addMessageTables.Designer.cs" />
     <Compile Remove="Migrations\20200407200751_1.cs" />
     <Compile Remove="Migrations\20200407200751_1.Designer.cs" />
+    <Compile Remove="Migrations\20201009213132_addOrderInExportModel.cs" />
+    <Compile Remove="Migrations\20201009213132_addOrderInExportModel.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

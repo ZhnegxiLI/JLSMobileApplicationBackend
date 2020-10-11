@@ -178,7 +178,34 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
+        
 
+        [HttpGet]
+        public async Task<JsonResult> GetPromotionProduct(int Begin, int Step, string Lang)
+        {
+            try
+            {
+                var productList = await _productRepository.GetPromotionProduct(Lang);
+                var list = new List<dynamic>();
+                if (Begin != -1 && Step != -1)
+                {
+                    list = productList.Skip(Begin * Step).Take(Step).ToList();
+                }
+                else
+                {
+                    list = productList.ToList();
+                }
+                return Json( new {
+                    ProductList = list,
+                    TotalCount = productList.Count()
+                } 
+               );
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
 
         public class GetProductInfoByReferenceIdsCriteria
         {

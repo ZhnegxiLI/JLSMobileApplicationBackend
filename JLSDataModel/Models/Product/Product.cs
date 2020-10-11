@@ -19,6 +19,7 @@ namespace JLSDataModel.Models.Product
         public string Description { get; set; }
 
         public string BarreCode { get; set; }
+        public float? PreviousPrice { get; set; }
 
         public long ReferenceItemId { get; set; }
         public ReferenceItem ReferenceItem { get; set; }

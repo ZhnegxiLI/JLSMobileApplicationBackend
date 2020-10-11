@@ -170,7 +170,6 @@ namespace JLSMobileApplication
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseDeveloperExceptionPage();
             /* Configure Hangfire trigger */
             app.UseHangfireServer();
             app.UseHangfireDashboard();
@@ -182,7 +181,6 @@ namespace JLSMobileApplication
 
             /* Set cache time : todo place into appsettings */
             var cachePeriod = env.IsDevelopment() ? "600" : "604800";
-
 
             /* This function will create new folder if folder not exist and return current folder if exists */
             System.IO.Directory.CreateDirectory("/images");

@@ -36,6 +36,7 @@ namespace JLSDataModel.ViewModels
         public int? Order { get; set; }
         public string Label { get; set; }
         public float? Price { get; set; }
+        public float? PreviousPrice { get; set; }
         public int? QuantityPerBox { get; set; }
         public int? MinQuantity { get; set; }
 

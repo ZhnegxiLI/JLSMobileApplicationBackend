@@ -13,7 +13,7 @@ namespace JLSDataAccess.Interfaces
         Task<List<ProductCategoryViewModel>> GetProductMainCategory(string Lang);
         Task<List<dynamic>> GetProductByPrice(string Lang, long? MainCategoryId);
         Task<List<ProductCategoryViewModel>> GetProductSecondCategory(long MainCategoryReferenceId, string Lang);
-
+        Task<List<dynamic>> GetPromotionProduct(string Lang);
         Task<ProductListViewModel> GetProductListBySecondCategory(long SecondCategoryReferenceId, string Lang, int begin, int step);
 
         Task<List<ProductListData>> GetProductInfoByReferenceIds(List<long> ReferenceIds, string Lang);
