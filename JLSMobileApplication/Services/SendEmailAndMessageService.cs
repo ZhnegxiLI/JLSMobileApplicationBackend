@@ -264,8 +264,9 @@ namespace JLSMobileApplication.Services
             {
                 foreach (var Email in EmailsToSend)
                 {
-                    _email.SendEmail(Email.ToEmail, Email.Title, Email.Body, Email.Attachment);
+                    var message = _email.SendEmail(Email.ToEmail, Email.Title, Email.Body, Email.Attachment);
                     Email.IsSended = true;
+                    Email.Message = message;
                     db.Update(Email);
                 }
                 db.SaveChanges();

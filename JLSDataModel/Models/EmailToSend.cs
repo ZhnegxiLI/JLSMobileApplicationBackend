@@ -12,5 +12,6 @@ namespace JLSDataModel.Models
         public string Body { get; set; }
         public string Attachment { get; set; }
         public bool? IsSended { get; set; }
+        public string Message { get; set; }
     }
 }

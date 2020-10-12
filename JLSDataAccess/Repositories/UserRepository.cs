@@ -300,13 +300,16 @@ namespace JLSDataAccess.Repositories
                 await db.SaveChangesAsync();
                 if (DefaultShippingAddressId!=null)
                 {
-                    var previousDefaultShippingAddress = (from ua in db.UserShippingAdress
+                    var previousDefaultShippingAddress = await (from ua in db.UserShippingAdress
                                                           join a in db.Adress on ua.ShippingAdressId equals a.Id
                                                           where ua.UserId == user.Id && a.IsDefaultAdress == true
-                                                          select a).FirstOrDefault();
-                    if (previousDefaultShippingAddress!=null)
+                                                          select a).ToListAsync();
+                    if (previousDefaultShippingAddress.Count()>0)
                     {
-                        previousDefaultShippingAddress.IsDefaultAdress = false;
+                        foreach (var item in previousDefaultShippingAddress)
+                        {
+                            item.IsDefaultAdress = false;
+                        }
                     }
                     var defaultShippingAddress = db.Adress.Where(p => p.Id == DefaultShippingAddressId).FirstOrDefault();
                     defaultShippingAddress.IsDefaultAdress = true;
