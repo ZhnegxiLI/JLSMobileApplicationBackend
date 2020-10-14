@@ -25,7 +25,8 @@ namespace JLSMobileApplication.HtmlToPdf
         public string Entreprise { get; set; }
         public string PhoneNumber { get; set; }
         public string Siret { get; set; }
-   
+        public string ClientRemark { get; set; }
+
         public float Tax { get; set; }
 
         public float TotalPrice { get; set; }

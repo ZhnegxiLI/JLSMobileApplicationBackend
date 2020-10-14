@@ -53,7 +53,7 @@
                 <th>Numéro de téléphone</th>
                 <th>Compte</th>
                 <th>N° TVA</th>
- 
+
             </tr>
         </thead>
         <tbody>
@@ -122,15 +122,15 @@
     <div style="margin-left: 5%; margin-top: 1%;width:90%; ">
         <div style="width:48%;border: 1px solid; float:left; height:160px;padding-left:5px;">
             <h3>Addresse de facturation</h3>
-            <div class="address-card__name">@Model.Data.Entreprise</div> 
+            <div class="address-card__name">@Model.Data.Entreprise</div>
             @*@Model.Data.FacturationAddress.ContactFirstName  @Model.Data.FacturationAddress.ContactLastName*@
-        <div class="address-card__row">
+            <div class="address-card__row">
 
 
-            @Model.Data.FacturationAddress.FirstLineAddress <br>
-            @Model.Data.FacturationAddress.SecondLineAddress<br>
-            @Model.Data.FacturationAddress.ZipCode,  @Model.Data.FacturationAddress.City, @Model.Data.FacturationAddress.Country
-        </div>
+                @Model.Data.FacturationAddress.FirstLineAddress <br>
+                @Model.Data.FacturationAddress.SecondLineAddress<br>
+                @Model.Data.FacturationAddress.ZipCode,  @Model.Data.FacturationAddress.City, @Model.Data.FacturationAddress.Country
+            </div>
             <div class="address-card__row">
                 <div class="address-card__row-title">Numéro de téléphone: @Model.Data.FacturationAddress.ContactTelephone </div>
             </div>
@@ -151,6 +151,18 @@
             </div>
 
         </div>
+    </div>
+
+    <div style="margin-left: 5%; margin-top: 1%;width:90%; ">
+        <div style="width:48%;border: 1px solid; float:left; height:160px;padding-left:5px; margin-top:5px;">
+            <h3>Message de client</h3>
+            @*@Model.Data.FacturationAddress.ContactFirstName  @Model.Data.FacturationAddress.ContactLastName*@
+            <div class="address-card__row">
+                @Model.Data.ClientRemark
+            </div>
+
+        </div>
+
     </div>
 
 </body>

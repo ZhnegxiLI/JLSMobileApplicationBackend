@@ -237,6 +237,11 @@ namespace JLSMobileApplication.Services
                     receipt.Siret = customer.Siret;
                 }
 
+                var clientRemark = orderInfo.GetType().GetProperty("ClientRemark").GetValue(orderInfo, null);
+                if (clientRemark!=null && clientRemark.Text!= null)
+                {
+                    receipt.ClientRemark = clientRemark.Text;
+                }
                 /* Get order tax info */
                 var tax = orderInfo.GetType().GetProperty("TaxRate").GetValue(orderInfo, null);
 
