@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JLSDataAccess.Interfaces;
 using JLSDataModel.Models.Message;
+using JLSMobileApplication.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,10 +18,12 @@ namespace JLSMobileApplication.Controllers
     {
 
         private readonly IMessageRepository _message;
+        private readonly ISendEmailAndMessageService _email;
 
-        public MessageController(IMessageRepository messageRepository)
+        public MessageController(IMessageRepository messageRepository, ISendEmailAndMessageService sendMessageService)
         {
             _message = messageRepository;
+            _email = sendMessageService;
         }
 
 
@@ -38,7 +41,13 @@ namespace JLSMobileApplication.Controllers
         {
             try
             {
-               return await  _message.CreateMessage(criteria.Message, criteria.FromUserId, criteria.ToUserId);
+                var result = await _message.CreateMessage(criteria.Message, criteria.FromUserId, criteria.ToUserId);
+                if (criteria.FromUserId == null && criteria.ToUserId == null)
+                {
+                    await _email.ClientMessageToAdminAsync(criteria.Message.SenderEmail, criteria.Message.Body);
+                }
+              
+                return result;
             }
             catch (Exception exc)
             {

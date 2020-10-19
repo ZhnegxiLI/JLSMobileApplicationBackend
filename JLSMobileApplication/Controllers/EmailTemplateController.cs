@@ -21,25 +21,24 @@ namespace JLSMobileApplication.Controllers
             _view = view;
         }
 
+        public class test
+        {
+            public string Email { get; set; }
+
+            public string Message { get; set; }
+        }
         [HttpGet("[action]")]
         [AllowAnonymous]
         public async Task<ActionResult> Test()
         {
             /* This function show only use for degug */
-            var emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ReinitialiserPassword", new ActiverMonCompteModel()
-            {
-                ConfirmationLink = "test",
-                Username = "test",
-                Entreprise = "test",
-                Phone = "test"
-            });
+      
 
-            return View("ActiverMonCompte", new ActiverMonCompteModel()
+            return View("ClientMessageToAdmin", new test
             {
-                ConfirmationLink = "test",
-                Username = "test",
-                Entreprise = "test",
-                Phone = "test"
+                Email = "test@gmail.com",
+                Message = "test"
+              
             });
         }
     }

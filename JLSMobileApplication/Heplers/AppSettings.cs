@@ -29,5 +29,7 @@
         public string SuperAdminList { get; set; }
         public string AdminInitialPassword { get; set; }
 
+        public string ExportPath { get; set; }
+
     }
 }

@@ -4,6 +4,7 @@ using JLSDataModel.Models;
 using JLSDataModel.Models.Message;
 using JLSDataModel.Models.User;
 using JLSMobileApplication.Heplers;
+using JLSMobileApplication.hubs;
 using JLSMobileApplication.Services.EmailTemplateModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -112,7 +113,7 @@ namespace JLSMobileApplication.Services
                     // todo 客户自下单,发送信息至后台
                     if (orderType.Code == "OrderType_External")
                     {
-                        var Message = new Message();
+                        var Message = new JLSDataModel.Models.Message.Message();
                         Message.Title = emailModelClient.Title;
                         Message.Body = messageClientTemplate;
                         Message.IsReaded = false;
@@ -207,7 +208,7 @@ namespace JLSMobileApplication.Services
                     emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/AfterActiverMonCompte", null);
                 }
                 // todo send internal message
-                var Message = new Message();
+                var Message = new JLSDataModel.Models.Message.Message();
 
                 await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate,null);
                 //_email.SendEmail(user.Email, emailModelClient.Title, emailClientTemplate);
@@ -216,6 +217,35 @@ namespace JLSMobileApplication.Services
             return 0;
         }
 
+        public class ClientMessageToAdminCriteria
+        {
+            public string Email { get; set; }
+            public string Message { get; set; }
+        }
+        public async Task<int> ClientMessageToAdminAsync(string ClientEmail, string Message)
+        {
+
+            var admins = (from u in db.Users
+                           join ur in db.UserRoles on u.Id equals ur.UserId
+                           join r in db.Roles on ur.RoleId equals r.Id
+                           where u.Validity == true && r.Name == "SuperAdmin"
+                          select u.Email).ToList();
+
+            if (ClientEmail != null && admins != null && admins.Count() > 0)
+            {
+                var emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ClientMessageToAdmin", new ClientMessageToAdminCriteria (){ 
+                    Email= ClientEmail,
+                    Message = Message
+                });
+                
+                foreach (var a in admins)
+                {
+                    await PushEmailIntoDb(a, "Nouveau message", emailClientTemplate, null);
+                }
+                return 1;
+            }
+            return 0;
+        }
 
         // todo think of how to define the template more efficiencly
         public int SendAdvertisement(string Type)
@@ -233,7 +263,7 @@ namespace JLSMobileApplication.Services
             {
                 var emailClientTemplate = emailModelClient.Body;
                 // todo send internal message
-                var Message = new Message();
+                var Message = new JLSDataModel.Models.Message.Message();
                 foreach (var c in clients)
                 {
                     _email.SendEmail(c, emailModelClient.Title, emailClientTemplate, null);

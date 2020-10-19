@@ -41,7 +41,7 @@ namespace JLSMobileApplication.Services
             if (List != null && List.Count()>0)
             {
                 /*Step0: Create file */ 
-                var newFile = "Exports/" + ExportName + ".xls";
+                var newFile = _appSettings.ExportPath + "/" + ExportName + ".xls";
                 if (System.IO.File.Exists(newFile))
                 {
                     System.IO.File.Delete(newFile);
@@ -209,7 +209,7 @@ namespace JLSMobileApplication.Services
             try
             {
                 /* File name */
-                string fileName = "Exports/" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_Invoice.pdf";
+                string fileName = _appSettings.ExportPath + "/" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_Invoice.pdf";
                 /* Get template path */
                 var tplPath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "HtmlToPdf",
                  "receipt.cshtml");
