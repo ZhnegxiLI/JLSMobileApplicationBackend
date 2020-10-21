@@ -28,7 +28,7 @@ using Microsoft.AspNetCore.Http;
 using Hangfire;
 using JLSMobileApplication.hubs;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
-
+using Microsoft.Extensions.Logging;
 namespace JLSMobileApplication
 {
     public class Startup

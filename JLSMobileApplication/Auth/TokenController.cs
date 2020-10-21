@@ -50,7 +50,7 @@ namespace JLSMobileApplication.Auth
             {
                 return new StatusCodeResult(500);
             }
-
+            // todo encry password when login and create account
             switch (model.GrantType)
             {
                 case "password":
@@ -93,7 +93,7 @@ namespace JLSMobileApplication.Auth
                 var newRtoken = CreateRefreshToken(_appSettings.ClientId, user.Id);
 
                 // first we delete any existing old refreshtokens
-                var oldrTokens = _db.TokenModel.Where(rt => rt.UserId == user.Id);
+                var oldrTokens = _db.TokenModel.Where(rt => rt.UserId == user.Id && rt.ExpiryTime< DateTime.UtcNow); // Remove only the expired token, keep the possibility to login for mutiple platform in the same time 
 
                 if (oldrTokens != null)
                 {
@@ -114,7 +114,7 @@ namespace JLSMobileApplication.Auth
                 var accessToken = await CreateAccessToken(user, newRtoken.Value);
 
 
-                return Ok(new { authToken = accessToken });
+                return Ok(new { authToken = accessToken }); // TODO: add refresh token expired 
 
             }
 
