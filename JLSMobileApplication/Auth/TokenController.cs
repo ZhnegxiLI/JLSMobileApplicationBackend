@@ -68,6 +68,7 @@ namespace JLSMobileApplication.Auth
         // Method to Create New JWT and Refresh Token
         private async Task<IActionResult> GenerateNewToken(TokenRequestModel model)
         {
+            // TODO CHECK front-end error message 
             // check if there's an user with the given username
             var user = await _userManager.FindByNameAsync(model.UserName);
 
@@ -120,7 +121,6 @@ namespace JLSMobileApplication.Auth
 
             ModelState.AddModelError("", "Username/Password was not Found");
             return NotFound(new { LoginError = "Msg_PasswordNotCorrect" });
-
 
         }
 

@@ -12,8 +12,10 @@ using LjWebApplication.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Controllers
@@ -151,6 +153,7 @@ namespace JLSMobileApplication.Controllers
         {
             if (string.IsNullOrWhiteSpace(userId)||string.IsNullOrWhiteSpace(code))
             {
+                // TODO redirect to error page 
                 ModelState.AddModelError("", "User Id and Code are required");
                 return BadRequest(ModelState);
             }
@@ -158,6 +161,7 @@ namespace JLSMobileApplication.Controllers
 
             if (user == null)
             {
+                // TODO redirect to error page 
                 return new JsonResult("ERROR"); // cannot find the user
             }
 
@@ -174,12 +178,18 @@ namespace JLSMobileApplication.Controllers
             }
             else
             {
+                /* TODO: show error plage when token is expired or other error, how error page and resent an email */
                 List<string> errors = new List<string>();
                 foreach (var error in result.Errors)
                 {
                     errors.Add(error.ToString());
                 }
-                return new JsonResult(errors);
+
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = token }, HttpContext.Request.Scheme);
+
+                await _sendEmailAndMessageService.ResetPasswordOuConfirmEmailLinkAsync(user.Id, callbackUrl, "EmailConfirmation");
+                return  RedirectToAction("ResentEmail", "Notifications");
             }
         }
 
@@ -200,8 +210,12 @@ namespace JLSMobileApplication.Controllers
         {
             User userIdentity = _userManager.FindByNameAsync(obj.UserName).Result;
 
+
+            var codeDecodedBytes = WebEncoders.Base64UrlDecode(obj.Token);// decrypt
+            var codeDecoded = Encoding.UTF8.GetString(codeDecodedBytes);
+
             IdentityResult result = _userManager.ResetPasswordAsync
-                      (userIdentity, obj.Token, obj.Password).Result;
+                      (userIdentity, codeDecoded, obj.Password).Result;
             if (result.Succeeded)
             {
                 _sendEmailAndMessageService.AfterResetPasswordOuConfirmEmailLinkAsync(userIdentity.Id, "AfterResetPassword");
@@ -236,7 +250,11 @@ namespace JLSMobileApplication.Controllers
 
             //var resetLink = Url.Action("ResetPassword",
             //    "Account", new { token = token },HttpContext.Request.Scheme);
-            var resetLink = _appSettings.WebSiteUrl + "/account/resetPassword?Token=" + token+"&Username="+ user.UserName;
+
+            byte[] tokenGeneratedBytes = Encoding.UTF8.GetBytes(token);
+            var codeEncoded = WebEncoders.Base64UrlEncode(tokenGeneratedBytes); // encrypt
+
+            var resetLink = _appSettings.WebSiteUrl + "/account/resetPassword?Token=" + codeEncoded + "&Username="+ user.UserName;
            await _sendEmailAndMessageService.ResetPasswordOuConfirmEmailLinkAsync(user.Id, resetLink, "ResetPassword");
             return Json(new ApiResult()
             {

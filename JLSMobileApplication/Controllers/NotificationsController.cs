@@ -22,5 +22,11 @@ namespace JLSMobileApplication.Controllers
             ViewData["WebSiteUrl"] = _appSettings.WebSiteUrl;
             return View();
         }
+
+        public IActionResult ResentEmail(int userId, string code)
+        {
+            ViewData["WebSiteUrl"] = _appSettings.WebSiteUrl;
+            return View();
+        }
     }
 }
