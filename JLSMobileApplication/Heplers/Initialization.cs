@@ -26,13 +26,18 @@ namespace JLSMobileApplication.Heplers
                 var adminUser = db.Users.Where(p => p.UserName == item).FirstOrDefault();
                 if (adminUser == null)
                 {
+                    /* Convert here to base64 */
+                    var Password = _appSettings.AdminInitialPassword;
+                    byte[] PasswordInByte = System.Text.Encoding.Default.GetBytes(Password);
+                    var encryptedPassword = Convert.ToBase64String(PasswordInByte);
+
                     User u = new User();
                     u.UserName = item;
                     u.Email = item;
                     u.EmailConfirmed = true;
 
                     u.Validity = true;
-                    var result = userManager.CreateAsync(u, _appSettings.AdminInitialPassword).Result; 
+                    var result = userManager.CreateAsync(u, encryptedPassword).Result; 
                     if (result.Succeeded)
                     {
                         userManager.AddToRoleAsync(u, "SuperAdmin").Wait();
