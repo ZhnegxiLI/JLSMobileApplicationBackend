@@ -184,7 +184,8 @@ namespace JLSDataAccess.Repositories
                               UserRoleId = r.Id,
                               UserRoleName = r.Name,
                               CreatedOn = u.CreatedOn,
-                              UpdatedOn = u.UpdatedOn
+                              UpdatedOn = u.UpdatedOn,
+                              EmailConfirmed = u.EmailConfirmed
                           }).ToListAsync<dynamic>();
 
             return result;
@@ -219,6 +220,7 @@ namespace JLSDataAccess.Repositories
                                     EntrepriseName = u.EntrepriseName,
                                     Siret = u.Siret,
                                     PhoneNumber = u.PhoneNumber,
+                                    EmailConfirmed = u.EmailConfirmed,
                                     ShippingAdress = (from a in db.Adress
                                                       join ua in db.UserShippingAdress on a.Id equals ua.ShippingAdressId
                                                       where ua.UserId == UserId
@@ -233,7 +235,7 @@ namespace JLSDataAccess.Repositories
         }
       
 
-        public async Task<dynamic> CreateOrUpdateUser(int UserId, string Email , string Password, int RoleId, bool Validity)
+        public async Task<dynamic> CreateOrUpdateUser(int UserId, string Email , string Password, int RoleId, bool Validity, bool EmailConfirmed)
         {
             //UserRole by RoleId
             var role = await db.Roles.Where(r => r.Id == RoleId).FirstOrDefaultAsync();
@@ -255,7 +257,7 @@ namespace JLSDataAccess.Repositories
                 UserToCreateOrUpdate = await db.Users.FindAsync(UserId);
             }
             UserToCreateOrUpdate.Validity = Validity;
-       
+            UserToCreateOrUpdate.EmailConfirmed = EmailConfirmed;
             if(UserId == 0)
             {
               var result =   await _userManager.CreateAsync(UserToCreateOrUpdate, Password);

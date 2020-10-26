@@ -98,6 +98,8 @@ namespace JLSMobileApplication.Controllers.AdminService
             public string Password { get; set; }
             public bool Validity { get; set; }
             public int RoleId { get; set; }
+
+            public bool EmailConfirmed { get; set; }
         }
         [HttpPost]
         public async Task<ActionResult> CreateOrUpdateUser([FromBody]CreateOrUpdateUserCriteria criteria)
@@ -125,6 +127,8 @@ namespace JLSMobileApplication.Controllers.AdminService
                     UserToCreateOrUpdate = await db.Users.FindAsync(criteria.UserId);
                 }
                 UserToCreateOrUpdate.Validity = criteria.Validity;
+                UserToCreateOrUpdate.EmailConfirmed = criteria.EmailConfirmed;
+                
                 if (criteria.Validity == false)
                 {
                     var refreshToken = await db.TokenModel.Where(p => p.UserId == criteria.UserId).ToListAsync();
