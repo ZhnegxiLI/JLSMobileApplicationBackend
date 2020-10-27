@@ -42,7 +42,7 @@ namespace JLSMobileApplication.Controllers
             try
             {
                 var result = await _message.CreateMessage(criteria.Message, criteria.FromUserId, criteria.ToUserId);
-                if (criteria.FromUserId == null && criteria.ToUserId == null)
+                if (criteria.ToUserId == null)
                 {
                     await _email.ClientMessageToAdminAsync(criteria.Message.SenderEmail, criteria.Message.Body);
                 }

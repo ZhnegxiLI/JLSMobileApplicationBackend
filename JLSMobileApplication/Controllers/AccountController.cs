@@ -72,6 +72,8 @@ namespace JLSMobileApplication.Controllers
             try
             {
                 // Step 1: 建立新地址
+                model.ShipmentAdress.EntrepriseName = model.EntrepriseName;
+                model.FacturationAdress.EntrepriseName = model.EntrepriseName;
                 var shippingAddressId = await _adressRepository.CreateOrUpdateAdress(model.ShipmentAdress);
                 var facturationAddressId = await _adressRepository.CreateOrUpdateAdress(model.FacturationAdress);
 
@@ -83,6 +85,7 @@ namespace JLSMobileApplication.Controllers
                 userIdentity.Email = model.Email;
                 userIdentity.EntrepriseName = model.EntrepriseName;
                 userIdentity.Siret = model.Siret;
+               
 
                 var result = await _userManager.CreateAsync(userIdentity, model.Password);
                 
