@@ -451,6 +451,7 @@ namespace JLSDataAccess.Repositories
                                     Color = p.Color,
                                     Material = p.Material,
                                     Price = p.Price,
+                                    MinQuantity = p.MinQuantity,
                                     PreviousPrice = p.PreviousPrice,
                                     DefaultPhotoPath = (from path in db.ProductPhotoPath
                                                         where path.ProductId == p.Id
@@ -486,6 +487,7 @@ namespace JLSDataAccess.Repositories
                                     CreatedOn = p.CreatedOn,
                                     ReferenceId = ri.Id,
                                     ProductId = p.Id,
+                                    MinQuantity = p.MinQuantity,
                                     Label = rl.Label,
                                     Code = ri.Code,
                                     Validity = ri.Validity,
