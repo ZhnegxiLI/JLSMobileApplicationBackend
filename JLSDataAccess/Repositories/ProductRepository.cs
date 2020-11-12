@@ -592,10 +592,13 @@ namespace JLSDataAccess.Repositories
                     result = result.OrderByDescending(p => p.Price);
                     break;
                 case "PublishDate_Recent":
-                    result = result.OrderByDescending(p=>p.CreatedOn);
+                    result = result.OrderByDescending(p=>p.CreatedOn).ThenBy(p=>p.Label);
                     break;
                 case "Porpularity_More":
                     result = result.OrderByDescending(p => p.SalesQuantity);
+                    break;
+                case "Promotion_More":
+                    result = result.OrderBy(p => p.PreviousPrice == null).ThenBy(p => p.Price / p.PreviousPrice);
                     break;
             }
             return await result.ToListAsync<dynamic>();

@@ -55,7 +55,7 @@ namespace JLSMobileApplication.Controllers
 
                 var statusIdValidedId = db.ReferenceItem.Where(p => p.Code == "OrderStatus_Valid").Select(p => p.Id).FirstOrDefault();
                 // last 10 days 
-                var validedList = (await _orderRepository.AdvancedOrderSearchByCriteria(Lang, null, DateTime.Now.AddDays(-10), DateTime.Today, null, statusIdValidedId)).Skip(0).Take(10);
+                var validedList = (await _orderRepository.AdvancedOrderSearchByCriteria(Lang, null, null, DateTime.Today, null, statusIdValidedId)).Skip(0).Take(10);
 
                 return Json(new
                 {
