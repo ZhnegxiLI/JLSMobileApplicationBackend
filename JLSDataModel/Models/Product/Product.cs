@@ -18,6 +18,8 @@ namespace JLSDataModel.Models.Product
 
         public string Description { get; set; }
 
+        public string Forme { get; set; }
+
         public string BarreCode { get; set; }
         public float? PreviousPrice { get; set; }
 

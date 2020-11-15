@@ -153,6 +153,8 @@ namespace JLSMobileApplication.Controllers.AdminService
             public string Material { get; set; }
 
             public string Size { get; set; }
+
+            public string Forme { get; set; }
         }
 
         [HttpPost]
@@ -167,7 +169,7 @@ namespace JLSMobileApplication.Controllers.AdminService
 
                     if (ReferenceId != 0)
                     {
-                        long ProductId = await _productRepository.SaveProductInfo(criteria.ProductId, ReferenceId, criteria.QuantityPerBox, criteria.MinQuantity, criteria.Price, criteria.TaxRateId, criteria.Description,criteria.Color, criteria.Material, criteria.Size,criteria.CreatedOrUpdatedBy);
+                        long ProductId = await _productRepository.SaveProductInfo(criteria.ProductId, ReferenceId, criteria.QuantityPerBox, criteria.MinQuantity, criteria.Price, criteria.TaxRateId, criteria.Description,criteria.Color, criteria.Material, criteria.Size, criteria.Forme,criteria.CreatedOrUpdatedBy);
                         // todo change : SaveReferenceLabel take an list of param and save one time all the three translation
                         long ReferenceLabelFrId = await _referenceRepository.SaveReferenceLabel(ReferenceId, criteria.Labelfr, "fr");
                         long ReferenceLabelEnId = await _referenceRepository.SaveReferenceLabel(ReferenceId, criteria.Labelen, "en");

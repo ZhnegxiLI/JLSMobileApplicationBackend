@@ -1,20 +1,13 @@
 ﻿using JLSDataAccess.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using JLSDataModel.ViewModels;
 using JLSDataModel.Models.Product;
 using Microsoft.AspNetCore.Http;
-using JLSDataModel.Models;
 using System.IO;
-using System.Linq.Expressions;
-using JLSDataModel.AdminViewModel;
-using JLSDataModel.Models.User;
-using System.Data.SqlClient;
-using JLSDataAccess.Migrations;
 
 namespace JLSDataAccess.Repositories
 {
@@ -637,7 +630,7 @@ namespace JLSDataAccess.Repositories
         }
 
 
-        public async Task<long> SaveProductInfo(long ProductId, long ReferenceId, int? QuantityPerBox, int? MinQuantity,float? Price, long? TaxRateId, string Description, string Color, string Material, string Size,int? CreatedOrUpdatedBy)
+        public async Task<long> SaveProductInfo(long ProductId, long ReferenceId, int? QuantityPerBox, int? MinQuantity,float? Price, long? TaxRateId, string Description, string Color, string Material, string Size, string Forme,int? CreatedOrUpdatedBy)
         {
             Product ProductToUpdateOrCreate = null;
             if (ProductId == 0)
@@ -662,6 +655,8 @@ namespace JLSDataAccess.Repositories
                 ProductToUpdateOrCreate.Color = Color;
                 ProductToUpdateOrCreate.Material = Material;
                 ProductToUpdateOrCreate.Size = Size;
+                ProductToUpdateOrCreate.Forme = Forme;
+
 
                 if (ProductId == 0)
                 {
@@ -738,6 +733,7 @@ namespace JLSDataAccess.Repositories
                                     PreviousPrice = p.PreviousPrice,
                                     QuantityPerBox = p.QuantityPerBox,
                                     Description = p.Description,
+                                    Forme = p.Forme,
                                     ReferenceId = ri.Id,
                                     TaxRateId = p.TaxRateId,
                                     Label = (from rl in db.ReferenceLabel
