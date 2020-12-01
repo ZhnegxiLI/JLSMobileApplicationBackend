@@ -30,6 +30,7 @@
         public string AdminInitialPassword { get; set; }
 
         public string ExportPath { get; set; }
+        public string ImagePath { get; set; }
 
     }
 }

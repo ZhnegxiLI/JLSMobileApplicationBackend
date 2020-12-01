@@ -11,9 +11,11 @@ using JLSDataModel.AdminViewModel;
 using JLSDataModel.Models;
 using JLSDataModel.Models.Product;
 using JLSDataModel.ViewModels;
+using JLSMobileApplication.Heplers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 
@@ -25,12 +27,14 @@ namespace JLSMobileApplication.Controllers.AdminService
     public class ProductController : Controller
     {
         private IProductRepository _productRepository;
+        private readonly AppSettings _appSettings;
         private IReferenceRepository _referenceRepository;
         private readonly IMapper _mapper;
         private readonly JlsDbContext db;
 
-        public ProductController(IProductRepository productRepository, IReferenceRepository referenceRepository, IMapper mapper, JlsDbContext context)
+        public ProductController(IOptions<AppSettings> appSettings, IProductRepository productRepository, IReferenceRepository referenceRepository, IMapper mapper, JlsDbContext context)
         {
+            _appSettings = appSettings.Value;
             this._referenceRepository = referenceRepository;
             this._productRepository = productRepository;
             _mapper = mapper;
@@ -47,7 +51,7 @@ namespace JLSMobileApplication.Controllers.AdminService
                 return 0;
             }
 
-            string imagePath = "images/" + image.Path; // todo place into the configuration
+            string imagePath = Path.Combine(_appSettings.ImagePath,image.Path); // todo place into the configuration
 
             try
             {
@@ -224,8 +228,9 @@ namespace JLSMobileApplication.Controllers.AdminService
 
                 Request.Form.TryGetValue("ProductId", out ProductId); // get ProductId todo change 
 
-                var folderName = Path.Combine("Images", ProductId.ToString()); // todo : place into the configruation file
-                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+
+                var folderName = Path.Combine ("Images", ProductId.ToString()) ; // todo : place into the configruation file
+                var pathToSave = Path.Combine( _appSettings.ImagePath,folderName);
 
                 DirectoryInfo di = Directory.CreateDirectory(pathToSave); // 创建路径
 
