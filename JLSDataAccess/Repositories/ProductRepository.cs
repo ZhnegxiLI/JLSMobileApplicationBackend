@@ -546,7 +546,7 @@ namespace JLSDataAccess.Repositories
                                 join riSecond in db.ReferenceItem on riProduct.ParentId equals riSecond.Id
                                 join riMain in db.ReferenceItem on riSecond.ParentId equals riMain.Id
                                 where riProduct.Validity == true && riSecond.Validity == true && riMain.Validity == true && rlProduct.Lang == Lang 
-                            && ( SearchText==null || SearchText=="" || rlProduct.Label.Contains(SearchText))
+                            && ( SearchText==null || SearchText=="" || (rlProduct.Label.Contains(SearchText) || p.Description.Contains(SearchText) || riProduct.Code.Contains(SearchText)))
                             &&(MainCategory == null || riMain.Id == MainCategory)
                             &&(SecondCategory == null || riSecond.Id == SecondCategory)
                             &&(PriceIntervalLower==null || p.Price >= PriceIntervalLower)
