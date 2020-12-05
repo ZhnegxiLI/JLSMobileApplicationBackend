@@ -41,6 +41,7 @@ namespace JLSDataModel.ViewModels
         public int? MinQuantity { get; set; }
 
         public string DefaultPhotoPath { get; set; }
+        public bool IsNew { get; set; }
 
         public List<ProductComment> Comments { get; set; }
 

@@ -9,6 +9,7 @@ using JLSDataModel.Models.Website;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace JLSDataAccess
 {
@@ -75,6 +76,10 @@ namespace JLSDataAccess
         public virtual DbSet<WebsiteSlide> WebsiteSlide { get; set; }
         public virtual DbSet<SubscribeEmail> SubscribeEmail { get; set; }
         public virtual DbSet<Dialog> Dialog { get; set; }
-        
+
+
+        // sql function 
+        [DbFunction("fn_CheckNewProduct", "dbo")]
+        public bool CheckNewProduct(long ProductId) => throw new NotSupportedException();
     }
 }
