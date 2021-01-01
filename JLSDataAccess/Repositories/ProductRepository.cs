@@ -455,6 +455,9 @@ namespace JLSDataAccess.Repositories
                                     Description = p.Description,
                                     PreviousPrice = p.PreviousPrice,
                                     IsNew = db.CheckNewProduct(p.Id),
+                                    ImagesPath = (from path in db.ProductPhotoPath
+                                                  where path.ProductId == p.Id
+                                                  select new { path.Id, path.Path }).ToList(),
                                     DefaultPhotoPath = (from path in db.ProductPhotoPath
                                                         where path.ProductId == p.Id
                                                         select path.Path).FirstOrDefault(),
