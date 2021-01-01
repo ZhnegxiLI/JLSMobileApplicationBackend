@@ -401,7 +401,9 @@ namespace JLSDataAccess.Repositories
                               UpdatedByUser  = (from u in db.Users
                                                 where u.Id == order.UpdatedBy
                                                 select u).FirstOrDefault(),
-
+                              CustomerInfo = (from customer in db.CustomerInfo
+                                              where customer.Id == order.CustomerId
+                                              select customer).FirstOrDefault(),
                               StatusId = statusRi.Id,
                               Status = ( from statusLabel in db.ReferenceLabel
                                          where statusLabel.ReferenceItemId == statusRi.Id && statusLabel.Lang == Lang
@@ -411,9 +413,11 @@ namespace JLSDataAccess.Repositories
                                              Label = statusLabel.Label,
                                              Code = statusRi.Code
                                          }).FirstOrDefault(),
+                            ShippingAddress = db.Adress.Where(p=>p.Id == order.ShippingAdressId).FirstOrDefault(),
                             CreatedOn = order.CreatedOn,
                             UpdatedOn = order.UpdatedOn,
                             TotalPrice = order.TotalPrice,
+                            TotalPriceHT = order.TotalPriceHT,
                             OrderType = (from orderTypeRi in db.ReferenceItem
                                          join orderTypeRl in db.ReferenceLabel on orderTypeRi.Id equals orderTypeRl.ReferenceItemId
                                          where orderTypeRi.Id == order.OrderTypeId && orderTypeRl.Lang == Lang

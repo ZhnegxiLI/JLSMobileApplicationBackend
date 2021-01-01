@@ -10,5 +10,6 @@ namespace JLSDataModel.ViewModels
         public long ReferenceId { get; set; }
         public int Quantity { get; set; }
         public int UnityQuantity { get; set; }
+        public int QuantityPerBox { get; set; }
     }
 }

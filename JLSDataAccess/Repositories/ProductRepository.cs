@@ -446,11 +446,13 @@ namespace JLSDataAccess.Repositories
                                     CategoryLabel = rc.ShortLabel,
                                     QuantityPerBox = p.QuantityPerBox,
                                     BarreCode = p.BarreCode,
+                                    Forme = p.Forme,
                                     Size = p.Size,
                                     Color = p.Color,
                                     Material = p.Material,
                                     Price = p.Price,
                                     MinQuantity = p.MinQuantity,
+                                    Description = p.Description,
                                     PreviousPrice = p.PreviousPrice,
                                     IsNew = db.CheckNewProduct(p.Id),
                                     DefaultPhotoPath = (from path in db.ProductPhotoPath

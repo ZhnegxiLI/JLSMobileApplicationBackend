@@ -51,11 +51,11 @@ namespace JLSMobileApplication.Controllers
             {
                 var statusIdProgressingId = db.ReferenceItem.Where(p => p.Code == "OrderStatus_Progressing").Select(p => p.Id).FirstOrDefault();
                 // last 10 days 
-                var progressingList = (await _orderRepository.AdvancedOrderSearchByCriteria(Lang, null, DateTime.Now.AddDays(-10),DateTime.Today, null, statusIdProgressingId)).Skip(0).Take(10);
+                var progressingList = (await _orderRepository.AdvancedOrderSearchByCriteria(Lang, null, null,null, null, statusIdProgressingId)).Skip(0).Take(10);//DateTime.Now.AddDays(-10)
 
                 var statusIdValidedId = db.ReferenceItem.Where(p => p.Code == "OrderStatus_Valid").Select(p => p.Id).FirstOrDefault();
                 // last 10 days 
-                var validedList = (await _orderRepository.AdvancedOrderSearchByCriteria(Lang, null, null, DateTime.Today, null, statusIdValidedId)).Skip(0).Take(10);
+                var validedList = (await _orderRepository.AdvancedOrderSearchByCriteria(Lang, null, null, DateTime.Today.Date, null, statusIdValidedId)).Skip(0).Take(10);
 
                 return Json(new
                 {

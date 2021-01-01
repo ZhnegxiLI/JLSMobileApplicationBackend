@@ -190,7 +190,7 @@ namespace JLSMobileApplication.Controllers.AdminService
                 orderToUpdate.ClientRemarkId = criteria.Orderinfo.ClientRemarkId;
                 orderToUpdate.FacturationAdressId = criteria.Orderinfo.FacturationAdressId;
                 orderToUpdate.ShippingAdressId = criteria.Orderinfo.ShippingAdressId;
-                orderToUpdate.OrderTypeId = await db.ReferenceItem.Where(p=>p.Code == "OrderType_Internal").Select(p=>p.Id).FirstOrDefaultAsync();
+                orderToUpdate.OrderTypeId = criteria.Orderinfo.OrderTypeId!=null && criteria.Orderinfo.OrderTypeId>0? criteria.Orderinfo.OrderTypeId :   await db.ReferenceItem.Where(p=>p.Code == "OrderType_Internal").Select(p=>p.Id).FirstOrDefaultAsync();
                 orderToUpdate.ShipmentInfoId = criteria.Orderinfo.ShipmentInfoId;
                 orderToUpdate.StatusReferenceItemId = criteria.Orderinfo.StatusReferenceItemId;
                 orderToUpdate.TaxRateId = criteria.Orderinfo.TaxRateId;
@@ -223,34 +223,51 @@ namespace JLSMobileApplication.Controllers.AdminService
                 var PreviousOrderProducts = await db.OrderProduct.Where(p => p.OrderId == orderToUpdate.Id).ToListAsync();
                 db.RemoveRange(PreviousOrderProducts);
 
+                //float TotalPrice = 0;
+                //List<OrderProduct> products = new List<OrderProduct>();
+                ///* Step 2: Add product in order */
+                //if (criteria.References.Count() > 0)
+                //{
+                //    foreach (var item in criteria.References)
+                //    {
+                //        var reference = new OrderProduct();
+                //        reference.ReferenceId = item.ReferenceId;
+                //        reference.Quantity = item.Quantity;
+                //        reference.UnitPrice = item.Price;
+                //        reference.OrderId = orderToUpdate.Id;
+
+                //        TotalPrice = TotalPrice + (item.Price.Value * item.Quantity);
+
+                //        products.Add(reference);
+                //    }
+                //}
+
+
                 float TotalPrice = 0;
-                List<OrderProduct> products = new List<OrderProduct>();
-                /* Step 2: Add product in order */
-                if (criteria.References.Count() > 0)
+                var OrderProducts = new List<OrderProduct>();
+                foreach (var r in criteria.References)
                 {
-                    foreach (var item in criteria.References)
+                    OrderProducts.Add(new OrderProduct()
                     {
-                        var reference = new OrderProduct();
-                        reference.ReferenceId = item.ReferenceId;
-                        reference.Quantity = item.Quantity;
-                        reference.UnitPrice = item.Price;
-                        reference.OrderId = orderToUpdate.Id;
-
-                        TotalPrice = TotalPrice + (item.Price.Value * item.Quantity);
-
-                        products.Add(reference);
-                    }
+                        OrderId = orderToUpdate.Id,
+                        Quantity = r.Quantity,
+                        ReferenceId = r.ReferenceId,
+                        UnitPrice = r.Price,
+                        Colissage = r.QuantityPerBox
+                    });
+                    TotalPrice = (r.Quantity * r.Price.Value * r.QuantityPerBox) + TotalPrice;
                 }
+                await db.AddRangeAsync(OrderProducts);
+                await db.SaveChangesAsync();
 
-
-                await db.AddRangeAsync(products);
-
-                orderToUpdate.TotalPrice = TotalPrice;
+                var taxRate = db.ReferenceItem.Where(p => p.Code == "TaxRate_20%").Select(p => p.Value).FirstOrDefault();
+                var tax = float.Parse(taxRate) * 0.01;
+                orderToUpdate.TotalPrice = (float?)(TotalPrice * (1 + (taxRate != null ? tax : 0)));
+                orderToUpdate.TotalPriceHT = TotalPrice;
 
                 db.Update(orderToUpdate);
 
                 await db.SaveChangesAsync();
-
 
                 await _sendEmailAndMessageService.CreateOrUpdateOrderAsync(orderToUpdate.Id, criteria.Orderinfo.Id == 0 ? "CreateNewOrder" : "UpdateOrder");
                 return Json(orderToUpdate.Id);
