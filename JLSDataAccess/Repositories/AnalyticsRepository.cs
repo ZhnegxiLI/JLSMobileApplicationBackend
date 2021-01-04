@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using JLSDataModel.Models.User;
+using JLSDataModel.Models.Analytics;
 
 namespace JLSDataAccess.Repositories
 {
@@ -31,7 +32,7 @@ namespace JLSDataAccess.Repositories
             var adminRoleIds = await db.Roles.Where(p => p.Name == "Admin" || p.Name == "SuperAdmin").Select(p=>p.Id).ToListAsync();
             var salesPerformance = await (from p in db.OrderInfo
                                     join ur in db.UserRoles on p.UserId equals ur.UserId
-                                    where adminRoleIds.Contains(ur.RoleId) && p.CreatedOn>= DateTime.Now.AddYears(-1) // last 1 year 
+                                    where adminRoleIds.Contains(ur.RoleId) //&& p.CreatedOn>= DateTime.Now.AddYears(-1) // last 1 year 
                                     group p by  new { p.UserId, p.CreatedOn.Value.Month, p.CreatedOn.Value.Year } into g
                                     orderby g.Key.Year, g.Key.Month descending
                                     select new TeamMemberSalesPerformance()
@@ -56,6 +57,8 @@ namespace JLSDataAccess.Repositories
 
             return userList;
         }
+
+
 
         public async Task<List<dynamic>> GetInternalExternalSalesPerformance(string Lang)
         {
@@ -92,6 +95,33 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
+        public async Task<List<dynamic>> GetTopSaleProduct(string Lang, int Limit)
+        {
+            var orderRefuseStatusId = db.ReferenceItem.Where(p => p.Code == "OrderStatus_Refus").FirstOrDefault().Id;
+            var result = await (from o in db.OrderInfo
+                                join op in db.OrderProduct on o.Id equals op.OrderId
+                                join rl in db.ReferenceLabel on op.ReferenceId equals rl.ReferenceItemId
+                                where o.StatusReferenceItemId!= orderRefuseStatusId && rl.Lang == Lang
+                                group op by new { op.ReferenceId, rl.Label } into g
+                                select new
+                                {
+                                    name = g.Key.Label,
+                                    totalQuantity = g.Sum(p=>p.Quantity)
+                                 
+                                }).ToListAsync<dynamic>();
+
+            result = (from r in result
+                      orderby r.totalQuantity descending
+                      select r).Take(Limit).ToList();
+
+            return result;
+        }
+        public List<BestClientWidget> GetBestClientWidget(int Limit)
+        {
+            var result = db.BestClientWidget.FromSql("SP_WidgetBestClient").Take(Limit).ToList();
+            return result;
+        }
+        
 
         public async Task<List<dynamic>> GetSalesPerformanceByYearMonth()
         {

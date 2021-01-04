@@ -1,5 +1,6 @@
 ﻿using JLSDataModel.Models;
 using JLSDataModel.Models.Adress;
+using JLSDataModel.Models.Analytics;
 using JLSDataModel.Models.Audit;
 using JLSDataModel.Models.Message;
 using JLSDataModel.Models.Order;
@@ -77,6 +78,8 @@ namespace JLSDataAccess
         public virtual DbSet<SubscribeEmail> SubscribeEmail { get; set; }
         public virtual DbSet<Dialog> Dialog { get; set; }
 
+
+        public virtual DbQuery<BestClientWidget> BestClientWidget  { get; set; }
 
         // sql function 
         [DbFunction("fn_CheckNewProduct", "dbo")]

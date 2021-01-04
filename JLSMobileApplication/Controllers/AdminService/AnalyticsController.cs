@@ -83,6 +83,37 @@ namespace JLSMobileApplication.Controllers
                 throw e;
             }
         }
+
+        [HttpGet]
+        public async Task<JsonResult> GetTopSaleProduct(string Lang, int Limit)
+        {
+            try
+            {
+                var result = await _analytics.GetTopSaleProduct(Lang, Limit);
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
+        [HttpGet]
+        public JsonResult GetBestClientWidget(int Limit)
+        {
+            try
+            {
+                var result =  _analytics.GetBestClientWidget(Limit);
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
         
 
         [HttpGet]
