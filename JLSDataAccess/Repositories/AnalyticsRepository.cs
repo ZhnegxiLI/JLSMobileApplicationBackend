@@ -29,31 +29,31 @@ namespace JLSDataAccess.Repositories
         }
         public async Task<List<dynamic>> GetTeamMemberSalesPerformance()
         {
-            var adminRoleIds = await db.Roles.Where(p => p.Name == "Admin" || p.Name == "SuperAdmin").Select(p=>p.Id).ToListAsync();
+            var adminRoleIds = await db.Roles.Where(p => p.Name == "Admin" || p.Name == "SuperAdmin").Select(p => p.Id).ToListAsync();
             var salesPerformance = await (from p in db.OrderInfo
-                                    join ur in db.UserRoles on p.UserId equals ur.UserId
-                                    where adminRoleIds.Contains(ur.RoleId) //&& p.CreatedOn>= DateTime.Now.AddYears(-1) // last 1 year 
-                                    group p by  new { p.UserId, p.CreatedOn.Value.Month, p.CreatedOn.Value.Year } into g
-                                    orderby g.Key.Year, g.Key.Month descending
-                                    select new TeamMemberSalesPerformance()
-                                    {
-                                        UserId = g.Key.UserId,
-                                        Year = g.Key.Year,
-                                        Month = g.Key.Month,
-                                        Sum = g.Sum(p => p.TotalPrice)
-                                    }).ToListAsync();
+                                          join ur in db.UserRoles on p.UserId equals ur.UserId
+                                          where adminRoleIds.Contains(ur.RoleId) //&& p.CreatedOn>= DateTime.Now.AddYears(-1) // last 1 year 
+                                          group p by new { p.UserId, p.CreatedOn.Value.Month, p.CreatedOn.Value.Year } into g
+                                          orderby g.Key.Year, g.Key.Month descending
+                                          select new TeamMemberSalesPerformance()
+                                          {
+                                              UserId = g.Key.UserId,
+                                              Year = g.Key.Year,
+                                              Month = g.Key.Month,
+                                              Sum = g.Sum(p => p.TotalPrice)
+                                          }).ToListAsync();
             var userList = await (from u in db.Users
-                            join ur in db.UserRoles on u.Id equals ur.UserId
-                            where adminRoleIds.Contains(ur.RoleId)
-                            select new
-                            {
-                                UserId = u.Id,
-                                Performance = (from s in salesPerformance
-                                               where s.UserId == u.Id
-                                               select s),
-                                Username = u.UserName,
-                                CreatedOn = u.CreatedOn
-                            }).ToListAsync<dynamic>();
+                                  join ur in db.UserRoles on u.Id equals ur.UserId
+                                  where adminRoleIds.Contains(ur.RoleId)
+                                  select new
+                                  {
+                                      UserId = u.Id,
+                                      Performance = (from s in salesPerformance
+                                                     where s.UserId == u.Id
+                                                     select s),
+                                      Username = u.UserName,
+                                      CreatedOn = u.CreatedOn
+                                  }).ToListAsync<dynamic>();
 
             return userList;
         }
@@ -64,17 +64,17 @@ namespace JLSDataAccess.Repositories
         {
             var riValidAndProgressing = await db.ReferenceItem.Where(p => p.Code == "OrderStatus_Valid" || p.Code == "OrderStatus_Progressing").Select(p => p.Id).ToListAsync();
             var result = await (from ri in db.ReferenceItem
-                              join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
-                              where (ri.Code == "OrderType_Internal" || ri.Code == "OrderType_External") && rl.Lang == Lang
-                              select new
-                              {
-                                  Id = ri.Id,
-                                  Code = ri.Code,
-                                  Label = rl.Label,
-                                  OrderCount = db.OrderInfo.Where(p=>p.OrderTypeId == ri.Id && riValidAndProgressing.Contains(p.StatusReferenceItemId)).Count(),
-                                  OrderSum = db.OrderInfo.Where(p => p.OrderTypeId == ri.Id && riValidAndProgressing.Contains(p.StatusReferenceItemId)).Sum(p=>p.TotalPrice),
-                              }).ToListAsync<dynamic>();
-            
+                                join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
+                                where (ri.Code == "OrderType_Internal" || ri.Code == "OrderType_External") && rl.Lang == Lang
+                                select new
+                                {
+                                    Id = ri.Id,
+                                    Code = ri.Code,
+                                    Label = rl.Label,
+                                    OrderCount = db.OrderInfo.Where(p => p.OrderTypeId == ri.Id && riValidAndProgressing.Contains(p.StatusReferenceItemId)).Count(),
+                                    OrderSum = db.OrderInfo.Where(p => p.OrderTypeId == ri.Id && riValidAndProgressing.Contains(p.StatusReferenceItemId)).Sum(p => p.TotalPrice),
+                                }).ToListAsync<dynamic>();
+
             return result;
         }
 
@@ -95,25 +95,31 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-        public async Task<List<dynamic>> GetTopSaleProduct(string Lang, int Limit)
+        public async Task<List<dynamic>> GetTopSaleProduct(string Lang, int? Limit)
         {
             var orderRefuseStatusId = db.ReferenceItem.Where(p => p.Code == "OrderStatus_Refus").FirstOrDefault().Id;
-            var result = await (from o in db.OrderInfo
-                                join op in db.OrderProduct on o.Id equals op.OrderId
-                                join rl in db.ReferenceLabel on op.ReferenceId equals rl.ReferenceItemId
-                                where o.StatusReferenceItemId!= orderRefuseStatusId && rl.Lang == Lang
-                                group op by new { op.ReferenceId, rl.Label } into g
+            var rcProductId = db.ReferenceCategory.Where(p => p.ShortLabel == "Product").FirstOrDefault().Id;
+            var result = await (from ri in db.ReferenceItem
+                                join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
+                                from op in db.OrderProduct.Where(x => ri.Id == x.ReferenceId).DefaultIfEmpty()
+                                from o in db.OrderInfo.Where(x => op.OrderId == x.Id).DefaultIfEmpty()
+                                where o.StatusReferenceItemId != orderRefuseStatusId && rl.Lang == Lang && ri.ReferenceCategoryId ==rcProductId
+                                group op by new { ri.Id, rl.Label } into g
                                 select new
                                 {
+                                    id = g.Key.Id,
                                     name = g.Key.Label,
-                                    totalQuantity = g.Sum(p=>p.Quantity)
-                                 
+                                    totalQuantity = g.Sum(p => p.Quantity)
+
                                 }).ToListAsync<dynamic>();
 
-            result = (from r in result
+        result = (from r in result
                       orderby r.totalQuantity descending
-                      select r).Take(Limit).ToList();
-
+                      select r).ToList();
+            if(Limit!= null && Limit >0){
+                result = result.Take((int)Limit).ToList();
+            }
+            
             return result;
         }
         public List<BestClientWidget> GetBestClientWidget(int Limit)
@@ -121,59 +127,81 @@ namespace JLSDataAccess.Repositories
             var result = db.BestClientWidget.FromSql("SP_WidgetBestClient").Take(Limit).ToList();
             return result;
         }
-        
+
+
+        // TODO: add into front-end 
+        public async Task<List<dynamic>> GetBestSalesSubCategory(int Limit, string Lang)
+        {
+            var riValidAndProgressing = await db.ReferenceItem.Where(p => p.Code != "OrderStatus_Refus").Select(p => p.Id).ToListAsync();
+            var result = await (from o in db.OrderInfo
+                                join op in db.OrderProduct on o.Id equals op.OrderId
+                                join riProduct in db.ReferenceItem on op.ReferenceId equals riProduct.Id
+                                join rlSecondCategory in db.ReferenceLabel on riProduct.ParentId equals rlSecondCategory.ReferenceItemId 
+                                where riValidAndProgressing.Contains(o.StatusReferenceItemId) && rlSecondCategory.Lang == Lang
+                                group op by new {rlSecondCategory.ReferenceItemId, rlSecondCategory.Label } into g
+                                select new
+                                {
+                                    SecondCategoryLabel = g.Key.ReferenceItemId,
+                                    SecondCategoryId = g.Key.Label,
+                                    Sum = g.Sum(x => x.Quantity)
+                                }).ToListAsync<dynamic>();
+
+            return result;
+        }
 
         public async Task<List<dynamic>> GetSalesPerformanceByYearMonth()
         {
-            var riValidAndProgressing = await db.ReferenceItem.Where(p => p.Code == "OrderStatus_Valid" || p.Code == "OrderStatus_Progressing").Select(p => p.Id).ToListAsync();
+            var riValidAndProgressing = await db.ReferenceItem.Where(p => p.Code != "OrderStatus_Refus").Select(p => p.Id).ToListAsync();
             var result = await (from o in db.OrderInfo
-                          where riValidAndProgressing.Contains(o.StatusReferenceItemId)
-                          group o by new { o.CreatedOn.Value.Year, o.CreatedOn.Value.Month } into g
-                          select new
-                          {
-                              Year = g.Key.Year,
-                              Month = g.Key.Month,
-                              Sum = g.Sum(p => p.TotalPrice)
-                          }).ToListAsync<dynamic>();
+                                where riValidAndProgressing.Contains(o.StatusReferenceItemId)
+                                group o by new { o.CreatedOn.Value.Year, o.CreatedOn.Value.Month } into g
+                                select new
+                                {
+                                    Year = g.Key.Year,
+                                    Month = g.Key.Month,
+                                    Sum = g.Sum(p => p.TotalPrice)
+                                }).ToListAsync<dynamic>();
+
 
             return result;
         }
 
         public async Task<List<dynamic>> GetAdminSalesPerformanceDashboard(string Lang)
         {
-           // var riStatusId = db.ReferenceItem.Where(p => p.Code == "OrderStatus_Valid").Select(p => p.Id).FirstOrDefault();
+            // var riStatusId = db.ReferenceItem.Where(p => p.Code == "OrderStatus_Valid").Select(p => p.Id).FirstOrDefault();
             var result = await (from riYear in db.ReferenceItem
-                          join rcYear in db.ReferenceCategory on riYear.ReferenceCategoryId equals rcYear.Id
-                          where rcYear.ShortLabel == "Year"
-                          orderby riYear.Value descending
-                          select new
-                          {
-                              Year = riYear.Value,
-                           
-                              Dashboard = (from riMonth in db.ReferenceItem
-                                                  join rcMonth in db.ReferenceCategory on riMonth.ReferenceCategoryId equals rcMonth.Id
-                                                  where rcMonth.ShortLabel == "Month" 
-                                                  select new
-                                                  {
-                                                      ProductCommentCount = (from pc in db.ProductComment
-                                                                        where pc.CreatedOn.Value.Year == int.Parse(riYear.Value) && pc.CreatedOn.Value.Month == int.Parse(riMonth.Value)
-                                                                        select pc.Id).Count(),
-                                                      Month = riMonth.Value,
-                                                      Order = (from o in db.OrderInfo
-                                                               where o.CreatedOn.Value.Year == int.Parse(riYear.Value) && o.CreatedOn.Value.Month == int.Parse(riMonth.Value) 
-                                                               select new{ 
-                                                                    Id = o.Id,
-                                                                    UserId = o.UserId,
-                                                                    TotalPrice = o.TotalPrice,
-                                                                    CreatedOn = o.CreatedOn,
-                                                                    OrderStatusId = o.StatusReferenceItemId,
-                                                                    OrderStatusCode =db.ReferenceItem.Where(p => p.Id == o.StatusReferenceItemId).Select(p => p.Code).FirstOrDefault(),
-                                                                    OrderTypeId = o.OrderTypeId,
-                                                                    OrderTypeCode = db.ReferenceItem.Where(p=>p.Id == o.OrderTypeId).Select(p=>p.Code).FirstOrDefault()
-                                                               }).ToList()
+                                join rcYear in db.ReferenceCategory on riYear.ReferenceCategoryId equals rcYear.Id
+                                where rcYear.ShortLabel == "Year"
+                                orderby riYear.Value descending
+                                select new
+                                {
+                                    Year = riYear.Value,
 
-                                                  }).ToList()
-                          }).ToListAsync<dynamic>();
+                                    Dashboard = (from riMonth in db.ReferenceItem
+                                                 join rcMonth in db.ReferenceCategory on riMonth.ReferenceCategoryId equals rcMonth.Id
+                                                 where rcMonth.ShortLabel == "Month"
+                                                 select new
+                                                 {
+                                                     ProductCommentCount = (from pc in db.ProductComment
+                                                                            where pc.CreatedOn.Value.Year == int.Parse(riYear.Value) && pc.CreatedOn.Value.Month == int.Parse(riMonth.Value)
+                                                                            select pc.Id).Count(),
+                                                     Month = riMonth.Value,
+                                                     Order = (from o in db.OrderInfo
+                                                              where o.CreatedOn.Value.Year == int.Parse(riYear.Value) && o.CreatedOn.Value.Month == int.Parse(riMonth.Value)
+                                                              select new
+                                                              {
+                                                                  Id = o.Id,
+                                                                  UserId = o.UserId,
+                                                                  TotalPrice = o.TotalPrice,
+                                                                  CreatedOn = o.CreatedOn,
+                                                                  OrderStatusId = o.StatusReferenceItemId,
+                                                                  OrderStatusCode = db.ReferenceItem.Where(p => p.Id == o.StatusReferenceItemId).Select(p => p.Code).FirstOrDefault(),
+                                                                  OrderTypeId = o.OrderTypeId,
+                                                                  OrderTypeCode = db.ReferenceItem.Where(p => p.Id == o.OrderTypeId).Select(p => p.Code).FirstOrDefault()
+                                                              }).ToList()
+
+                                                 }).ToList()
+                                }).ToListAsync<dynamic>();
             return result;
         }
 

@@ -85,11 +85,27 @@ namespace JLSMobileApplication.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetTopSaleProduct(string Lang, int Limit)
+        public async Task<JsonResult> GetTopSaleProduct(string Lang, int? Limit)
         {
             try
             {
                 var result = await _analytics.GetTopSaleProduct(Lang, Limit);
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
+
+          [HttpGet]
+        public async Task<JsonResult> GetBestSalesSubCategory(string Lang, int Limit)
+        {
+            try
+            {
+                var result = await _analytics.GetBestSalesSubCategory( Limit, Lang);
                 return Json(result);
             }
             catch (Exception e)
