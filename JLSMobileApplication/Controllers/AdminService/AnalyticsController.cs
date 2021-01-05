@@ -43,7 +43,7 @@ namespace JLSMobileApplication.Controllers
                 throw e;
             }
         }
-        /* TODO:前端加入 */
+
         [HttpGet]
         public async Task<JsonResult> GetRecentOrderInfo(string Lang)
         {
@@ -68,7 +68,7 @@ namespace JLSMobileApplication.Controllers
                 throw e;
             }
         }
-        /* TODO:前端加入 */
+
         [HttpGet]
         public async Task<JsonResult> GetSalesPerformanceByYearMonth()
         {

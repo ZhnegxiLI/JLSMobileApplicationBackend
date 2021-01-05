@@ -104,12 +104,13 @@ namespace JLSDataAccess.Repositories
                                 from op in db.OrderProduct.Where(x => ri.Id == x.ReferenceId).DefaultIfEmpty()
                                 from o in db.OrderInfo.Where(x => op.OrderId == x.Id).DefaultIfEmpty()
                                 where o.StatusReferenceItemId != orderRefuseStatusId && rl.Lang == Lang && ri.ReferenceCategoryId ==rcProductId
-                                group op by new { ri.Id, rl.Label } into g
+                                group op by new { ri.Id, rl.Label, ri.Code } into g
                                 select new
                                 {
                                     id = g.Key.Id,
                                     name = g.Key.Label,
-                                    totalQuantity = g.Sum(p => p.Quantity)
+                                    totalQuantity = g.Sum(p => p.Quantity),
+                                    code = g.Key.Code
 
                                 }).ToListAsync<dynamic>();
 
@@ -128,8 +129,6 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-
-        // TODO: add into front-end 
         public async Task<List<dynamic>> GetBestSalesSubCategory(int Limit, string Lang)
         {
             var riValidAndProgressing = await db.ReferenceItem.Where(p => p.Code != "OrderStatus_Refus").Select(p => p.Id).ToListAsync();
@@ -141,10 +140,12 @@ namespace JLSDataAccess.Repositories
                                 group op by new {rlSecondCategory.ReferenceItemId, rlSecondCategory.Label } into g
                                 select new
                                 {
-                                    SecondCategoryLabel = g.Key.ReferenceItemId,
-                                    SecondCategoryId = g.Key.Label,
+                                    SecondCategoryLabel = g.Key.Label,
+                                    SecondCategoryId = g.Key.ReferenceItemId,
                                     Sum = g.Sum(x => x.Quantity)
                                 }).ToListAsync<dynamic>();
+
+            result = result.OrderByDescending(p => p.Sum).Take(Limit).ToList();
 
             return result;
         }
