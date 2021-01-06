@@ -253,7 +253,8 @@ namespace JLSMobileApplication.Controllers.AdminService
                         Quantity = r.Quantity,
                         ReferenceId = r.ReferenceId,
                         UnitPrice = r.Price,
-                        Colissage = r.QuantityPerBox
+                        Colissage = r.QuantityPerBox, // todo check if QuantityPerBox exists or not
+                        TotalPrice = r.Quantity * r.Price.Value * r.QuantityPerBox
                     });
                     TotalPrice = (r.Quantity * r.Price.Value * r.QuantityPerBox) + TotalPrice;
                 }

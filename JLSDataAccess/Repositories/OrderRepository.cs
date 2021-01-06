@@ -190,7 +190,9 @@ namespace JLSDataAccess.Repositories
                         reference.Quantity = item.Quantity;
                         reference.UnitPrice = item.Price;
                         reference.OrderId = order.Id;
-                      
+                        reference.Colissage = item.QuantityPerBox; // todo: add check here 
+                        reference.TotalPrice =  reference.Quantity * reference.UnitPrice * reference.Colissage; // todo add check here 
+
                         TotalPrice = TotalPrice + (item.Price.Value * item.Quantity * item.UnityQuantity);
                         
                         products.Add(reference);
