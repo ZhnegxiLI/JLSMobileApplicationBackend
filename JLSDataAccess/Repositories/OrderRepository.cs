@@ -80,14 +80,16 @@ namespace JLSDataAccess.Repositories
             var OrderProducts = new List<OrderProduct>();
             foreach(var r in References)
             {
-                OrderProducts.Add(new OrderProduct()
+                var product = await db.Product.Where(p => p.ReferenceItemId == r.ReferenceId).FirstOrDefaultAsync();
+                var op = new OrderProduct()
                 {
                     OrderId = Order.Id,
                     Quantity = r.Quantity,
                     ReferenceId = r.ReferenceId,
-                    UnitPrice = r.Price,
-                    Colissage = r.UnityQuantity
-                });
+                    UnitPrice = double.Parse(r.Price.Value.ToString("0.00")) ,
+                    Colissage = r.QuantityPerBox != 0 ? r.QuantityPerBox : (int)product.QuantityPerBox, // todo check if QuantityPerBox exists or not
+                };
+                OrderProducts.Add(op);
                 TotalPrice = (r.Quantity * r.Price.Value *r.UnityQuantity) + TotalPrice;
             }
             await db.AddRangeAsync(OrderProducts);
@@ -188,7 +190,7 @@ namespace JLSDataAccess.Repositories
                         var reference = new OrderProduct();
                         reference.ReferenceId = item.ReferenceId;
                         reference.Quantity = item.Quantity;
-                        reference.UnitPrice = item.Price;
+                        reference.UnitPrice = double.Parse(item.Price.Value.ToString("0.00"));
                         reference.OrderId = order.Id;
                         reference.Colissage = item.QuantityPerBox; // todo: add check here 
                         reference.TotalPrice =  reference.Quantity * reference.UnitPrice * reference.Colissage; // todo add check here 
@@ -362,7 +364,7 @@ namespace JLSDataAccess.Repositories
                                                       Label = rl.Label,
                                                       Price = op.UnitPrice,
                                                       TotalPrice = op.TotalPrice,
-                                                      QuantityPerBox = p.QuantityPerBox,
+                                                      QuantityPerBox = op.Colissage!=0? op.Colissage:p.QuantityPerBox,
                                                       MinQuantity = p.MinQuantity,
                                                       Size = p.Size,
                                                       Color = p.Color,

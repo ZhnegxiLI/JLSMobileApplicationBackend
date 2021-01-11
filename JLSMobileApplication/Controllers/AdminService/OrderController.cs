@@ -247,16 +247,18 @@ namespace JLSMobileApplication.Controllers.AdminService
                 var OrderProducts = new List<OrderProduct>();
                 foreach (var r in criteria.References)
                 {
-                    OrderProducts.Add(new OrderProduct()
+                    var product = await db.Product.Where(p => p.ReferenceItemId == r.ReferenceId).FirstOrDefaultAsync();
+                    var op = new OrderProduct()
                     {
                         OrderId = orderToUpdate.Id,
                         Quantity = r.Quantity,
                         ReferenceId = r.ReferenceId,
-                        UnitPrice = r.Price,
-                        Colissage = r.QuantityPerBox, // todo check if QuantityPerBox exists or not
+                        UnitPrice = double.Parse(r.Price.Value.ToString("0.00")),
+                        Colissage = r.QuantityPerBox != 0 ? r.QuantityPerBox : (int)product.QuantityPerBox, // todo check if QuantityPerBox exists or not
                         TotalPrice = r.Quantity * r.Price.Value * r.QuantityPerBox
-                    });
-                    TotalPrice = (r.Quantity * r.Price.Value * r.QuantityPerBox) + TotalPrice;
+                    };
+                    OrderProducts.Add(op);
+                    TotalPrice = (r.Quantity * r.Price.Value * op.Colissage) + TotalPrice;
                 }
                 await db.AddRangeAsync(OrderProducts);
                 await db.SaveChangesAsync();
