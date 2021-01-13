@@ -199,6 +199,9 @@ namespace JLSMobileApplication
             /* Initialization action: create a super admin in database */
             Initialization.AddAdminUser(userManager, context);
 
+
+            app.UseMiddleware(typeof(VisitorCounterMiddleware));
+            
             app.UseErrorHandling();
 
             /* JWT authorization */
