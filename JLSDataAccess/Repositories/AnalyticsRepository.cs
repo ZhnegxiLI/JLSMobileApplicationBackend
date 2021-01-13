@@ -78,6 +78,16 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
+        public async Task<dynamic> GetVisitorAndClientInfo()
+        {
+            var visitorData = await db.VisitorCounter.ToListAsync();
+            var UserInfo = await db.Users.ToListAsync();
+            return new { 
+                VisitorData = visitorData,
+                UserInfo = UserInfo
+            };
+        }
+
         public async Task<List<dynamic>> GetSalesPerformanceByStatus(string Lang)
         {
             var statusCategoryId = db.ReferenceCategory.Where(p => p.ShortLabel == "OrderStatus").Select(p => p.Id).FirstOrDefault();

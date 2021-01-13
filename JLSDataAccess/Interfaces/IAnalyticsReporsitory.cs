@@ -25,5 +25,7 @@ namespace JLSDataAccess.Interfaces
         Task<List<dynamic>> GetBestSalesSubCategory(int Limit, string Lang);
 
         List<BestClientWidget> GetBestClientWidget(int Limit);
+
+        Task<dynamic> GetVisitorAndClientInfo();
     }
 }

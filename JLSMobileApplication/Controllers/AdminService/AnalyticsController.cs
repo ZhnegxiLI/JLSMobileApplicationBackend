@@ -44,6 +44,22 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
+
+        [HttpGet]
+        public async Task<JsonResult> GetVisitorAndClientInfo()
+        {
+            try
+            {
+                var result = await _analytics.GetVisitorAndClientInfo();
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
         [HttpGet]
         public async Task<JsonResult> GetRecentOrderInfo(string Lang)
         {
