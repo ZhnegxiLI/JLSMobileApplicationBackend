@@ -1,4 +1,4 @@
-using JLSDataAccess;
+﻿using JLSDataAccess;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
@@ -19,7 +19,7 @@ public class VisitorCounterMiddleware
         var request = context.Request;
 
         string visitorId = context.Request.Cookies["VisitorId"];
-      if (visitorId == null)
+      if (visitorId == null && CheckAgent(context) == false)
       {
             //don the necessary staffs here to save the count by one
             int Year = DateTime.Now.Year;
@@ -49,5 +49,32 @@ public class VisitorCounterMiddleware
        }
 
       await _requestDelegate(context);
+    }
+
+    public static bool CheckAgent(HttpContext context)
+    {
+        bool flag = false;
+
+        string agent = context.Request.Headers["User-Agent"].ToString();
+        string[] keywords = { "Android", "iPhone", "iPod", "iPad", "Windows Phone", "MQQBrowser" };
+
+        //排除 Windows 桌面系统
+        if (!agent.Contains("Windows NT") || (agent.Contains("Windows NT") && agent.Contains("compatible; MSIE 9.0;")))
+        {
+            //排除 苹果桌面系统
+            if (!agent.Contains("Windows NT") && !agent.Contains("Macintosh"))
+            {
+                foreach (string item in keywords)
+                {
+                    if (agent.Contains(item))
+                    {
+                        flag = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return flag;
     }
 }
