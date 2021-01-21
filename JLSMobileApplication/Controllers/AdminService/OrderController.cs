@@ -47,7 +47,7 @@ namespace JLSMobileApplication.Controllers.AdminService
             public DateTime? ToDate { get; set; }
 
             public long? StatusId { get; set; }
-            
+
             public string OrderId { get; set; }
 
             public int begin { get; set; }
@@ -60,7 +60,7 @@ namespace JLSMobileApplication.Controllers.AdminService
         {
             try
             {
-                var result = await _orderRepository.AdvancedOrderSearchByCriteria(criteria.Lang,criteria.UserId,criteria.FromDate,criteria.ToDate,criteria.OrderId,criteria.StatusId);
+                var result = await _orderRepository.AdvancedOrderSearchByCriteria(criteria.Lang, criteria.UserId, criteria.FromDate, criteria.ToDate, criteria.OrderId, criteria.StatusId);
                 var list = result.Skip(criteria.begin * criteria.step).Take(criteria.step);
 
                 return Json(new
@@ -102,7 +102,7 @@ namespace JLSMobileApplication.Controllers.AdminService
             {
 
                 /* Step1 : save shipping address */
-                if (criteria.ShippingAddress!=null && criteria.ShippingAddress.Id==0)
+                if (criteria.ShippingAddress != null && criteria.ShippingAddress.Id == 0)
                 {
                     criteria.ShippingAddress.CreatedBy = criteria.CreatedOrUpdatedBy;
                     criteria.ShippingAddress.CreatedOn = DateTime.Now;
@@ -126,7 +126,7 @@ namespace JLSMobileApplication.Controllers.AdminService
                 var FacturationAddressId = await _adressRepository.CreateOrUpdateAdress(criteria.FacturationAddress);
 
                 /* Step3: save shipment info */
-                if (criteria.ShipmentInfo!=null )
+                if (criteria.ShipmentInfo != null)
                 {
                     var ShipmentInfoId = await _orderRepository.SaveOrderShipmentInfo(criteria.ShipmentInfo, criteria.CreatedOrUpdatedBy);
                     criteria.Orderinfo.ShipmentInfoId = ShipmentInfoId;
@@ -138,7 +138,7 @@ namespace JLSMobileApplication.Controllers.AdminService
                     var AdminRemarkId = await _orderRepository.SaveOrderRemark(criteria.AdminRemark, criteria.CreatedOrUpdatedBy);
                     criteria.Orderinfo.AdminRemarkId = AdminRemarkId;
                 }
-                if (criteria.CustomerInfo !=null)
+                if (criteria.CustomerInfo != null)
                 {
                     var CustomerId = await _orderRepository.SaveCustomerInfo(criteria.CustomerInfo, criteria.CreatedOrUpdatedBy);
                     criteria.Orderinfo.CustomerId = CustomerId;
@@ -190,7 +190,7 @@ namespace JLSMobileApplication.Controllers.AdminService
                 orderToUpdate.ClientRemarkId = criteria.Orderinfo.ClientRemarkId;
                 orderToUpdate.FacturationAdressId = criteria.Orderinfo.FacturationAdressId;
                 orderToUpdate.ShippingAdressId = criteria.Orderinfo.ShippingAdressId;
-                orderToUpdate.OrderTypeId = criteria.Orderinfo.OrderTypeId!=null && criteria.Orderinfo.OrderTypeId>0? criteria.Orderinfo.OrderTypeId :   await db.ReferenceItem.Where(p=>p.Code == "OrderType_Internal").Select(p=>p.Id).FirstOrDefaultAsync();
+                orderToUpdate.OrderTypeId = criteria.Orderinfo.OrderTypeId != null && criteria.Orderinfo.OrderTypeId > 0 ? criteria.Orderinfo.OrderTypeId : await db.ReferenceItem.Where(p => p.Code == "OrderType_Internal").Select(p => p.Id).FirstOrDefaultAsync();
                 orderToUpdate.ShipmentInfoId = criteria.Orderinfo.ShipmentInfoId;
                 orderToUpdate.StatusReferenceItemId = criteria.Orderinfo.StatusReferenceItemId;
                 orderToUpdate.TaxRateId = criteria.Orderinfo.TaxRateId;
@@ -280,7 +280,18 @@ namespace JLSMobileApplication.Controllers.AdminService
                 throw e;
             }
         }
-        
 
+        [HttpGet]
+        public async Task<JsonResult> GetCustomerInfoList()
+        {
+            try
+            {
+                return Json(await _orderRepository.GetCustomerInfoList());
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
+        }
     }
 }

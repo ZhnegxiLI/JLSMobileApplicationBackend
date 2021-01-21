@@ -204,19 +204,5 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
-
-        [HttpGet]
-        public async Task<JsonResult> GetCustomerInfoList()
-        {
-            try
-            {
-                return Json(await _orderRepository.GetCustomerInfoList());
-            }
-            catch (Exception exc)
-            {
-                throw exc;
-            }
-        }
-        
     }
 }
