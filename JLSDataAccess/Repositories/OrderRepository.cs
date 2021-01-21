@@ -629,6 +629,7 @@ namespace JLSDataAccess.Repositories
                                     Id = c.Id,
                                     Email = c.Email,
                                     PhoneNumber = c.PhoneNumber,
+                                    EntrepriseName = c.EntrepriseName,
                                     Siret = c.Siret,
                                     PreviousShippingAddress = (from a in db.Adress
                                                                where a.Id == o.ShippingAdressId
