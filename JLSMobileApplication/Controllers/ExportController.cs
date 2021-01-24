@@ -94,10 +94,14 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<ActionResult> ExportPdf(long OrderId)
+        public class PdfExportModel
         {
-            string fileName = await this._exportService.ExportPdf(OrderId, "Fr");
+            public long OrderId { get; set; }
+        }
+        [HttpPost]
+        public async Task<ActionResult> ExportPdf([FromBody] PdfExportModel model)
+        {
+            string fileName = await this._exportService.ExportPdf(model.OrderId, "Fr");
 
             /* Download file function */
             byte[] fileBytes = System.IO.File.ReadAllBytes(fileName);

@@ -261,6 +261,7 @@ namespace JLSMobileApplication.Services
                             Label = item.GetType().GetProperty("Label").GetValue(item, null),
                             Price = (float)item.GetType().GetProperty("Price").GetValue(item, null),
                             Quantity = item.GetType().GetProperty("Quantity").GetValue(item, null),
+                            IsModifiedPriceOrBox = item.GetType().GetProperty("IsModifiedPriceOrBox").GetValue(item, null),
                         });
 
                         receipt.TotalPriceWithoutTax = (float)(receipt.TotalPriceWithoutTax + item.GetType().GetProperty("QuantityPerBox").GetValue(item, null) * item.GetType().GetProperty("Price").GetValue(item, null) * item.GetType().GetProperty("Quantity").GetValue(item, null));

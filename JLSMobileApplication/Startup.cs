@@ -199,9 +199,6 @@ namespace JLSMobileApplication
             /* Initialization action: create a super admin in database */
             Initialization.AddAdminUser(userManager, context);
 
-
-            app.UseMiddleware(typeof(VisitorCounterMiddleware));
-            
             app.UseErrorHandling();
 
             /* JWT authorization */
@@ -213,6 +210,7 @@ namespace JLSMobileApplication
                 options.MapHub<MessageHub>("/MessageHub");
             });
 
+            app.UseMiddleware(typeof(VisitorCounterMiddleware));
 
             /* Configure mvc model */
             app.UseMvc(routes =>

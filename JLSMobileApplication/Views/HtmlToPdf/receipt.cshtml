@@ -84,7 +84,8 @@
             {
                 string totalPrice = (@item.Price * @item.Quantity * @item.Colissage).ToString("0.00");
                 double TotalQuantity = @item.Quantity * @item.Colissage;
-                <tr>
+                string style = @item.IsModifiedPriceOrBox == true? "color:Red" : null;
+                <tr style="@style">
                     <td><img src="@item.PhotoPath" width="70" /> </td>
                     <td>@item.Code</td>
                     <td>@item.Label</td>

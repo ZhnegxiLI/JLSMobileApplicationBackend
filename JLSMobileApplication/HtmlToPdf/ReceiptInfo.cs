@@ -50,5 +50,6 @@ namespace JLSMobileApplication.HtmlToPdf
         public int Colissage { get; set; }
         public float Price { get; set; }
         public string PhotoPath { get; set; }
+        public bool? IsModifiedPriceOrBox { get; set; }
     }
 }

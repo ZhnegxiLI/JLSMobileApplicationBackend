@@ -364,6 +364,7 @@ namespace JLSDataAccess.Repositories
                                                       Label = rl.Label,
                                                       Price = op.UnitPrice,
                                                       TotalPrice = op.TotalPrice,
+                                                      IsModifiedPriceOrBox = (op.Colissage == 0 || op.UnitPrice!= p.Price)? true: false,
                                                       QuantityPerBox = op.Colissage!=0? op.Colissage:p.QuantityPerBox,
                                                       MinQuantity = p.MinQuantity,
                                                       Size = p.Size,
