@@ -30,5 +30,7 @@ namespace JLSDataAccess.Interfaces
         Task<long> SaveOrderShipmentInfo(ShipmentInfo shipment, int? CreatedOrUpadatedBy);
 
         Task<long> SaveCustomerInfo(CustomerInfo customer, int? CreatedOrUpadatedBy);
+
+        Task<dynamic> GetCustomerInfoList();
     }
 }

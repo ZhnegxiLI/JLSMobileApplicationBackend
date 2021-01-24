@@ -364,7 +364,7 @@ namespace JLSDataAccess.Repositories
                                                       Label = rl.Label,
                                                       Price = op.UnitPrice,
                                                       TotalPrice = op.TotalPrice,
-                                                      IsModifiedPriceOrBox = (op.Colissage == 0 || op.UnitPrice!= p.Price)? true: false,
+                                                      IsModifiedPriceOrBox = !( op.Colissage == p.QuantityPerBox && Math.Abs(op.UnitPrice.Value - p.Price.Value) < 0.001)? true: false,
                                                       QuantityPerBox = op.Colissage!=0? op.Colissage:p.QuantityPerBox,
                                                       MinQuantity = p.MinQuantity,
                                                       Size = p.Size,
@@ -612,6 +612,30 @@ namespace JLSDataAccess.Repositories
                                                 }).ToList()
                                 }).FirstOrDefaultAsync();
 
+            return result;
+        }
+
+        public async Task<dynamic> GetCustomerInfoList()
+        {
+            var result = await (from c in db.CustomerInfo
+                                orderby c.EntrepriseName
+                                select new
+                                {
+                                    Id = c.Id,
+                                    Email = c.Email,
+                                    PhoneNumber = c.PhoneNumber,
+                                    EntrepriseName = c.EntrepriseName,
+                                    Siret = c.Siret,
+                                    PreviousShippingAddress = (from a in db.Adress
+                                                               join o in db.OrderInfo on a.Id equals o.ShippingAdressId
+                                                               where  o.CustomerId == c.Id
+                                                               select a).FirstOrDefault(),
+                                    PreviousFacturationAddress = (from a in db.Adress
+                                                                  join o in db.OrderInfo on a.Id equals o.FacturationAdressId
+                                                                  where o.CustomerId == c.Id
+                                                                  select a).FirstOrDefault(),
+                                }
+                          ).Distinct().ToListAsync<dynamic>();
             return result;
         }
     }
