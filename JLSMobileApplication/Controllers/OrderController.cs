@@ -97,10 +97,13 @@ namespace JLSMobileApplication.Controllers
                 if (User!=null)
                 {
                     CustomerInfo customer = new CustomerInfo();
+
                     customer.PhoneNumber = User.PhoneNumber;
                     customer.Siret = User.Siret;
                     customer.EntrepriseName = User.EntrepriseName;
                     customer.Email = User.Email;
+
+                    customer.UserId = User.Id;
 
                     CustomerId = await _orderRepository.SaveCustomerInfo(customer, criteria.UserId);
                 }

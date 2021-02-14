@@ -458,6 +458,12 @@ namespace JLSDataAccess.Repositories
 
         public async Task<long> SaveCustomerInfo(CustomerInfo customer, int? CreatedOrUpadatedBy)
         {
+            var previousCustomerInfo = db.CustomerInfo.Where(p => p.UserId == CreatedOrUpadatedBy).FirstOrDefault();
+            if (previousCustomerInfo!=null)
+            {
+                db.Entry<CustomerInfo>(previousCustomerInfo).State = EntityState.Detached;
+                customer.Id = previousCustomerInfo.Id;
+            }
             if (customer.Id != 0)
             {
                 customer.UpdatedBy = CreatedOrUpadatedBy;
@@ -618,6 +624,7 @@ namespace JLSDataAccess.Repositories
         public async Task<dynamic> GetCustomerInfoList()
         {
             var result = await (from c in db.CustomerInfo
+                                join o in db.OrderInfo on c.Id equals o.CustomerId
                                 orderby c.EntrepriseName
                                 select new
                                 {
