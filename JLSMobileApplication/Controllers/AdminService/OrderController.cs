@@ -271,8 +271,12 @@ namespace JLSMobileApplication.Controllers.AdminService
                 db.Update(orderToUpdate);
 
                 await db.SaveChangesAsync();
-
-                await _sendEmailAndMessageService.CreateOrUpdateOrderAsync(orderToUpdate.Id, criteria.Orderinfo.Id == 0 ? "CreateNewOrder" : "UpdateOrder");
+                if (criteria.Orderinfo.Id == 0)
+                {
+                    // JLS ask for sending email only for new order, the order update not need to send email for jls.
+                    // TODO: place a better method to send email according to updated information 
+                    await _sendEmailAndMessageService.CreateOrUpdateOrderAsync(orderToUpdate.Id, criteria.Orderinfo.Id == 0 ? "CreateNewOrder" : "UpdateOrder");
+                }
                 return Json(orderToUpdate.Id);
             }
             catch (Exception e)

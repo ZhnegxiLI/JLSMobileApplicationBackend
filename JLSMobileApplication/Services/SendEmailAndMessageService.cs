@@ -48,8 +48,10 @@ namespace JLSMobileApplication.Services
             var adminEmails = (from u in db.Users
                                join ur in db.UserRoles on u.Id equals ur.UserId
                                join r in db.Roles on ur.RoleId equals r.Id
-                               where (r.Name == "Admin" || r.Name == "SuperAdmin") && u.Validity == true 
+                               where ( r.Name == "SuperAdmin") && u.Validity == true 
                                select u.Email).ToList();
+            // Here: not need to send to user role 'Admin'
+
 
             var emailModelClient = db.EmailTemplate.Where(p => p.Name == Type +"_Client").FirstOrDefault();
             var emailModelAdmin = db.EmailTemplate.Where(p => p.Name == Type +"_Admin").FirstOrDefault();
@@ -57,6 +59,18 @@ namespace JLSMobileApplication.Services
             if (order!=null && emailModelClient != null && emailModelAdmin!=null)
             {
                 var orderType = db.ReferenceItem.Where(p => p.Id == order.OrderTypeId).FirstOrDefault();
+
+                if (orderType!= null && orderType.Code!= null && orderType.Code == "OrderType_Internal")
+                {
+                    // When order is internal, also need to send email to operator user 'Admin' 
+                    var orderOperatorEmail = db.Users.Where(p => p.Id == order.UserId).Select(p => p.Email).FirstOrDefault();
+                    if (orderOperatorEmail!=null)
+                    {
+                        adminEmails.Add(orderOperatorEmail);
+                    }
+
+                }
+
                 var customerInfo = db.CustomerInfo.Where(p => p.Id == order.CustomerId).FirstOrDefault();
                 if (customerInfo !=null )
                 {
