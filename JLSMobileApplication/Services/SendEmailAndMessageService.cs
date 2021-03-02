@@ -308,6 +308,12 @@ namespace JLSMobileApplication.Services
             {
                 foreach (var Email in EmailsToSend)
                 {
+                    if (_appSettings.RedirectEmailTo!=null && _appSettings.RedirectEmailTo!="")
+                    {
+                    
+                        Email.Title = Email.Title + "(" + Email.ToEmail + ")";
+                        Email.ToEmail = _appSettings.RedirectEmailTo;
+                    }
                     var message = _email.SendEmail(Email.ToEmail, Email.Title, Email.Body, Email.Attachment);
                     Email.IsSended = true;
                     Email.Message = message;
