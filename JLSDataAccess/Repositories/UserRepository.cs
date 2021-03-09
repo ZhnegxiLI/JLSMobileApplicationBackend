@@ -174,6 +174,7 @@ namespace JLSDataAccess.Repositories
                           where (UserType == null || ur.RoleId == UserType)
                           && (Validity == null || u.Validity == Validity)
                           && (Username == "" || u.UserName.Contains(Username))
+                          orderby u.CreatedOn descending
                           select new
                           {
                               Id = u.Id,
@@ -185,7 +186,12 @@ namespace JLSDataAccess.Repositories
                               UserRoleName = r.Name,
                               CreatedOn = u.CreatedOn,
                               UpdatedOn = u.UpdatedOn,
-                              EmailConfirmed = u.EmailConfirmed
+                              EmailConfirmed = u.EmailConfirmed,
+                              ZipCode = (from a in db.Adress
+                                         join ua in db.UserShippingAdress on a.Id equals ua.ShippingAdressId
+                                         orderby a.IsDefaultAdress
+                                         where ua.UserId == u.Id
+                                         select a.ZipCode).FirstOrDefault()
                           }).ToListAsync<dynamic>();
 
             return result;
@@ -211,6 +217,7 @@ namespace JLSDataAccess.Repositories
                                 select new
                                 {
                                     Id = u.Id,
+                                    CreatedOn = u.CreatedOn,
                                     OrderCount = db.OrderInfo.Where(p=>p.UserId == UserId).Count(),
                                     CommentCount = db.ProductComment.Where(p=>p.UserId == UserId).Count(),
                                     FavoriteCount = db.ProductFavorite.Where(p=>p.UserId == UserId).Count(),

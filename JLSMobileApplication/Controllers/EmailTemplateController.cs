@@ -6,6 +6,7 @@ using JLSMobileApplication.Services;
 using JLSMobileApplication.Services.EmailTemplateModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static JLSMobileApplication.Services.SendEmailAndMessageService;
 
 namespace JLSMobileApplication.Controllers
 {
@@ -34,11 +35,11 @@ namespace JLSMobileApplication.Controllers
             /* This function show only use for degug */
       
 
-            return View("ClientMessageToAdmin", new test
+            return View("ModifyOrderAdmin", new OrderEmailModel()
             {
-                Email = "test@gmail.com",
-                Message = "test"
-              
+
+                Username = "test",
+                OrderNumber = "test"
             });
         }
     }

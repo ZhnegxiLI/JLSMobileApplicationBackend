@@ -593,6 +593,9 @@ namespace JLSDataAccess.Repositories
 
             switch (OrderBy)
             {
+                case "Default":
+                    result = result.OrderBy(p => p.Label);
+                    break;
                 case "Price_Increase":
                     result = result.OrderBy(p => p.Price);
                     break;
@@ -607,6 +610,9 @@ namespace JLSDataAccess.Repositories
                     break;
                 case "Promotion_More":
                     result = result.OrderBy(p => p.PreviousPrice == null).ThenBy(p => p.Price / p.PreviousPrice);
+                    break;
+                default:
+                    result = result.OrderBy(p => p.Label);
                     break;
             }
             return await result.ToListAsync<dynamic>();
