@@ -6,6 +6,8 @@
 
         public long ProductId { get; set; }
 
+        public bool? IsDefault { get; set; }
+
         public Product Product { get; set; }
     }
 }

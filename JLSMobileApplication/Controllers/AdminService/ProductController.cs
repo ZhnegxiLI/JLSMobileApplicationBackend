@@ -15,6 +15,7 @@ using JLSMobileApplication.Heplers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
@@ -72,6 +73,45 @@ namespace JLSMobileApplication.Controllers.AdminService
                 throw e;
             }
         }
+
+
+        [HttpPost]
+        public async Task<long> SetDefaultImageById([FromBody] long Id)
+        {
+            ProductPhotoPath image = await db.ProductPhotoPath.FindAsync(Id);
+
+            if (image == null)
+            {
+                return 0;
+            }
+
+            try
+            {
+                var productImageList = await db.ProductPhotoPath.Where(p => p.ProductId == image.ProductId).ToListAsync();
+
+                foreach (var item in productImageList)
+                {
+                    if (item.Id == Id)
+                    {
+                        item.IsDefault = true;
+                    }
+                    else
+                    {
+                        item.IsDefault = false;
+                    }
+                }
+
+                db.UpdateRange(productImageList);
+                await db.SaveChangesAsync();
+
+                return image.Id;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
 
         [HttpGet]
         public async Task<long> RemoveProductCommentById(long CommentId)

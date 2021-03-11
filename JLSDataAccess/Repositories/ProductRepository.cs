@@ -45,8 +45,9 @@ namespace JLSDataAccess.Repositories
                                 QuantityPerBox = product.QuantityPerBox,
                                 MinQuantity = product.MinQuantity,
                                 DefaultPhotoPath = (from path in db.ProductPhotoPath
-                                                                       where path.ProductId == product.Id
-                                                                       select path.Path).FirstOrDefault(),
+                                                    orderby path.IsDefault descending
+                                                    where path.ProductId == product.Id
+                                                    select path.Path).FirstOrDefault(),
                                 PhotoPath = (from path in db.ProductPhotoPath
                                             where path.ProductId == product.Id
                                             select new ProductListPhotoPath() { Path = path.Path }).ToList(),
@@ -76,7 +77,8 @@ namespace JLSDataAccess.Repositories
                                     QuantityPerBox = product.QuantityPerBox,
                                     MinQuantity = product.MinQuantity,
                                     DefaultPhotoPath = (from path in db.ProductPhotoPath
-                                                    where path.ProductId == product.Id
+                                                        orderby path.IsDefault descending
+                                                        where path.ProductId == product.Id
                                                     select path.Path).FirstOrDefault(),
                                     IsNew = db.CheckNewProduct(product.Id)
                                 });
@@ -128,8 +130,9 @@ namespace JLSDataAccess.Repositories
                               QuantityPerBox = product.QuantityPerBox,
                               MinQuantity = product.MinQuantity,
                               DefaultPhotoPath = (from path in db.ProductPhotoPath
-                                           where path.ProductId == product.Id
-                                           select path.Path).FirstOrDefault(),
+                                                  orderby path.IsDefault descending
+                                                  where path.ProductId == product.Id
+                                                select path.Path).FirstOrDefault(),
                               IsNew = db.CheckNewProduct(product.Id)
                           });
             var totalCount = result.Count();
@@ -188,6 +191,7 @@ namespace JLSDataAccess.Repositories
                                QuantityPerBox = r.QuantityPerBox,
                                MinQuantity = r.MinQuantity,
                                DefaultPhotoPath = (from pp in db.ProductPhotoPath
+                                                   orderby pp.IsDefault descending
                                                    where pp.ProductId == r.ProductId
                                                    select pp.Path).FirstOrDefault(),
                                IsNew = db.CheckNewProduct(r.ProductId)
@@ -244,6 +248,7 @@ namespace JLSDataAccess.Repositories
                                QuantityPerBox = r.QuantityPerBox,
                                MinQuantity = r.MinQuantity,
                                DefaultPhotoPath = (from pp in db.ProductPhotoPath
+                                                   orderby pp.IsDefault descending
                                                    where pp.ProductId == r.ProductId
                                                    select pp.Path).FirstOrDefault(),
                                IsNew = db.CheckNewProduct(r.ProductId)
@@ -280,6 +285,7 @@ namespace JLSDataAccess.Repositories
                                     QuantityPerBox = product.QuantityPerBox,
                                     MinQuantity = product.MinQuantity,
                                     DefaultPhotoPath = (from path in db.ProductPhotoPath
+                                                        orderby path.IsDefault descending
                                                         where path.ProductId == product.Id
                                                         select path.Path).FirstOrDefault(),
                                     IsNew = db.CheckNewProduct(product.Id)
@@ -394,6 +400,7 @@ namespace JLSDataAccess.Repositories
                                            select u).FirstOrDefault(),
                                     ProductComment = pc,
                                     PhotoPath = (from pp in db.ProductPhotoPath
+                                                 orderby pp.IsDefault descending
                                                  where pp.ProductId == pc.ProductId
                                                  select pp.Path).FirstOrDefault(),
                                     Label = (from p in db.Product
@@ -456,9 +463,11 @@ namespace JLSDataAccess.Repositories
                                     PreviousPrice = p.PreviousPrice,
                                     IsNew = db.CheckNewProduct(p.Id),
                                     ImagesPath = (from path in db.ProductPhotoPath
+                                                  orderby path.IsDefault descending
                                                   where path.ProductId == p.Id
                                                   select new { path.Id, path.Path }).ToList(),
                                     DefaultPhotoPath = (from path in db.ProductPhotoPath
+                                                        orderby path.IsDefault descending
                                                         where path.ProductId == p.Id
                                                         select path.Path).FirstOrDefault(),
                                     MainCategoryLabel = (from rlMain in db.ReferenceLabel
@@ -507,6 +516,7 @@ namespace JLSDataAccess.Repositories
                                     IsNew = db.CheckNewProduct(p.Id),
                                     PreviousPrice = p.PreviousPrice,
                                     DefaultPhotoPath = (from path in db.ProductPhotoPath
+                                                        orderby path.IsDefault descending
                                                         where path.ProductId == p.Id
                                                         select path.Path).FirstOrDefault(),
                                     MainCategoryLabel = (from rlMain in db.ReferenceLabel
@@ -544,6 +554,7 @@ namespace JLSDataAccess.Repositories
                                     QuantityPerBox = p.QuantityPerBox,
                                     MinQuantity = p.MinQuantity,
                                     DefaultPhotoPath = (from pp in db.ProductPhotoPath
+                                                        orderby pp.IsDefault descending
                                                         where pp.ProductId == p.Id
                                                         select pp.Path).FirstOrDefault(),
                                     IsNew = db.CheckNewProduct(p.Id)
@@ -586,6 +597,7 @@ namespace JLSDataAccess.Repositories
                                     QuantityPerBox = p.QuantityPerBox,
                                     MinQuantity = p.MinQuantity,
                                     DefaultPhotoPath = (from pp in db.ProductPhotoPath
+                                                        orderby pp.IsDefault descending
                                                         where pp.ProductId == p.Id
                                                         select pp.Path).FirstOrDefault(),
                                     IsNew = db.CheckNewProduct(p.Id)
@@ -645,6 +657,7 @@ namespace JLSDataAccess.Repositories
 
                               IsNew = db.CheckNewProduct(p.Id),
                               DefaultPhotoPath = (from pp in db.ProductPhotoPath
+                                                  orderby pp.IsDefault descending
                                                   where pp.ProductId == p.Id
                                                   select pp.Path).FirstOrDefault()
                           });
@@ -749,6 +762,16 @@ namespace JLSDataAccess.Repositories
                                                       join riSecond in db.ReferenceItem on riMain.Id equals riSecond.ParentId
                                                       where riSecond.Id == ri.ParentId
                                                       select riMain.Id).FirstOrDefault(),
+                                    MainCategoryLabel = (from riMain in db.ReferenceItem
+                                                         join riSecond in db.ReferenceItem on riMain.Id equals riSecond.ParentId
+                                                         join rlMain in db.ReferenceLabel on riMain.Id equals rlMain.ReferenceItemId
+                                                         where riSecond.Id == ri.ParentId && rlMain.Lang == Lang
+                                                         select rlMain.Label).FirstOrDefault(),
+
+                                    SecondCategoryLabel = (from riSecond in db.ReferenceItem
+                                                         join rlSecond in db.ReferenceLabel on riSecond.Id equals rlSecond.ReferenceItemId
+                                                         where riSecond.Id == ri.ParentId && rlSecond.Lang == Lang
+                                                         select rlSecond.Label).FirstOrDefault(),
                                     SecondCategoryId = ri.ParentId,
                                     ReferenceCode = ri.Code,
                                     MinQuantity = p.MinQuantity,
@@ -774,7 +797,8 @@ namespace JLSDataAccess.Repositories
                                                    }).ToList(),
                                     ImagesPath = (from path in db.ProductPhotoPath
                                                   where path.ProductId == p.Id
-                                                  select new { path.Id, path.Path }).ToList(),
+                                                  orderby path.IsDefault descending
+                                                  select new { path.Id, path.Path, path.IsDefault }).ToList(),
                                     Comments = (from c in db.ProductComment
                                                 where c.ProductId == p.Id
                                                 select new { 
@@ -793,6 +817,7 @@ namespace JLSDataAccess.Repositories
                                     IsNew = db.CheckNewProduct(p.Id),
                                     DefaultPhotoPath = (from pp in db.ProductPhotoPath
                                                          where pp.ProductId == p.Id
+                                                         orderby pp.IsDefault descending
                                                          select pp.Path).FirstOrDefault()
                                 }).FirstOrDefaultAsync();
             if (result == null)
@@ -807,6 +832,7 @@ namespace JLSDataAccess.Repositories
         public async Task<dynamic> GetProductPhotoPathById(long ProductId)
         {
             var result = await (from pt in db.ProductPhotoPath
+                                orderby pt.IsDefault descending
                                 where pt.ProductId == ProductId
                                 select pt).ToListAsync();
 
