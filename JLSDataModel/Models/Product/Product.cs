@@ -6,6 +6,8 @@ namespace JLSDataModel.Models.Product
     {
         public float? Price { get; set; }
         public int? QuantityPerBox { get; set; }
+
+        public int? QuantityPerParcel { get; set; }
         public int? MinQuantity { get; set; }
 
         public long? TaxRateId { get; set; }// Link with ri

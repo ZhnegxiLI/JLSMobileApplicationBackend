@@ -43,6 +43,7 @@ namespace JLSDataAccess.Repositories
                                 Price = product.Price,
                                 PreviousPrice = product.PreviousPrice,
                                 QuantityPerBox = product.QuantityPerBox,
+                                QuantityPerParcel = product.QuantityPerParcel,
                                 MinQuantity = product.MinQuantity,
                                 DefaultPhotoPath = (from path in db.ProductPhotoPath
                                                     orderby path.IsDefault descending
@@ -75,6 +76,7 @@ namespace JLSDataAccess.Repositories
                                     Price = product.Price,
                                     PreviousPrice = product.PreviousPrice,
                                     QuantityPerBox = product.QuantityPerBox,
+                                    QuantityPerParcel = product.QuantityPerParcel,
                                     MinQuantity = product.MinQuantity,
                                     DefaultPhotoPath = (from path in db.ProductPhotoPath
                                                         orderby path.IsDefault descending
@@ -128,6 +130,7 @@ namespace JLSDataAccess.Repositories
                               Price = product.Price,
                               PreviousPrice = product.PreviousPrice,
                               QuantityPerBox = product.QuantityPerBox,
+                              QuantityPerParcel = product.QuantityPerParcel,
                               MinQuantity = product.MinQuantity,
                               DefaultPhotoPath = (from path in db.ProductPhotoPath
                                                   orderby path.IsDefault descending
@@ -156,7 +159,7 @@ namespace JLSDataAccess.Repositories
                           from op in db.OrderProduct.Where(p => p.ReferenceId == ri.Id).DefaultIfEmpty()
                           where rc.ShortLabel == "Product" && ri.Validity == true && rl.Lang == Lang
                           && riSecond.Validity == true && riMain.Validity == true
-                          group op by new { ri.Id, productId = product.Id, ri.ParentId, ri.Code, ri.Value, rl.Label, product.Price, product.QuantityPerBox, product.MinQuantity, product.PreviousPrice } into g
+                          group op by new { ri.Id, productId = product.Id, ri.ParentId, ri.Code, ri.Value, rl.Label, product.Price, product.QuantityPerBox, product.QuantityPerParcel, product.MinQuantity, product.PreviousPrice } into g
                           orderby g.Sum(x => x.Quantity) descending
                           select new
                           {
@@ -169,6 +172,7 @@ namespace JLSDataAccess.Repositories
                               Price = g.Key.Price,
                               PreviousPrice = g.Key.PreviousPrice,
                               QuantityPerBox = g.Key.QuantityPerBox,
+                              QuantityPerParcel = g.Key.QuantityPerParcel,
                               MinQuantity = g.Key.MinQuantity
                           });
             var totalCount = result.Count();
@@ -189,6 +193,7 @@ namespace JLSDataAccess.Repositories
                                Price = r.Price,
                                PreviousPrice = r.PreviousPrice,
                                QuantityPerBox = r.QuantityPerBox,
+                               QuantityPerParcel = r.QuantityPerParcel,
                                MinQuantity = r.MinQuantity,
                                DefaultPhotoPath = (from pp in db.ProductPhotoPath
                                                    orderby pp.IsDefault descending
@@ -214,7 +219,7 @@ namespace JLSDataAccess.Repositories
                           from pc in db.ProductComment.Where(p => p.ProductId  == product.Id).DefaultIfEmpty()
                           where rc.ShortLabel == "Product" && ri.Validity == true && rl.Lang == Lang
                           && riSecond.Validity == true && riMain.Validity == true
-                          group pc by new { ri.Id, productId = product.Id, ri.ParentId, ri.Code, ri.Value, rl.Label, product.Price, product.QuantityPerBox, product.MinQuantity, pc.ProductId, product.PreviousPrice } into g
+                          group pc by new { ri.Id, productId = product.Id, ri.ParentId, ri.Code, ri.Value, rl.Label, product.Price, product.QuantityPerBox, product.QuantityPerParcel, product.MinQuantity, pc.ProductId, product.PreviousPrice } into g
                           orderby g.Sum(x => x.Level) descending
                           select new
                           {
@@ -227,6 +232,7 @@ namespace JLSDataAccess.Repositories
                               Price = g.Key.Price,
                               PreviousPrice = g.Key.PreviousPrice,
                               QuantityPerBox = g.Key.QuantityPerBox,
+                              QuantityPerParcel = g.Key.QuantityPerParcel,
                               MinQuantity = g.Key.MinQuantity
                           });
             var productList = await result.ToListAsync();
@@ -246,6 +252,7 @@ namespace JLSDataAccess.Repositories
                                Price = r.Price,
                                PreviousPrice = r.PreviousPrice,
                                QuantityPerBox = r.QuantityPerBox,
+                               QuantityPerParcel = r.QuantityPerParcel,
                                MinQuantity = r.MinQuantity,
                                DefaultPhotoPath = (from pp in db.ProductPhotoPath
                                                    orderby pp.IsDefault descending
@@ -283,6 +290,7 @@ namespace JLSDataAccess.Repositories
                                     Price = product.Price,
                                     PreviousPrice = product.PreviousPrice,
                                     QuantityPerBox = product.QuantityPerBox,
+                                    QuantityPerParcel = product.QuantityPerParcel,
                                     MinQuantity = product.MinQuantity,
                                     DefaultPhotoPath = (from path in db.ProductPhotoPath
                                                         orderby path.IsDefault descending
@@ -508,6 +516,7 @@ namespace JLSDataAccess.Repositories
                                     CategoryId = rc.Id,
                                     CategoryLabel = rc.ShortLabel,
                                     QuantityPerBox = p.QuantityPerBox,
+                                    QuantityPerParcel = p.QuantityPerParcel,
                                     BarreCode = p.BarreCode,
                                     Size = p.Size,
                                     Color = p.Color,
@@ -552,6 +561,7 @@ namespace JLSDataAccess.Repositories
                                     Price = p.Price,
                                     PreviousPrice = p.PreviousPrice,
                                     QuantityPerBox = p.QuantityPerBox,
+                                    QuantityPerParcel = p.QuantityPerParcel,
                                     MinQuantity = p.MinQuantity,
                                     DefaultPhotoPath = (from pp in db.ProductPhotoPath
                                                         orderby pp.IsDefault descending
@@ -595,6 +605,7 @@ namespace JLSDataAccess.Repositories
                                     Price = p.Price,
                                     PreviousPrice = p.PreviousPrice,
                                     QuantityPerBox = p.QuantityPerBox,
+                                    QuantityPerParcel = p.QuantityPerParcel,
                                     MinQuantity = p.MinQuantity,
                                     DefaultPhotoPath = (from pp in db.ProductPhotoPath
                                                         orderby pp.IsDefault descending
@@ -653,6 +664,7 @@ namespace JLSDataAccess.Repositories
                               Price = p.Price,
                               PreviousPrice = p.PreviousPrice,
                               QuantityPerBox = p.QuantityPerBox,
+                              QuantityPerParcel = p.QuantityPerParcel,
                               MinQuantity = p.MinQuantity,
 
                               IsNew = db.CheckNewProduct(p.Id),
@@ -666,7 +678,7 @@ namespace JLSDataAccess.Repositories
         }
 
 
-        public async Task<long> SaveProductInfo(long ProductId, long ReferenceId, int? QuantityPerBox, int? MinQuantity,float? Price, long? TaxRateId, string Description, string Color, string Material, string Size, string Forme,int? CreatedOrUpdatedBy)
+        public async Task<long> SaveProductInfo(long ProductId, long ReferenceId, int? QuantityPerBox, int? QuantityPerParcel, int? MinQuantity,float? Price, long? TaxRateId, string Description, string Color, string Material, string Size, string Forme,int? CreatedOrUpdatedBy)
         {
             Product ProductToUpdateOrCreate = null;
             if (ProductId == 0)
@@ -684,6 +696,7 @@ namespace JLSDataAccess.Repositories
             if (ProductToUpdateOrCreate!=null)
             {
                 ProductToUpdateOrCreate.QuantityPerBox = QuantityPerBox;
+                ProductToUpdateOrCreate.QuantityPerParcel = QuantityPerParcel;
                 ProductToUpdateOrCreate.MinQuantity = MinQuantity;
                 ProductToUpdateOrCreate.Price = Price;
                 ProductToUpdateOrCreate.TaxRateId = TaxRateId;
@@ -778,6 +791,7 @@ namespace JLSDataAccess.Repositories
                                     Price = p.Price,
                                     PreviousPrice = p.PreviousPrice,
                                     QuantityPerBox = p.QuantityPerBox,
+                                    QuantityPerParcel = p.QuantityPerParcel,
                                     Description = p.Description,
                                     Forme = p.Forme,
                                     ReferenceId = ri.Id,
