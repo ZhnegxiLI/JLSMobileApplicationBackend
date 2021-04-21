@@ -7,7 +7,7 @@ namespace JLSDataAccess.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "QuantityPerParecel",
+                name: "QuantityPerParcel",
                 table: "Product",
                 nullable: true);
         }
@@ -15,7 +15,7 @@ namespace JLSDataAccess.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "QuantityPerParecel",
+                name: "QuantityPerParcel",
                 table: "Product");
         }
     }
