@@ -455,6 +455,9 @@ namespace JLSDataAccess.Repositories
                                     ReferenceId = ri.Id,
                                     ProductId = p.Id,
                                     Label = rl.Label,
+                                    Translations = (from rl1 in db.ReferenceLabel
+                                                    where rl1.ReferenceItemId == ri.Id
+                                                    select rl1),
                                     Code = ri.Code,
                                     Validity = ri.Validity,
                                     CategoryId = rc.Id,
@@ -510,6 +513,7 @@ namespace JLSDataAccess.Repositories
                                     ReferenceId = ri.Id,
                                     ProductId = p.Id,
                                     MinQuantity = p.MinQuantity,
+                                
                                     Label = rl.Label,
                                     Code = ri.Code,
                                     Validity = ri.Validity,

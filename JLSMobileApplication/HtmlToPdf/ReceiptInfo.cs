@@ -46,7 +46,7 @@ namespace JLSMobileApplication.HtmlToPdf
         public string Code { get; set; }
         public string Label { get; set; }
         public int Quantity { get; set; }
-
+        public int? QuantityPerParcel { get; set; }
         public int Colissage { get; set; }
         public float Price { get; set; }
         public string PhotoPath { get; set; }

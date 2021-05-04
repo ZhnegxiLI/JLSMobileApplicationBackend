@@ -257,6 +257,7 @@ namespace JLSMobileApplication.Services
                         {
                             Code = item.GetType().GetProperty("Code").GetValue(item, null),
                             Colissage = item.GetType().GetProperty("QuantityPerBox").GetValue(item, null),
+                            QuantityPerParcel = item.GetType().GetProperty("QuantityPerParcel").GetValue(item, null),
                             PhotoPath = _appSettings.WebSiteUrl + item.GetType().GetProperty("DefaultPhotoPath").GetValue(item, null),
                             Label = item.GetType().GetProperty("Label").GetValue(item, null),
                             Price = (float)item.GetType().GetProperty("Price").GetValue(item, null),
