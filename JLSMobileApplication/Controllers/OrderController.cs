@@ -12,6 +12,7 @@ using JLSDataModel.ViewModels;
 using JLSMobileApplication.Services;
 using LjWebApplication.Model;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -29,8 +30,9 @@ namespace JLSMobileApplication.Controllers
         private readonly IMapper _mapper;
         private readonly IProductRepository _productRepository;
         private readonly ISendEmailAndMessageService _sendEmailAndMessageService;
+        private readonly IHostingEnvironment _env;
 
-        public OrderController(IMapper mapper, IOrderRepository order, IAdressRepository adress, UserManager<User> userManager, IProductRepository product, ISendEmailAndMessageService sendEmailAndMessageService)
+        public OrderController(IMapper mapper, IOrderRepository order, IAdressRepository adress, UserManager<User> userManager, IProductRepository product, ISendEmailAndMessageService sendEmailAndMessageService, IHostingEnvironment env)
         {
             _userManager = userManager;
             _orderRepository = order;
@@ -38,6 +40,7 @@ namespace JLSMobileApplication.Controllers
             _mapper = mapper;
             _productRepository = product;
             _sendEmailAndMessageService = sendEmailAndMessageService;
+            _env = env;
         }
         public class SaveOrderCriteria{
             public SaveOrderCriteria()
@@ -140,7 +143,12 @@ namespace JLSMobileApplication.Controllers
                                                      ReferenceId = ri.ReferenceId
                                                  }).ToList();
                     var orderId = await _orderRepository.SaveOrder(FormatedReferenceList, shippingAddressId, criteria.FacturationAdressId, criteria.UserId, ClientRemarkId, CustomerId);
-                    await _sendEmailAndMessageService.CreateOrUpdateOrderAsync(orderId, "CreateNewOrder");
+
+                    if (!_env.IsDevelopment())
+                    {
+                        await _sendEmailAndMessageService.CreateOrUpdateOrderAsync(orderId, "CreateNewOrder");
+                    }
+
                     return Json(new ApiResult()
                     {
                         Data = orderId,

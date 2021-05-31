@@ -11,6 +11,7 @@ using JLSDataModel.Models.Order;
 using JLSDataModel.ViewModels;
 using JLSMobileApplication.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,14 +28,16 @@ namespace JLSMobileApplication.Controllers.AdminService
         private readonly IAdressRepository _adressRepository;
         private readonly JlsDbContext db;
         private readonly ISendEmailAndMessageService _sendEmailAndMessageService;
+        private readonly IHostingEnvironment _env;
 
-        public OrderController(IOrderRepository orderRepository, IMapper mapper, IAdressRepository adressRepository, JlsDbContext context, ISendEmailAndMessageService sendEmailAndMessageService)
+        public OrderController(IOrderRepository orderRepository, IMapper mapper, IAdressRepository adressRepository, JlsDbContext context, ISendEmailAndMessageService sendEmailAndMessageService, IHostingEnvironment env)
         {
             this._orderRepository = orderRepository;
             _mapper = mapper;
             _adressRepository = adressRepository;
             db = context;
             _sendEmailAndMessageService = sendEmailAndMessageService;
+            _env = env;
         }
 
         public class AdvancedOrderSearchCriteria
@@ -196,7 +199,7 @@ namespace JLSMobileApplication.Controllers.AdminService
                 orderToUpdate.TaxRateId = criteria.Orderinfo.TaxRateId;
                 orderToUpdate.CustomerId = criteria.Orderinfo.CustomerId;
 
-                if (criteria.Orderinfo.Id == 0)
+                if (criteria.Orderinfo.Id == 0 && !_env.IsDevelopment())
                 {
                     await db.AddAsync(orderToUpdate);
                     await db.SaveChangesAsync();
