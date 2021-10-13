@@ -168,33 +168,39 @@ namespace JLSDataAccess.Repositories
 
         public async Task<List<dynamic>> AdvancedUserSearch(int? UserType, bool? Validity, string Username)
         {
-            var result = await (from u in db.Users
-                          join ur in db.UserRoles on u.Id equals ur.UserId
-                          join r in db.Roles on ur.RoleId equals r.Id
-                          where (UserType == null || ur.RoleId == UserType)
-                          && (Validity == null || u.Validity == Validity)
-                          && (Username == "" || u.UserName.Contains(Username))
-                          orderby u.CreatedOn descending
-                          select new
-                          {
-                              Id = u.Id,
-                              Username = u.UserName,
-                              EntrepriseName = u.EntrepriseName,
-                              Validity = u.Validity,
-                              Telephone = u.PhoneNumber,
-                              UserRoleId = r.Id,
-                              UserRoleName = r.Name,
-                              CreatedOn = u.CreatedOn,
-                              UpdatedOn = u.UpdatedOn,
-                              EmailConfirmed = u.EmailConfirmed,
-                              ZipCode = (from a in db.Adress
-                                         join ua in db.UserShippingAdress on a.Id equals ua.ShippingAdressId
-                                         orderby a.IsDefaultAdress
-                                         where ua.UserId == u.Id
-                                         select a.ZipCode).FirstOrDefault()
-                          }).ToListAsync<dynamic>();
+            var result =  (from u in db.Users
+                                join ur in db.UserRoles on u.Id equals ur.UserId
+                                join r in db.Roles on ur.RoleId equals r.Id
+                                where (UserType == null || ur.RoleId == UserType)
+                                && (Validity == null || u.Validity == Validity)
+                                orderby u.CreatedOn descending
+                                select new
+                                {
+                                    Id = u.Id,
+                                    Username = u.UserName,
+                                    EntrepriseName = u.EntrepriseName,
+                                    Validity = u.Validity,
+                                    Telephone = u.PhoneNumber,
+                                    UserRoleId = r.Id,
+                                    UserRoleName = r.Name,
+                                    CreatedOn = u.CreatedOn,
+                                    UpdatedOn = u.UpdatedOn,
+                                    EmailConfirmed = u.EmailConfirmed,
+                                    ZipCode = (from a in db.Adress
+                                               join ua in db.UserShippingAdress on a.Id equals ua.ShippingAdressId
+                                               orderby a.IsDefaultAdress
+                                               where ua.UserId == u.Id
+                                               select a.ZipCode).FirstOrDefault()
+                                }); //.Distinct().ToListAsync<dynamic>();
 
-            return result;
+            if (Username!=null && Username!="")
+            { 
+                // The field Username can search the information according to email/telephone/ entrepriseName and zipcode
+                result = result.Where(p => p.Username.Contains(Username) || p.EntrepriseName.Contains(Username) || p.Telephone.Contains(Username) || p.ZipCode.Contains(Username));
+            }
+      
+
+            return await result.Distinct().ToListAsync<dynamic>();
         }
 
         public async Task<List<dynamic>> GetUserRoleList()
