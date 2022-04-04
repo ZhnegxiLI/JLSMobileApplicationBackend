@@ -69,6 +69,7 @@ namespace JLSMobileApplication.Controllers
             }
             try
             {
+                // TODO ADD TRANSACTION 
                 // Step 1: 建立新地址
                 model.ShipmentAdress.EntrepriseName = model.EntrepriseName;
                 model.FacturationAdress.EntrepriseName = model.EntrepriseName;

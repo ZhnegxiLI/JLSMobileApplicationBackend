@@ -60,6 +60,7 @@ namespace JLSMobileApplication.Controllers
         [HttpPost]
         public async Task<JsonResult> SaveOrder([FromBody] SaveOrderCriteria criteria)
         {
+            // TODO ADD TRANSACTION IN THIS FUNCTION
             try
             {
                 /* Step1: Get shipping and facturation address */
