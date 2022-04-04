@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 
 namespace JLSMobileApplication.Controllers.AdminService
 {
@@ -27,9 +28,9 @@ namespace JLSMobileApplication.Controllers.AdminService
         private readonly IAdressRepository _adressRepository;
         private readonly JlsDbContext db;
         private readonly ISendEmailAndMessageService _sendEmailAndMessageService;
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
 
-        public OrderController(IOrderRepository orderRepository, IMapper mapper, IAdressRepository adressRepository, JlsDbContext context, ISendEmailAndMessageService sendEmailAndMessageService, IHostingEnvironment env)
+        public OrderController(IOrderRepository orderRepository, IMapper mapper, IAdressRepository adressRepository, JlsDbContext context, ISendEmailAndMessageService sendEmailAndMessageService, IWebHostEnvironment env)
         {
             this._orderRepository = orderRepository;
             _mapper = mapper;

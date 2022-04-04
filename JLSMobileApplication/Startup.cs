@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using Serilog;
@@ -42,7 +43,7 @@ namespace JLSMobileApplication
             services.AddAutoMapper();
 
             /* Init mvc */
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddJsonOptions(options =>
+            services.AddControllersWithViews().AddNewtonsoftJson(options =>
             {
                 /* Configure the json output date format */
                 options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
@@ -155,7 +156,7 @@ namespace JLSMobileApplication
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, JlsDbContext context, UserManager<User> userManager, ISendEmailAndMessageService timerEmailService)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, JlsDbContext context, UserManager<User> userManager, ISendEmailAndMessageService timerEmailService)
         {
             if (env.IsDevelopment())
             {
@@ -196,20 +197,19 @@ namespace JLSMobileApplication
             /* JWT authorization */
             app.UseAuthentication();
 
-            /* Configure router path of signalR */
-            app.UseSignalR(options =>
-            {
-                options.MapHub<MessageHub>("/MessageHub");
-            });
-
             app.UseMiddleware(typeof(VisitorCounterMiddleware));
 
             /* Configure mvc model */
-            app.UseMvc(routes =>
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
+                /* Configure router path of signalR */
+                endpoints.MapHub<MessageHub>("/MessageHub");
+
+                endpoints.MapControllerRoute(
                     name: "default",
-                    template: "{controller}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}"
+                );
             });
 
             app.Map("/admin", client =>
