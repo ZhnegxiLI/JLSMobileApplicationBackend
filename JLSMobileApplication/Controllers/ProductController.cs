@@ -61,7 +61,6 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-
         [HttpGet]
         public async Task<JsonResult> GetProductByPrice(string Lang, long? MainCategoryId, int Begin, int Step)
         {
@@ -117,7 +116,6 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-
         [HttpGet]
         public async Task<JsonResult> GetProductListBySecondCategory(long SecondCategoryReferenceId, string Lang, int Begin, int Step)
         {
@@ -141,7 +139,6 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
-
 
         [HttpGet]
         public async Task<JsonResult> GetProductCommentListByCriteria(long? ProductId, long? UserId, int Begin, int Step, string Lang)
@@ -175,7 +172,6 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
-
 
         [HttpGet]
         public async Task<JsonResult> GetPromotionProduct(int Begin, int Step, string Lang)
@@ -211,6 +207,7 @@ namespace JLSMobileApplication.Controllers
             {
                 this.ReferenceIds = new List<long>();
             }
+
             public List<long> ReferenceIds { get; set; }
             public string Lang { get; set; }
         }
@@ -246,7 +243,6 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-
         public class AdvancedSearchCriteria
         {
             public string SearchText { get; set; }
@@ -261,6 +257,7 @@ namespace JLSMobileApplication.Controllers
             public int Begin { get; set; }
             public int Step { get; set; }
         }
+
         [HttpPost]
         public async Task<JsonResult> AdvancedProductSearchClient(AdvancedSearchCriteria criteria)
         {
@@ -297,7 +294,6 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-
         [HttpGet]
         public async Task<JsonResult> GetProductById(long ProductId, string Lang, int? UserId)
         {
@@ -311,7 +307,6 @@ namespace JLSMobileApplication.Controllers
                 throw e;
             }
         }
-
 
         [HttpGet]
         public async Task<JsonResult> GetFavoriteListByUserId(int UserId, string Lang, int? Step, int? Begin)
@@ -336,6 +331,7 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
+
         [HttpGet]
         public async Task<JsonResult> AddIntoProductFavoriteList(int UserId, long ProductId, bool? IsFavorite)
         {
@@ -350,8 +346,8 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-
         /******************************** ZOOM Service with authentification *******************************/
+
         [Authorize]
         [HttpPost]
         public async Task<JsonResult> SaveProductComment([FromBody] ProductComment comment)
@@ -372,6 +368,7 @@ namespace JLSMobileApplication.Controllers
         }
 
         /* Only for web site */
+
         [HttpGet]
         public async Task<JsonResult> GetCategoryForWebSite(int NumberOfCateogry, string Lang)
         {
@@ -389,6 +386,7 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
+
         [HttpGet]
         public async Task<JsonResult> GetMainPageForWebSite(string Lang)
         {
@@ -399,7 +397,6 @@ namespace JLSMobileApplication.Controllers
                 var productByPublishDate = await _productRepository.GetProductListByPublishDate(Lang, null, Begin, Step);
                 var productBySalesPerformance = await _productRepository.GetProductListBySalesPerformance(Lang, Begin, Step);
                 var productByPrice = (await _productRepository.GetProductByPrice(Lang, null)).Take(Step).ToList();
-
 
                 return Json(new
                 {

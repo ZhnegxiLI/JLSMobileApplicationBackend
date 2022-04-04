@@ -21,18 +21,21 @@ namespace JLSMobileApplication.Controllers
         }
 
         /*
-         * Create or update address according to the type 
+         * Create or update address according to the type
          */
+
         public class CreateOrUpdateAdressCriteria
         {
             public CreateOrUpdateAdressCriteria()
             {
                 this.adress = new Adress();
             }
+
             public Adress adress { get; set; }
             public int userId { get; set; }
             public string type { get; set; }
         }
+
         [HttpPost]
         public async Task<JsonResult> CreateOrUpdateAdress([FromBody] CreateOrUpdateAdressCriteria criteria)
         {
@@ -64,6 +67,7 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
+
         [HttpGet]
         public async Task<JsonResult> GetUserFacturationAdress(int UserId)
         {
@@ -148,7 +152,5 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
-
-
     }
 }

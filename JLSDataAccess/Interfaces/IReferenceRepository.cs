@@ -10,9 +10,7 @@ namespace JLSDataAccess.Interfaces
     {
         Task<List<dynamic>> GetReferenceItemsByCategoryLabels(List<string> shortLabels, string lang);
 
-
         Task<ReferenceCategory> GetReferenceCategoryByShortLabel(string ShortLabel);
-
 
         Task<List<ReferenceCategory>> GetAllCategoryList();
 
@@ -21,6 +19,7 @@ namespace JLSDataAccess.Interfaces
         Task<long> SaveReferenceItem(long ReferenceId, long CategoryId, string Code, long? ParentId, bool Validity, string Value, int? CreatedOrUpdatedBy);
 
         Task<long> SaveReferenceLabel(long ReferenceId, string Label, string Lang);
+
         /*
          * Admin zoom
          */
@@ -31,8 +30,8 @@ namespace JLSDataAccess.Interfaces
 
         Task<List<ReferenceCategory>> GetAllReferenceCategory();
 
-
         Task<bool> CheckReferenceCodeExists(string Code);
+
         Task<List<WebsiteSlide>> GetWbesiteslides();
     }
 }

@@ -23,7 +23,6 @@ namespace JLSMobileApplication.Auth
     {
         // jwt and refresh tokens
 
-
         private readonly UserManager<User> _userManager;
 
         private readonly AppSettings _appSettings;
@@ -54,20 +53,20 @@ namespace JLSMobileApplication.Auth
             {
                 case "password":
                     return await GenerateNewToken(model);
+
                 case "refresh_token":
                     return await RefreshToken(model);
+
                 default:
                     // not supported - return a HTTP 401 (Unauthorized)
                     return new UnauthorizedResult();//BadRequestResult();
             }
-
         }
-
 
         // Method to Create New JWT and Refresh Token
         private async Task<IActionResult> GenerateNewToken(TokenRequestModel model)
         {
-            // TODO CHECK front-end error message 
+            // TODO CHECK front-end error message
             // check if there's an user with the given username
             var user = await _userManager.FindByNameAsync(model.UserName);
 
@@ -93,7 +92,7 @@ namespace JLSMobileApplication.Auth
                 var newRtoken = CreateRefreshToken(_appSettings.ClientId, user.Id);
 
                 // first we delete any existing old refreshtokens
-                var oldrTokens = _db.TokenModel.Where(rt => rt.UserId == user.Id && rt.ExpiryTime < DateTime.UtcNow); // Remove only the expired token, keep the possibility to login for mutiple platform in the same time 
+                var oldrTokens = _db.TokenModel.Where(rt => rt.UserId == user.Id && rt.ExpiryTime < DateTime.UtcNow); // Remove only the expired token, keep the possibility to login for mutiple platform in the same time
 
                 if (oldrTokens != null)
                 {
@@ -101,7 +100,6 @@ namespace JLSMobileApplication.Auth
                     {
                         _db.TokenModel.Remove(oldrt);
                     }
-
                 }
 
                 // Add new refresh token to Database
@@ -113,14 +111,11 @@ namespace JLSMobileApplication.Auth
 
                 var accessToken = await CreateAccessToken(user, newRtoken.Value);
 
-
-                return Ok(new { authToken = accessToken }); // TODO: add refresh token expired 
-
+                return Ok(new { authToken = accessToken }); // TODO: add refresh token expired
             }
 
             ModelState.AddModelError("", "Username/Password was not Found");
             return NotFound(new { LoginError = "Msg_PasswordNotCorrect" });
-
         }
 
         // Create access Tokenm
@@ -128,8 +123,6 @@ namespace JLSMobileApplication.Auth
         {
             try
             {
-
-
                 double tokenExpiryTime = Convert.ToDouble(_appSettings.ExpireTime);
 
                 var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.Secret));
@@ -147,7 +140,6 @@ namespace JLSMobileApplication.Auth
                             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString() ),
                             new Claim(ClaimTypes.Role, "client"), //todo change
                             new Claim("LoggedOn", DateTime.Now.ToString()),
-
                          }),
 
                     SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256),
@@ -175,7 +167,6 @@ namespace JLSMobileApplication.Auth
             }
             catch (Exception e)
             {
-
                 throw e;
             }
         }
@@ -196,8 +187,6 @@ namespace JLSMobileApplication.Auth
             };
         }
 
-
-
         // Method to Refresh JWT and Refresh Token
         private async Task<IActionResult> RefreshToken(TokenRequestModel model)
         {
@@ -208,7 +197,6 @@ namespace JLSMobileApplication.Auth
                     .FirstOrDefault(t =>
                     t.ClientId == _appSettings.ClientId
                     && t.Value == model.RefreshToken.ToString());
-
 
                 if (rt == null)
                 {
@@ -225,14 +213,13 @@ namespace JLSMobileApplication.Auth
                 // check if there's an user with the refresh token's userId
                 var user = await _userManager.FindByIdAsync(rt.UserId.ToString());
 
-
                 if (user == null)
                 {
                     // UserId not found or invalid
                     return new UnauthorizedResult();// BadRequestResult();
                 }
 
-                // generate a new refresh token 
+                // generate a new refresh token
 
                 var rtNew = CreateRefreshToken(rt.ClientId, rt.UserId);
 
@@ -245,16 +232,14 @@ namespace JLSMobileApplication.Auth
                 // persist changes in the DB
                 _db.SaveChanges();
 
-                // 
+                //
 
                 var response = await CreateAccessToken(user, rtNew.Value);
 
                 return Ok(new { authToken = response });
-
             }
             catch (Exception ex)
             {
-
                 return new UnauthorizedResult();// BadRequestResult();
             }
         }

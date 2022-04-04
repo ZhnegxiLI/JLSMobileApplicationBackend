@@ -14,7 +14,6 @@ namespace JLSMobileApplication.Controllers
     [ApiController]
     public class MessageController : Controller
     {
-
         private readonly IMessageRepository _message;
         private readonly ISendEmailAndMessageService _email;
 
@@ -24,7 +23,6 @@ namespace JLSMobileApplication.Controllers
             _email = sendMessageService;
         }
 
-
         public class SaveMessageCriteria
         {
             public int? FromUserId { get; set; }
@@ -33,6 +31,7 @@ namespace JLSMobileApplication.Controllers
 
             public Message Message { get; set; }
         }
+
         [AllowAnonymous]
         [HttpPost]
         public async Task<long> SaveMessage([FromBody] SaveMessageCriteria criteria)
@@ -52,6 +51,7 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
+
         [HttpGet]
         public async Task<JsonResult> GetMessageByUserAndStatus(int UserId, bool? Status, int Step, int Begin)
         {
@@ -70,13 +70,13 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-
         public class UpdateMessageStatusCriteria
         {
             public long MessageId { get; set; }
             public bool Status { get; set; }
             public int? UserId { get; set; }
         }
+
         [HttpPost]
         public async Task<long> UpdateMessageStatus([FromBody] UpdateMessageStatusCriteria criteria)
         {
@@ -89,7 +89,6 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
-
 
         [HttpGet]
         public async Task<int> GetNoReadMessageCount(int UserId)
@@ -104,7 +103,5 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
-
     }
-
 }

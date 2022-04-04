@@ -70,7 +70,5 @@ namespace JLSDataAccess.Repositories
             }
             return 0;
         }
-
-
     }
 }

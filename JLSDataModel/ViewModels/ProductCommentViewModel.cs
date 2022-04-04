@@ -11,6 +11,7 @@ namespace JLSDataModel.ViewModels
             this.ProductComment = new ProductComment();
             this.User = new User();
         }
+
         public ProductComment ProductComment { get; set; }
         public User User { get; set; }
 

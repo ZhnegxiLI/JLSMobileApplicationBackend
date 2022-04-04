@@ -25,9 +25,11 @@ namespace JLSConsoleApplication.Controllers
             {
                 this.ShortLabels = new List<string>();
             }
+
             public List<string> ShortLabels { get; set; }
             public string Lang { get; set; }
         }
+
         [HttpPost]
         public async Task<JsonResult> GetReferenceItemsByCategoryLabels([FromBody] GetReferenceItemsByCategoryLabelsCriteria criteria)
         {
@@ -39,12 +41,9 @@ namespace JLSConsoleApplication.Controllers
             }
             catch (Exception e)
             {
-
                 throw e;
             }
-
         }
-
 
         [HttpGet]
         public async Task<JsonResult> GetWbesiteslides()
@@ -57,10 +56,8 @@ namespace JLSConsoleApplication.Controllers
             }
             catch (Exception e)
             {
-
                 throw e;
             }
-
         }
 
         [HttpGet]
@@ -82,7 +79,6 @@ namespace JLSConsoleApplication.Controllers
                     list = result.Skip(step * begin).Take(step).ToList();
                 }
 
-
                 return Json(new
                 {
                     ReferenceCategoryList = list,
@@ -91,10 +87,8 @@ namespace JLSConsoleApplication.Controllers
             }
             catch (Exception e)
             {
-
                 throw e;
             }
         }
-
     }
 }

@@ -23,12 +23,13 @@ namespace JLSDataAccess.Repositories
             public int? Month { get; set; }
             public float? Sum { get; set; }
         }
+
         public async Task<List<dynamic>> GetTeamMemberSalesPerformance()
         {
             var adminRoleIds = await db.Roles.Where(p => p.Name == "Admin" || p.Name == "SuperAdmin").Select(p => p.Id).ToListAsync();
             var salesPerformance = await (from p in db.OrderInfo
                                           join ur in db.UserRoles on p.UserId equals ur.UserId
-                                          where adminRoleIds.Contains(ur.RoleId) //&& p.CreatedOn>= DateTime.Now.AddYears(-1) // last 1 year 
+                                          where adminRoleIds.Contains(ur.RoleId) //&& p.CreatedOn>= DateTime.Now.AddYears(-1) // last 1 year
                                           group p by new { p.UserId, p.CreatedOn.Value.Month, p.CreatedOn.Value.Year } into g
                                           orderby g.Key.Year, g.Key.Month descending
                                           select new TeamMemberSalesPerformance()
@@ -53,8 +54,6 @@ namespace JLSDataAccess.Repositories
 
             return userList;
         }
-
-
 
         public async Task<List<dynamic>> GetInternalExternalSalesPerformance(string Lang)
         {
@@ -118,7 +117,6 @@ namespace JLSDataAccess.Repositories
                                     name = g.Key.Label,
                                     totalQuantity = g.Sum(p => p.Quantity),
                                     code = g.Key.Code
-
                                 }).ToListAsync<dynamic>();
 
             result = (from r in result
@@ -131,6 +129,7 @@ namespace JLSDataAccess.Repositories
 
             return result;
         }
+
         public List<BestClientWidget> GetBestClientWidget(int Limit)
         {
             var result = db.BestClientWidget.FromSql("SP_WidgetBestClient").Take(Limit).ToList();
@@ -171,7 +170,6 @@ namespace JLSDataAccess.Repositories
                                     Sum = g.Sum(p => p.TotalPrice)
                                 }).ToListAsync<dynamic>();
 
-
             return result;
         }
 
@@ -208,12 +206,9 @@ namespace JLSDataAccess.Repositories
                                                                   OrderTypeId = o.OrderTypeId,
                                                                   OrderTypeCode = db.ReferenceItem.Where(p => p.Id == o.OrderTypeId).Select(p => p.Code).FirstOrDefault()
                                                               }).ToList()
-
                                                  }).ToList()
                                 }).ToListAsync<dynamic>();
             return result;
         }
-
-
     }
 }

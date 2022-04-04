@@ -8,6 +8,5 @@
         public string NewValue { get; set; }
         public long AuditId { get; set; }
         public Audit Audit { get; set; }
-
     }
 }

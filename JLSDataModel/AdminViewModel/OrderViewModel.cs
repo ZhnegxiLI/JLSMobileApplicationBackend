@@ -6,7 +6,6 @@ namespace JLSDataModel.ViewModels
 {
     public class OrderViewModel
     {
-
         public string OrderReferenceCode { get; set; }
 
         public string PaymentInfo { get; set; }
@@ -19,7 +18,7 @@ namespace JLSDataModel.ViewModels
 
         public float? TaxRate { get; set; }
 
-        // Foreign key 
+        // Foreign key
         public UserViewModel User { get; set; }
 
         public ReferenceItem StatusReferenceItem { get; set; }

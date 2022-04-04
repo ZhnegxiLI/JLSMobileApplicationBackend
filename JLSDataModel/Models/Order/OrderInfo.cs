@@ -20,8 +20,10 @@
         public long CustomerId { get; set; }
 
         public long? ShipmentInfoId { get; set; }
-        // Foreign key 
+
+        // Foreign key
         public int UserId { get; set; }
+
         public User.User User { get; set; }
 
         public long StatusReferenceItemId { get; set; }

@@ -8,6 +8,7 @@ namespace JLSMobileApplication.Resources
         {
             this.PhotoPath = new List<ProductListPhotoPathView>();
         }
+
         public long ReferenceId { get; set; }
         public long ProductId { get; set; }
         public string Code { get; set; }

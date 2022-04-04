@@ -27,9 +27,11 @@ namespace JLSConsoleApplication.Controllers.AdminService
             {
                 this.ShortLabels = new List<string>();
             }
+
             public List<string> ShortLabels { get; set; }
             public string Lang { get; set; }
         }
+
         [HttpPost]
         public async Task<JsonResult> GetReferenceItemsByCategoryLabels([FromBody] GetReferenceItemsByCategoryLabelsCriteria criteria)
         {
@@ -41,10 +43,8 @@ namespace JLSConsoleApplication.Controllers.AdminService
             }
             catch (Exception e)
             {
-
                 throw e;
             }
-
         }
 
         [HttpGet]
@@ -66,7 +66,6 @@ namespace JLSConsoleApplication.Controllers.AdminService
                     list = result.Skip(step * begin).Take(step).ToList();
                 }
 
-
                 return Json(new
                 {
                     ReferenceCategoryList = list,
@@ -75,14 +74,12 @@ namespace JLSConsoleApplication.Controllers.AdminService
             }
             catch (Exception e)
             {
-
                 throw e;
             }
         }
 
         public class AdvancedSearchReferenceItemCriteria
         {
-
             public string SearchText { get; set; }
 
             public long? ReferenceCategoryId { get; set; }
@@ -116,7 +113,6 @@ namespace JLSConsoleApplication.Controllers.AdminService
             }
             catch (Exception e)
             {
-
                 throw e;
             }
         }
@@ -134,7 +130,6 @@ namespace JLSConsoleApplication.Controllers.AdminService
                 throw e;
             }
         }
-
 
         [HttpGet]
         public async Task<bool> CheckReferenceCodeExists(string Code)
@@ -163,6 +158,7 @@ namespace JLSConsoleApplication.Controllers.AdminService
             public string LabelCN { get; set; }
             public string LabelEN { get; set; }
         }
+
         [HttpPost]
         public async Task<JsonResult> SaveReferenceItem([FromBody] SaveReferenceItemCriteria criteria)
         {
@@ -174,7 +170,6 @@ namespace JLSConsoleApplication.Controllers.AdminService
                 long ReferenceLabelEnId = await _referenceRepository.SaveReferenceLabel(result, criteria.LabelEN, "en");
                 long ReferenceLabelCnId = await _referenceRepository.SaveReferenceLabel(result, criteria.LabelCN, "cn");
 
-
                 return Json(result);
             }
             catch (Exception e)
@@ -182,7 +177,5 @@ namespace JLSConsoleApplication.Controllers.AdminService
                 throw e;
             }
         }
-
-
     }
 }

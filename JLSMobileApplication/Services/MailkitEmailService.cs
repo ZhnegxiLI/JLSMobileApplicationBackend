@@ -12,13 +12,14 @@ namespace JLSMobileApplication.Services
         /// 只用于测试目的请勿在生产环境中放入此代码
         /// </summary>
         private readonly AppSettings _appSettings;
+
         public EmailService(IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings.Value;
         }
+
         public string SendEmail(string ToEmail, string Subjet, string Message, string AttachmentPath)
         {
-
             try
             {
                 // Credentials
@@ -50,11 +51,11 @@ namespace JLSMobileApplication.Services
                     Credentials = credentials
                 };
                 client.Send(mail);
-                return "Email Sent Successfully!"; //todo change to code 
+                return "Email Sent Successfully!"; //todo change to code
             }
             catch (System.Exception e)
             {
-                return e.Message; // todo change to code 
+                return e.Message; // todo change to code
             }
         }
     }

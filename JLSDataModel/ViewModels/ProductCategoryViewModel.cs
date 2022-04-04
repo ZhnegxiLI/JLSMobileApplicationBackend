@@ -6,6 +6,7 @@
         {
             this.Reference = new SubProductCategoryViewModel();
         }
+
         public SubProductCategoryViewModel Reference { get; set; }
         public int TotalCount { get; set; }
         public long ReferenceId { get; set; }

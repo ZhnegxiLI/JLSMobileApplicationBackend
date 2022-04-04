@@ -18,6 +18,7 @@ namespace JLSMobileApplication.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+
         public UserController(UserManager<User> userManager, IMapper mapper, IUserRepository user)
         {
             _mapper = mapper;
@@ -30,6 +31,7 @@ namespace JLSMobileApplication.Controllers
         {
             return await _userRepository.CheckUserIsAlreadyExist(Username);
         }
+
         [HttpGet]
         public async Task<long> InsertSubscribeEmail(string Email)
         {
@@ -41,12 +43,12 @@ namespace JLSMobileApplication.Controllers
         {
             return await _userRepository.GetNoReadedDialogClient(UserId);
         }
+
         [HttpGet]
         public async Task<long> UpdateReadedDialog(int UserId)
         {
             return await _userRepository.UpdateReadedDialog(UserId);
         }
-
 
         [HttpGet]
         public async Task<List<dynamic>> GetChatDialog(int UserId)
@@ -54,8 +56,8 @@ namespace JLSMobileApplication.Controllers
             return await _userRepository.GetChatDialog(UserId, null);
         }
 
-
         /* Auth zoom  start */
+
         [Authorize]
         [HttpGet]
         public async Task<JsonResult> GetUserById(int UserId)
@@ -66,10 +68,10 @@ namespace JLSMobileApplication.Controllers
             }
             catch (Exception e)
             {
-
                 throw e;
             }
         }
+
         public class UpdateUserInfoCriteria
         {
             public int UserId { get; set; }
@@ -82,6 +84,7 @@ namespace JLSMobileApplication.Controllers
 
             public long? DefaultShippingAddressId { get; set; }
         }
+
         [Authorize]
         [HttpPost]
         public async Task<JsonResult> UpdateUserInfo(UpdateUserInfoCriteria criteria)
@@ -93,7 +96,6 @@ namespace JLSMobileApplication.Controllers
             }
             catch (Exception e)
             {
-
                 throw e;
             }
         }
@@ -105,6 +107,7 @@ namespace JLSMobileApplication.Controllers
 
             public string NewPassword { get; set; }
         }
+
         [Authorize]
         [HttpPost]
         public async Task<int> UpdatePassword(UpdatePasswordCriteria criteria)
@@ -114,7 +117,6 @@ namespace JLSMobileApplication.Controllers
                 User user = _userManager.FindByIdAsync(criteria.UserId.ToString()).Result;
                 if (user != null && await _userManager.CheckPasswordAsync(user, criteria.PreviousPassword))
                 {
-
                     var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
                     var result = await _userManager.ResetPasswordAsync(user, token, criteria.NewPassword);
@@ -126,7 +128,6 @@ namespace JLSMobileApplication.Controllers
                     {
                         return 0;
                     }
-
                 }
                 else
                 {
@@ -135,10 +136,10 @@ namespace JLSMobileApplication.Controllers
             }
             catch (Exception e)
             {
-
                 throw e;
             }
         }
+
         /* Auth zoom  end */
     }
 }

@@ -9,8 +9,10 @@ namespace JLSDataModel.Models
         {
             CreatedOn = DateTime.Now;
         }
+
         [Key]
         public long Id { get; set; }
+
         public DateTime? CreatedOn { get; set; }
         public long? CreatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }

@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 namespace JLSMobileApplication.Auth
 {
     [Route("api/[controller]/{action}/{id?}")]
-    //[ApiController]
     public class AuthController : Controller
     {
         private readonly UserManager<User> _userManager;
@@ -40,7 +39,6 @@ namespace JLSMobileApplication.Auth
         [HttpPost]
         public async Task<JsonResult> Login([FromBody] LoginViewModel model)
         {
-
             if (model == null)
             {
                 return Json(new ApiResult()
@@ -99,12 +97,9 @@ namespace JLSMobileApplication.Auth
             }
         }
 
-
-
-        // Generate the jwt toekn 
+        // Generate the jwt toekn
         private string GenerateToken(int userId)
         {
-
             var claims = new Claim[]
             {
                 new Claim(ClaimTypes.Name, userId.ToString()),
@@ -123,7 +118,6 @@ namespace JLSMobileApplication.Auth
 
         private string GenerateRefreshToken(int userId)
         {
-
             var randomNumber = new byte[32];
             using (var rng = RandomNumberGenerator.Create())
             {
@@ -131,7 +125,5 @@ namespace JLSMobileApplication.Auth
                 return Convert.ToBase64String(randomNumber);
             }
         }
-
     }
-
 }

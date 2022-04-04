@@ -11,11 +11,9 @@ namespace JLSMobileApplication.Auth
 
         public string PhoneNumber { get; set; }
 
-
         public IList<string> Roles { get; set; }
         public string Siret { get; set; }
         public string EntrepriseName { get; set; }
-
 
         public Adress FacturationAdress { get; set; }
 

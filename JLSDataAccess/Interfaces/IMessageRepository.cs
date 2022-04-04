@@ -6,7 +6,6 @@ namespace JLSDataAccess.Interfaces
 {
     public interface IMessageRepository
     {
-
         Task<long> CreateMessage(Message message, int? FromUser, int? ToUser);
 
         Task<List<dynamic>> GetMessageByUserAndStatus(int ToUserId, bool? IsReaded);

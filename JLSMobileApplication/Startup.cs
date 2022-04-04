@@ -24,6 +24,7 @@ using Serilog;
 using System;
 using System.IO;
 using System.Text;
+
 namespace JLSMobileApplication
 {
     public class Startup
@@ -65,7 +66,6 @@ namespace JLSMobileApplication
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
-
             /* Init  serilog */
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
@@ -74,9 +74,9 @@ namespace JLSMobileApplication
 
             // Inject email service (send email function)
             services.AddTransient<IEmailService, MailkitEmailService>();
-            // Inject export service  
+            // Inject export service
             services.AddTransient<IExportService, ExportService>();
-            // Inject format email and message service 
+            // Inject format email and message service
             services.AddTransient<ISendEmailAndMessageService, SendEmailAndMessageService>();
 
             /* Init identity password option */
@@ -95,7 +95,7 @@ namespace JLSMobileApplication
             services.Configure<DataProtectionTokenProviderOptions>(options =>
                 options.TokenLifespan = TimeSpan.FromDays(10)); // Config into appsettings
 
-            // Init jwt credential 
+            // Init jwt credential
             var appSettings = appSettingsSection.Get<AppSettings>();
 
             Initialization._appSettings = appSettings;
@@ -157,7 +157,6 @@ namespace JLSMobileApplication
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, JlsDbContext context, UserManager<User> userManager, ISendEmailAndMessageService timerEmailService)
         {
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -237,12 +236,11 @@ namespace JLSMobileApplication
 
                         spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
                     });
-
                 }
                 else
                 {
                     // Each map gets its own physical path
-                    // for it to map the static files to. 
+                    // for it to map the static files to.
                     StaticFileOptions clientApp2Dist = new StaticFileOptions()
                     {
                         FileProvider = new PhysicalFileProvider(
@@ -254,7 +252,7 @@ namespace JLSMobileApplication
                     };
 
                     // Each map its own static files otherwise
-                    // it will only ever serve index.html no matter the filename 
+                    // it will only ever serve index.html no matter the filename
                     client.UseSpaStaticFiles(clientApp2Dist);
 
                     // Each map will call its own UseSpa where
@@ -265,12 +263,10 @@ namespace JLSMobileApplication
                         spa.Options.SourcePath = "Angular/Admin";
                         spa.Options.DefaultPageStaticFileOptions = clientApp2Dist;
                     });
-
                 }
-
             });
 
-            // for each angular client we want to host. 
+            // for each angular client we want to host.
 
             if (env.IsDevelopment())
             {
@@ -293,12 +289,11 @@ namespace JLSMobileApplication
                         // spa.UseAngularCliServer(npmScript: "start");
                         spa.UseProxyToSpaDevelopmentServer("http://localhost:4201");
                     });
-
             }
             else
             {
                 // Each map gets its own physical path
-                // for it to map the static files to. 
+                // for it to map the static files to.
                 StaticFileOptions clientApp2Dist = new StaticFileOptions()
                 {
                     FileProvider = new PhysicalFileProvider(
@@ -310,7 +305,7 @@ namespace JLSMobileApplication
                 };
 
                 // Each map its own static files otherwise
-                // it will only ever serve index.html no matter the filename 
+                // it will only ever serve index.html no matter the filename
                 app.UseSpaStaticFiles(clientApp2Dist);
 
                 // Each map will call its own UseSpa where
@@ -321,12 +316,7 @@ namespace JLSMobileApplication
                         spa.Options.SourcePath = "Angular/Website";
                         spa.Options.DefaultPageStaticFileOptions = clientApp2Dist;
                     });
-
             }
-
-
-
-
         }
     }
 }

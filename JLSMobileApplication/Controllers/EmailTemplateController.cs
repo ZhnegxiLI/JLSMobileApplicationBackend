@@ -10,7 +10,6 @@ namespace JLSMobileApplication.Controllers
     [ApiController]
     public class EmailTemplateController : Controller
     {
-
         private IViewRenderService _view = null;
 
         public EmailTemplateController(IViewRenderService view)
@@ -24,16 +23,15 @@ namespace JLSMobileApplication.Controllers
 
             public string Message { get; set; }
         }
+
         [HttpGet("[action]")]
         [AllowAnonymous]
         public async Task<ActionResult> Test()
         {
             /* This function show only use for degug */
 
-
             return View("ModifyOrderAdmin", new OrderEmailModel()
             {
-
                 Username = "test",
                 OrderNumber = "test"
             });

@@ -69,7 +69,6 @@ namespace JLSMobileApplication.Controllers.AdminService
             }
         }
 
-
         [HttpPost]
         public async Task<long> SetDefaultImageById([FromBody] long Id)
         {
@@ -107,7 +106,6 @@ namespace JLSMobileApplication.Controllers.AdminService
             }
         }
 
-
         [HttpGet]
         public async Task<long> RemoveProductCommentById(long CommentId)
         {
@@ -121,9 +119,9 @@ namespace JLSMobileApplication.Controllers.AdminService
                 throw exc;
             }
         }
+
         public class AdvancedProductSearchCriteria
         {
-
             public AdvancedProductSearchCriteria()
             {
                 this.SecondCategoryReferenceId = new List<long>();
@@ -140,6 +138,7 @@ namespace JLSMobileApplication.Controllers.AdminService
 
             public int step { get; set; }
         }
+
         [HttpPost]
         public async Task<JsonResult> AdvancedProductSearchByCriteria(AdvancedProductSearchCriteria criteria)
         {
@@ -229,7 +228,6 @@ namespace JLSMobileApplication.Controllers.AdminService
             {
                 throw e;
             }
-
         }
 
         public class GetProductInfoByReferenceIdsCriteria
@@ -238,6 +236,7 @@ namespace JLSMobileApplication.Controllers.AdminService
             {
                 this.ReferenceIds = new List<long>();
             }
+
             public List<long> ReferenceIds { get; set; }
             public string Lang { get; set; }
         }
@@ -255,7 +254,6 @@ namespace JLSMobileApplication.Controllers.AdminService
             }
         }
 
-
         [HttpPost, DisableRequestSizeLimit]
         public async Task<IActionResult> UploadPhoto()
         {
@@ -265,8 +263,7 @@ namespace JLSMobileApplication.Controllers.AdminService
 
                 var file = Request.Form.Files[0];
 
-                Request.Form.TryGetValue("ProductId", out ProductId); // get ProductId todo change 
-
+                Request.Form.TryGetValue("ProductId", out ProductId); // get ProductId todo change
 
                 var folderName = Path.Combine("Images", ProductId.ToString()); // todo : place into the configruation file
                 var pathToSave = Path.Combine(_appSettings.ImagePath, folderName);
@@ -275,12 +272,10 @@ namespace JLSMobileApplication.Controllers.AdminService
 
                 if (file.Length > 0)
                 {
-
                     var fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
 
                     var fullPath = Path.Combine(pathToSave, fileName);
                     var dbPath = Path.Combine(folderName, fileName);
-
 
                     using (var stream = new FileStream(fullPath, FileMode.Create))
                     {
@@ -308,8 +303,6 @@ namespace JLSMobileApplication.Controllers.AdminService
             var data = await _productRepository.GetProductPhotoPathById(ProductId);
             return Json(data);
         }
-
-
 
         [HttpGet]
         public async Task<JsonResult> GetProductById(long Id)

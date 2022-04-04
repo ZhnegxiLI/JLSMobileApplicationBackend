@@ -31,6 +31,7 @@ namespace JLSMobileApplication.Controllers
 
             public string Lang { get; set; }
         }
+
         [HttpPost]
         public async Task<IActionResult> ExportAction([FromBody] ExportModel Model)
         {
@@ -43,6 +44,7 @@ namespace JLSMobileApplication.Controllers
                         var SearchText = Model.Criteria.GetValue("SearchText").Value;
                         list = await _productRepository.SimpleProductSearch(SearchText, Model.Lang);
                         break;
+
                     case "AdvancedProductSearchByCriteria":
                         var ProductLabel = Model.Criteria.GetValue("ProductLabel").Value;
                         var MainCategoryReferenceId = Model.Criteria.GetValue("MainCategoryReferenceId").Value;
@@ -72,6 +74,7 @@ namespace JLSMobileApplication.Controllers
 
                         list = await _orderRepository.AdvancedOrderSearchByCriteria(Model.Lang, UserId, FromDate, ToDate, OrderId, StatusId);
                         break;
+
                     default:
                         break;
                 }
@@ -96,6 +99,7 @@ namespace JLSMobileApplication.Controllers
         {
             public long OrderId { get; set; }
         }
+
         [HttpPost]
         public async Task<ActionResult> ExportPdf([FromBody] PdfExportModel model)
         {
@@ -104,7 +108,6 @@ namespace JLSMobileApplication.Controllers
             /* Download file function */
             byte[] fileBytes = System.IO.File.ReadAllBytes(fileName);
             return File(fileBytes, "application/x-msdownload", DateTime.Now.ToString() + "_Invoice.pdf");
-
         }
     }
 }

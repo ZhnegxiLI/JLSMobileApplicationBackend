@@ -9,6 +9,7 @@ namespace JLSDataModel.ViewModels
         {
             this.Labels = new List<ReferenceLabel>();
         }
+
         public long Id { get; set; }
         public string Code { get; set; }
         public long? ParentId { get; set; }

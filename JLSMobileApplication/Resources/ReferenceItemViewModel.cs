@@ -2,7 +2,6 @@
 {
     public class ReferenceItemViewModel
     {
-
         public long Id { get; set; }
         public string Code { get; set; }
         public long? ParentId { get; set; }

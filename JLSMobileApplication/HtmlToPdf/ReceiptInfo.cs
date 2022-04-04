@@ -14,6 +14,7 @@ namespace JLSMobileApplication.HtmlToPdf
             this.FacturationAddress = new Adress();
             this.ProductList = new List<ReceiptProductList>();
         }
+
         public long OrderId { get; set; }
         public DateTime CreatedOn { get; set; }
         public string Username { get; set; }

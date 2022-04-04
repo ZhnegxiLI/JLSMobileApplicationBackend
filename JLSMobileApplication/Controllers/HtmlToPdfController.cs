@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace JLSMobileApplication.Controllers
 {
     /* Todo remove: migration to export controller, please teste */
+
     [Route("api/[controller]/{action}/{id?}")]
     [ApiController]
     public class HtmlToPdfController : Controller
@@ -30,7 +31,7 @@ namespace JLSMobileApplication.Controllers
             var tpl = System.IO.File.ReadAllText(tplPath);
 
             /* GetOrderInfo todo change */
-            var orderInfo = await this._orderRepository.GetOrdersListByOrderId(26, "fr"); // todo change 
+            var orderInfo = await this._orderRepository.GetOrdersListByOrderId(26, "fr"); // todo change
 
             /* Get order basic info */
             var receipt = new ReceiptInfo();
@@ -95,7 +96,6 @@ namespace JLSMobileApplication.Controllers
             /* Download file function */
             byte[] fileBytes = System.IO.File.ReadAllBytes(fileName);
             return File(fileBytes, "application/x-msdownload", DateTime.Now.ToString() + "_Invoice.pdf");
-
         }
     }
 }

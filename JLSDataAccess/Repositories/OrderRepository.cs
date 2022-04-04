@@ -14,14 +14,16 @@ namespace JLSDataAccess.Repositories
     public class OrderRepository : IOrderRepository
     {
         private readonly JlsDbContext db;
+
         public OrderRepository(JlsDbContext context)
         {
             db = context;
         }
 
         /*
-         * Mobile Zoom 
+         * Mobile Zoom
          */
+
         public async Task<long> SaveOrder(List<OrderProductViewModelMobile> References, long ShippingAdressId, long FacturationAdressId, int UserId, long? ClientRemarkId, long CutomerInfoId)
         {
             /* Step1: get progressing status ri */
@@ -34,7 +36,6 @@ namespace JLSDataAccess.Repositories
                                    join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
                                    where rc.ShortLabel == "OrderType" && ri.Code == "OrderType_External"
                                    select ri).FirstOrDefaultAsync();
-
 
             var TaxRate = await (from ri in db.ReferenceItem
                                  join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
@@ -103,7 +104,6 @@ namespace JLSDataAccess.Repositories
             return Order.Id;
         }
 
-
         public async Task<long> SaveAdminOrder(OrderInfo order, List<OrderProductViewModelMobile> References, int CreatedOrUpdatedBy)
         {
             try
@@ -170,9 +170,7 @@ namespace JLSDataAccess.Repositories
                     db.OrderInfoStatusLog.Add(orderInfoStatusLog);
 
                     await db.SaveChangesAsync();
-
                 }
-
 
                 /* Step 1: remove all the product in order */
                 var PreviousOrderProducts = await db.OrderProduct.Where(p => p.OrderId == order.Id).ToListAsync();
@@ -190,15 +188,14 @@ namespace JLSDataAccess.Repositories
                         reference.Quantity = item.Quantity;
                         reference.UnitPrice = double.Parse(item.Price.Value.ToString("0.00"));
                         reference.OrderId = order.Id;
-                        reference.Colissage = item.QuantityPerBox; // todo: add check here 
-                        reference.TotalPrice = reference.Quantity * reference.UnitPrice * reference.Colissage; // todo add check here 
+                        reference.Colissage = item.QuantityPerBox; // todo: add check here
+                        reference.TotalPrice = reference.Quantity * reference.UnitPrice * reference.Colissage; // todo add check here
 
                         TotalPrice = TotalPrice + (item.Price.Value * item.Quantity * item.UnityQuantity);
 
                         products.Add(reference);
                     }
                 }
-
 
                 await db.AddRangeAsync(products);
                 var taxRate = db.ReferenceItem.Where(p => p.Code == "TaxRate_20%").Select(p => p.Value).FirstOrDefault();
@@ -217,8 +214,6 @@ namespace JLSDataAccess.Repositories
             {
                 throw e;
             }
-
-
         }
 
         public async Task<List<OrderListViewModelMobile>> GetOrdersListByUserId(int UserId, string StatusCode, string Lang)
@@ -246,7 +241,6 @@ namespace JLSDataAccess.Repositories
                                 }).ToListAsync();
             return result;
         }
-
 
         public async Task<dynamic> GetOrdersListByOrderId(long OrderId, string Lang)
         {
@@ -385,9 +379,8 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-
         /*
-         * Admin Zoom 
+         * Admin Zoom
          */
 
         public async Task<List<dynamic>> AdvancedOrderSearchByCriteria(string Lang, int? UserId, DateTime? FromDate, DateTime? ToDate, string OrderId, long? StatusId)
@@ -536,24 +529,31 @@ namespace JLSDataAccess.Repositories
                 case "id":
                     funcOrder = order => order.Id;
                     break;
+
                 case "reference":
                     funcOrder = order => order.OrderReferenceCode;
                     break;
+
                 case "name":
                     funcOrder = order => order.UserName;
                     break;
+
                 case "entrepriseName":
                     funcOrder = order => order.EntrepriseName;
                     break;
+
                 case "total":
                     funcOrder = order => order.TotalPrice;
                     break;
+
                 case "status":
                     funcOrder = order => order.StatusReferenceItemLabel;
                     break;
+
                 case "date":
                     funcOrder = order => order.Date;
                     break;
+
                 default:
                     funcOrder = order => order.Id;
                     break;
@@ -569,7 +569,6 @@ namespace JLSDataAccess.Repositories
             }
 
             var result = await request.Skip(intervalCount * size).Take(size).ToListAsync();
-
 
             return result;
         }

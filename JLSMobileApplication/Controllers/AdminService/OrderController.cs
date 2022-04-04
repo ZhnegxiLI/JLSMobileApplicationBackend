@@ -77,7 +77,6 @@ namespace JLSMobileApplication.Controllers.AdminService
             }
         }
 
-
         public class SaveAdminOrderCriteria
         {
             public CustomerInfo CustomerInfo { get; set; }
@@ -102,7 +101,6 @@ namespace JLSMobileApplication.Controllers.AdminService
         {
             try
             {
-
                 /* Step1 : save shipping address */
                 if (criteria.ShippingAddress != null && criteria.ShippingAddress.Id == 0)
                 {
@@ -244,7 +242,6 @@ namespace JLSMobileApplication.Controllers.AdminService
                 //    }
                 //}
 
-
                 float TotalPrice = 0;
                 var OrderProducts = new List<OrderProduct>();
                 foreach (var r in criteria.References)
@@ -276,7 +273,7 @@ namespace JLSMobileApplication.Controllers.AdminService
                 if (criteria.Orderinfo.Id == 0)
                 {
                     // JLS ask for sending email only for new order, the order update not need to send email for jls.
-                    // TODO: place a better method to send email according to updated information 
+                    // TODO: place a better method to send email according to updated information
                     await _sendEmailAndMessageService.CreateOrUpdateOrderAsync(orderToUpdate.Id, criteria.Orderinfo.Id == 0 ? "CreateNewOrder" : "UpdateOrder");
                 }
                 return Json(orderToUpdate.Id);

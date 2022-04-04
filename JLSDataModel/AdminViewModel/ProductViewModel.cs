@@ -19,7 +19,6 @@ namespace JLSDataModel.ViewModels
 
         public long ReferenceItemId { get; set; }
 
-
         /* 不确定需要询问客户 */
         public string Color { get; set; }
 
@@ -29,6 +28,5 @@ namespace JLSDataModel.ViewModels
 
         public string Description { get; set; }
         /* 不确定需要询问客户 */
-
     }
 }

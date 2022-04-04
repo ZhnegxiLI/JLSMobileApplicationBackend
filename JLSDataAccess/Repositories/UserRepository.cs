@@ -134,8 +134,8 @@ namespace JLSDataAccess.Repositories
                 return EmailToInsert.Id;
             }
             return 0;
-
         }
+
         public async Task<Adress> GetUserFacturationAdress(int userId)
         {
             var result = (from a in db.Adress
@@ -198,7 +198,6 @@ namespace JLSDataAccess.Repositories
                 result = result.Where(p => p.Username.Contains(Username) || p.EntrepriseName.Contains(Username) || p.Telephone.Contains(Username) || p.ZipCode.Contains(Username));
             }
 
-
             return await result.Distinct().ToListAsync<dynamic>();
         }
 
@@ -246,7 +245,6 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-
         public async Task<dynamic> CreateOrUpdateUser(int UserId, string Email, string Password, int RoleId, bool Validity, bool EmailConfirmed)
         {
             //UserRole by RoleId
@@ -288,8 +286,7 @@ namespace JLSDataAccess.Repositories
                 }
             }
 
-
-            //Remove all role for user 
+            //Remove all role for user
             var userRoleToRemove = await db.UserRoles.Where(p => p.UserId == UserToCreateOrUpdate.Id).ToListAsync();
 
             db.UserRoles.RemoveRange(userRoleToRemove);
@@ -298,7 +295,6 @@ namespace JLSDataAccess.Repositories
 
             return UserToCreateOrUpdate.Id;
         }
-
 
         public async Task<long> UpdateUserInfo(int UserId, string EntrepriseName, string Siret, string PhoneNumber, long? DefaultShippingAddressId)
         {
@@ -335,11 +331,11 @@ namespace JLSDataAccess.Repositories
             }
             return 0;
         }
+
         public async Task<bool> CheckUserIsAlreadyExist(string Username)
         {
             var result = await db.Users.Where(p => p.UserName == Username).FirstOrDefaultAsync();
             return result != null ? true : false;
         }
-
     }
 }

@@ -9,6 +9,7 @@ namespace JLSDataModel.ViewModels
         {
             this.ProductListData = new List<ProductListData>();
         }
+
         public List<ProductListData> ProductListData { get; set; }
         public int TotalCount { get; set; }
     }
@@ -17,6 +18,7 @@ namespace JLSDataModel.ViewModels
     {
         public string Path { get; set; }
     }
+
     public class ProductListData
     {
         public ProductListData()
@@ -25,6 +27,7 @@ namespace JLSDataModel.ViewModels
 
             this.Comments = new List<ProductComment>();
         }
+
         public int? NumberOfComment { get; set; }
         public long ReferenceId { get; set; }
         public long ProductId { get; set; }

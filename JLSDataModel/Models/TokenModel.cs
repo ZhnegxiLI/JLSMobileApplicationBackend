@@ -29,6 +29,7 @@ namespace JLSDataModel.Models
         // The UserId it was issued to
         [Required]
         public int UserId { get; set; }
+
         public virtual User.User User { get; set; }
     }
 }

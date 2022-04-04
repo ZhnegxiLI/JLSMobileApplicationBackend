@@ -18,7 +18,5 @@
 
         public string ZipCode { get; set; }
         public bool? UseSameAddress { get; set; }
-
-
     }
 }

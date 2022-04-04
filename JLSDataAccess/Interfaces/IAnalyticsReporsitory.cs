@@ -16,7 +16,6 @@ namespace JLSDataAccess.Interfaces
 
         Task<List<dynamic>> GetSalesPerformanceByYearMonth();
 
-
         Task<List<dynamic>> GetTopSaleProduct(string Lang, int? Limit);
 
         Task<List<dynamic>> GetBestSalesSubCategory(int Limit, string Lang);

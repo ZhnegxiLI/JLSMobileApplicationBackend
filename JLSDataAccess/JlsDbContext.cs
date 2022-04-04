@@ -30,7 +30,6 @@ namespace JLSDataAccess
         public virtual DbSet<OrderInfo> OrderInfo { get; set; }
         public virtual DbSet<OrderInfoLog> OrderInfoLog { get; set; }
 
-
         public virtual DbSet<DiscountActivity> DiscountActivity { get; set; }
 
         public virtual DbSet<DiscountActivityProduct> DiscountActivityProduct { get; set; }
@@ -80,7 +79,7 @@ namespace JLSDataAccess
         public virtual DbSet<VisitorCounter> VisitorCounter { get; set; }
         public virtual DbQuery<BestClientWidget> BestClientWidget { get; set; }
 
-        // sql function 
+        // sql function
         [DbFunction("fn_CheckNewProduct", "dbo")]
         public bool CheckNewProduct(long ProductId) => throw new NotSupportedException();
     }

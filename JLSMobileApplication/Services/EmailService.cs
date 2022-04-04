@@ -7,19 +7,17 @@ namespace JLSMobileApplication.Services
 {
     public class MailkitEmailService : IEmailService
     {
-
         private readonly AppSettings _appSettings;
+
         public MailkitEmailService(IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings.Value;
         }
+
         public string SendEmail(string ToEmail, string Subjet, string Message, string AttachmentPath)
         {
-
             try
             {
-
-
                 MimeMessage message = new MimeMessage();
 
                 MailboxAddress from = new MailboxAddress("JLS IMPORT",
@@ -41,7 +39,6 @@ namespace JLSMobileApplication.Services
 
                 message.Body = bodyBuilder.ToMessageBody();
 
-
                 SmtpClient client = new SmtpClient();
                 client.Connect(_appSettings.EmailHost, _appSettings.EmailPort, true);
                 client.Authenticate(_appSettings.EmailAccount, _appSettings.EmailPassword);
@@ -50,11 +47,11 @@ namespace JLSMobileApplication.Services
                 client.Disconnect(true);
                 client.Dispose();
 
-                return "Email Sent Successfully!"; //todo change to code 
+                return "Email Sent Successfully!"; //todo change to code
             }
             catch (System.Exception e)
             {
-                return e.Message; // todo change to code 
+                return e.Message; // todo change to code
             }
         }
     }

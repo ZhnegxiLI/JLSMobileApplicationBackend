@@ -42,7 +42,6 @@ namespace JLSMobileApplication.Heplers
                     }
                 }
             }
-
         }
     }
 }

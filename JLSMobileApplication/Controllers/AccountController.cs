@@ -32,6 +32,7 @@ namespace JLSMobileApplication.Controllers
         private IViewRenderService _view = null;
 
         private readonly AppSettings _appSettings;
+
         public AccountController(UserManager<User> userManager, JlsDbContext dbContext, IMapper mapper, IEmailService emailService, IAdressRepository adressRepository, ISendEmailAndMessageService sendEmailAndMessageService, IOptions<AppSettings> appSettings, IViewRenderService view)
         {
             _mapper = mapper;
@@ -44,7 +45,6 @@ namespace JLSMobileApplication.Controllers
 
             this._view = view;
         }
-
 
         public class RegistreCriteria
         {
@@ -84,10 +84,9 @@ namespace JLSMobileApplication.Controllers
                 userIdentity.EntrepriseName = model.EntrepriseName;
                 userIdentity.Siret = model.Siret;
 
-
                 var result = await _userManager.CreateAsync(userIdentity, model.Password);
 
-                // Step3: 检查注册是否成功 
+                // Step3: 检查注册是否成功
                 if (!result.Succeeded)
                 {
                     foreach (var error in result.Errors)
@@ -103,7 +102,6 @@ namespace JLSMobileApplication.Controllers
 
                 // Step2bis : 添加发货地址与用户的关系
                 await _adressRepository.CreateUserShippingAdress(shippingAddressId, userIdentity.Id);
-
 
                 // Step3: 加入用户权限
                 var result1 = await _userManager.AddToRoleAsync(userIdentity, "Client");
@@ -135,12 +133,9 @@ namespace JLSMobileApplication.Controllers
             }
             catch (System.Exception exc)
             {
-
                 throw exc;
             }
-
         }
-
 
         /// <summary>
         /// 邮箱验证生成器,并进行验证后的操作
@@ -154,7 +149,7 @@ namespace JLSMobileApplication.Controllers
         {
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
             {
-                // TODO redirect to error page 
+                // TODO redirect to error page
                 ModelState.AddModelError("", "User Id and Code are required");
                 return BadRequest(ModelState);
             }
@@ -162,14 +157,14 @@ namespace JLSMobileApplication.Controllers
 
             if (user == null)
             {
-                // TODO redirect to error page 
+                // TODO redirect to error page
                 return new JsonResult("ERROR"); // cannot find the user
             }
 
             await _sendEmailAndMessageService.AfterResetPasswordOuConfirmEmailLinkAsync(user.Id, "AfterEmailConfirmation");
             if (user.EmailConfirmed)
             {
-                return Redirect(_appSettings.WebSiteUrl); // 
+                return Redirect(_appSettings.WebSiteUrl); //
             }
             var result = await _userManager.ConfirmEmailAsync(user, code);
 
@@ -205,12 +200,10 @@ namespace JLSMobileApplication.Controllers
             return View();
         }
 
-
         [HttpPost("[action]")]
         public bool ResetPassword(ResetPasswordViewModel obj)
         {
             User userIdentity = _userManager.FindByNameAsync(obj.UserName).Result;
-
 
             var codeDecodedBytes = WebEncoders.Base64UrlDecode(obj.Token);// decrypt
             var codeDecoded = Encoding.UTF8.GetString(codeDecodedBytes);
@@ -265,8 +258,5 @@ namespace JLSMobileApplication.Controllers
                 Success = true
             });
         }
-
-
-
     }
 }

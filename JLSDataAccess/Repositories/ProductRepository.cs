@@ -23,6 +23,7 @@ namespace JLSDataAccess.Repositories
         /*
          * Mobile Zoom
          */
+
         // todo adapt mobile and admin
         public async Task<List<ProductListData>> GetProductInfoByReferenceIds(List<long> ReferenceIds, string Lang)
         {
@@ -92,6 +93,7 @@ namespace JLSDataAccess.Repositories
                 TotalCount = totalCount
             };
         }
+
         public async Task<long> RemoveProductCommentById(long ProductCommentId)
         {
             var ProductComment = db.ProductComment.Find(ProductCommentId);
@@ -104,6 +106,7 @@ namespace JLSDataAccess.Repositories
             }
             return 0;
         }
+
         public async Task<ProductListViewModel> GetProductListByPublishDate(string Lang, long? MainCategoryId, int begin, int step)
         {
             var result = (from ri in db.ReferenceItem
@@ -301,7 +304,6 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-
         public async Task<long> AddIntoProductFavoriteList(int UserId, long ProductId, bool? IsFavorite)
         {
             var result = db.ProductFavorite.Where(p => p.UserId == UserId && p.ProductId == ProductId).FirstOrDefault();
@@ -417,12 +419,12 @@ namespace JLSDataAccess.Repositories
                                              join rl in db.ReferenceLabel on p.ReferenceItemId equals rl.ReferenceItemId
                                              where rl.Lang == Lang && p.Id == pc.ProductId
                                              select rl.Label).FirstOrDefault()
-
                                 }).ToListAsync();
             return result;
         }
 
         /* TODO: change */
+
         public async Task<List<dynamic>> SearchProductByLabel(string Label, string Lang, int begin, int step)
         {
             var result = await (from rl in db.ReferenceLabel
@@ -432,7 +434,6 @@ namespace JLSDataAccess.Repositories
                                 select ri).Skip(begin * step).Take(step).ToListAsync<dynamic>();
             return result;
         }
-
 
         public async Task<List<dynamic>> AdvancedProductSearchByCriteria(string ProductLabel, long MainCategoryReferenceId, List<long> SecondCategoryReferenceId, bool? Validity, string Lang)
         {
@@ -495,7 +496,6 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-
         public async Task<List<dynamic>> GetPromotionProduct(string Lang)
         {
             var result = await (from rl in db.ReferenceLabel
@@ -545,7 +545,6 @@ namespace JLSDataAccess.Repositories
 
             return result;
         }
-
 
         // For mobile attention : same format as by sales performance... (todo: fix format)
         public async Task<List<dynamic>> SimpleProductSearch(string SearchText, string Lang)
@@ -627,21 +626,27 @@ namespace JLSDataAccess.Repositories
                 case "Default":
                     result = result.OrderBy(p => p.Label);
                     break;
+
                 case "Price_Increase":
                     result = result.OrderBy(p => p.Price);
                     break;
+
                 case "Price_Decrease":
                     result = result.OrderByDescending(p => p.Price);
                     break;
+
                 case "PublishDate_Recent":
                     result = result.OrderByDescending(p => p.CreatedOn).ThenBy(p => p.Label);
                     break;
+
                 case "Porpularity_More":
                     result = result.OrderByDescending(p => p.SalesQuantity);
                     break;
+
                 case "Promotion_More":
                     result = result.OrderBy(p => p.PreviousPrice == null).ThenBy(p => p.Price / p.PreviousPrice);
                     break;
+
                 default:
                     result = result.OrderBy(p => p.Label);
                     break;
@@ -685,7 +690,6 @@ namespace JLSDataAccess.Repositories
             return await result.ToListAsync<dynamic>();
         }
 
-
         public async Task<long> SaveProductInfo(long ProductId, long ReferenceId, int? QuantityPerBox, int? QuantityPerParcel, int? MinQuantity, float? Price, long? TaxRateId, string Description, string Color, string Material, string Size, string Forme, int? CreatedOrUpdatedBy)
         {
             Product ProductToUpdateOrCreate = null;
@@ -714,7 +718,6 @@ namespace JLSDataAccess.Repositories
                 ProductToUpdateOrCreate.Size = Size;
                 ProductToUpdateOrCreate.Forme = Forme;
 
-
                 if (ProductId == 0)
                 {
                     await db.Product.AddAsync(ProductToUpdateOrCreate);
@@ -729,11 +732,9 @@ namespace JLSDataAccess.Repositories
             return 0;
         }
 
-
         /*
          * Admin Zoom
          */
-
 
         private async Task<Boolean> SaveImage(IFormFile image, string path)
         {
@@ -759,14 +760,11 @@ namespace JLSDataAccess.Repositories
                 return false;
             }
 
-
             return true;
         }
 
-
         public async Task<dynamic> GetProductById(long Id, string Lang, int? UserId)
         {
-
             var result = await (from ri in db.ReferenceItem
                                 join p in db.Product on ri.Id equals p.ReferenceItemId
                                 where p.Id == Id
@@ -852,7 +850,6 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-
         public async Task<dynamic> GetProductPhotoPathById(long ProductId)
         {
             var result = await (from pt in db.ProductPhotoPath
@@ -884,7 +881,6 @@ namespace JLSDataAccess.Repositories
             return 0;
         }
 
-
         public async Task<int> RemoveImageById(long Id)
         {
             ProductPhotoPath image = await db.ProductPhotoPath.FindAsync(Id);
@@ -913,7 +909,6 @@ namespace JLSDataAccess.Repositories
             }
             return 1;
         }
-
 
         public async Task<List<dynamic>> GetCategoryForWebSite(string Lang)
         {

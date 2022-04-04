@@ -16,9 +16,10 @@ namespace JLSMobileApplication.hubs
         }
 
         /* Publish message to everybody in the channel(show/hide message by font-end), method is not complete for the moment
-         * todo:  redefine the message model, build a unique channel between fromUser and toUser , 
+         * todo:  redefine the message model, build a unique channel between fromUser and toUser ,
          * find a light way to stock the conversation  (actually, we need to write into db everytime for the conversation)
          */
+
         public async Task NewMessage(Message msg)
         {
             var username = Context.User.Identity.Name;

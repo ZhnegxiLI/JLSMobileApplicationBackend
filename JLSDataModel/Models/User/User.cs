@@ -10,6 +10,7 @@ namespace JLSDataModel.Models.User
             this.CreatedOn = DateTime.Now;
             this.Validity = true;
         }
+
         public DateTime? CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
 

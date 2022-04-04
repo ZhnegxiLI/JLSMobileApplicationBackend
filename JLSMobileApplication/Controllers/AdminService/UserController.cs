@@ -22,6 +22,7 @@ namespace JLSMobileApplication.Controllers.AdminService
         private readonly UserManager<User> _userManager;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+
         public UserController(IUserRepository userRepository, IMapper mapper, JlsDbContext jlsDbContext, UserManager<User> userManager)
         {
             db = jlsDbContext;
@@ -45,7 +46,6 @@ namespace JLSMobileApplication.Controllers.AdminService
             }
         }
 
-
         public class AdvancedUserSearchCriteria
         {
             public int? UserType { get; set; }
@@ -54,6 +54,7 @@ namespace JLSMobileApplication.Controllers.AdminService
             public int begin { get; set; }
             public int step { get; set; }
         }
+
         [HttpPost]
         public async Task<JsonResult> AdvancedUserSearch(AdvancedUserSearchCriteria criteria)
         {
@@ -70,7 +71,6 @@ namespace JLSMobileApplication.Controllers.AdminService
             }
             catch (Exception e)
             {
-
                 throw e;
             }
         }
@@ -85,7 +85,6 @@ namespace JLSMobileApplication.Controllers.AdminService
             }
             catch (Exception e)
             {
-
                 throw e;
             }
         }
@@ -102,6 +101,7 @@ namespace JLSMobileApplication.Controllers.AdminService
 
             public bool EmailConfirmed { get; set; }
         }
+
         [HttpPost]
         public async Task<ActionResult> CreateOrUpdateUser([FromBody] CreateOrUpdateUserCriteria criteria)
         {
@@ -154,8 +154,7 @@ namespace JLSMobileApplication.Controllers.AdminService
                     }
                 }
 
-
-                //Remove all role for user 
+                //Remove all role for user
                 var userRoleToRemove = await db.UserRoles.Where(p => p.UserId == UserToCreateOrUpdate.Id).ToListAsync();
 
                 db.UserRoles.RemoveRange(userRoleToRemove);
@@ -166,7 +165,6 @@ namespace JLSMobileApplication.Controllers.AdminService
             }
             catch (Exception e)
             {
-
                 throw e;
             }
         }
@@ -181,12 +179,12 @@ namespace JLSMobileApplication.Controllers.AdminService
             }
             catch (Exception e)
             {
-
                 throw e;
             }
         }
 
         /* Chat service start */
+
         [HttpGet]
         public async Task<List<dynamic>> GetChatedUser(int UserId)
         {
@@ -210,7 +208,7 @@ namespace JLSMobileApplication.Controllers.AdminService
         {
             return await _userRepository.GetNoReadedDialog(UserId);
         }
-        /* Chat service end */
 
+        /* Chat service end */
     }
 }

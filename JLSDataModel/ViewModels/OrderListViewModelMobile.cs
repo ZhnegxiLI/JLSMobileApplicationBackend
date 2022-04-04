@@ -9,6 +9,7 @@ namespace JLSDataModel.ViewModels
         {
             this.ShippingAdress = new Adress();
         }
+
         public long Id { get; set; }
         public DateTime? CreatedOn { get; set; }
         public float? TotalPrice { get; set; }

@@ -15,6 +15,7 @@ namespace JLSDataModel.ViewModels
             this.Status = new ReferenceItemViewModel();
             this.StatusInfo = new object();
         }
+
         public ReferenceItemViewModel Status { get; set; }
         public OrderInfo OrderInfo { get; set; }
         public Adress FacturationAdress { get; set; }

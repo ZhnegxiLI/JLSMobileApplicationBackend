@@ -61,7 +61,6 @@ namespace JLSDataAccess.Repositories
                     User.FacturationAdressId = adressId;
                     db.Update(User);
                     await db.SaveChangesAsync();
-
                 }
                 return User.FacturationAdressId;
             }
@@ -69,7 +68,6 @@ namespace JLSDataAccess.Repositories
             {
                 return 0;
             }
-
         }
 
         public async Task<Adress> GetAdressByIdAsync(long Id)
@@ -116,7 +114,6 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-
         public async Task<int> RemoveShippingAddress(long AddressId)
         {
             var address = await db.Adress.Where(p => p.Id == AddressId).FirstOrDefaultAsync();
@@ -133,7 +130,6 @@ namespace JLSDataAccess.Repositories
             {
                 return 0;
             }
-
         }
     }
 }

@@ -9,6 +9,5 @@
         public string ReferenceCode { get; set; }
         public float? Price { get; set; }
         public bool? Validity { get; set; }
-
     }
 }

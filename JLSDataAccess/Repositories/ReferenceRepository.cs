@@ -14,12 +14,10 @@ namespace JLSDataAccess.Repositories
     {
         private readonly JlsDbContext db;
 
-
         public ReferenceRepository(JlsDbContext context)
         {
             db = context;
         }
-
 
         public async Task<ReferenceCategory> GetReferenceCategoryByShortLabel(string ShortLabel)
         {
@@ -28,7 +26,6 @@ namespace JLSDataAccess.Repositories
 
         public async Task<List<dynamic>> GetReferenceItemsByCategoryLabels(List<string> shortLabels, string lang)
         {
-
             var result = (from ri in db.ReferenceItem
                           join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
                           where shortLabels.Contains(rc.ShortLabel)
@@ -87,7 +84,6 @@ namespace JLSDataAccess.Repositories
 
         public async Task<long> SaveReferenceLabel(long ReferenceId, string Label, string Lang)
         {  // TODO Add createdBy / createdOn / UpdatedBy
-
             var ReferenceLabelToUpdateOrCreate = db.ReferenceLabel.Where(p => p.ReferenceItemId == ReferenceId && p.Lang == Lang).FirstOrDefault();
 
             if (ReferenceLabelToUpdateOrCreate == null)
@@ -109,7 +105,6 @@ namespace JLSDataAccess.Repositories
             }
             await db.SaveChangesAsync();
             return ReferenceLabelToUpdateOrCreate.Id;
-
         }
 
         public async Task<List<ReferenceCategory>> GetAllCategoryList()
@@ -187,6 +182,7 @@ namespace JLSDataAccess.Repositories
         /*
          * Admin Zoom
          */
+
         public async Task<List<ReferenceItemViewModel>> GetReferenceItemsByCategoryLabelsAdmin(string shortLabels, string lang)
         {
             List<string> referenceLabelList = new List<string>(shortLabels.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries));
@@ -209,6 +205,7 @@ namespace JLSDataAccess.Repositories
                           });
             return await result.ToListAsync<ReferenceItemViewModel>();
         }
+
         public async Task<List<ReferenceCategory>> GetAllReferenceCategory()
         {
             var result = await (from rc in db.ReferenceCategory
@@ -217,10 +214,10 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-
         /*
          * Check code of referenceitem is not used yet (todo: add a constraint sql server side)
          */
+
         public async Task<bool> CheckReferenceCodeExists(string Code)
         {
             var result = await db.ReferenceItem.Where(p => p.Code == Code).FirstOrDefaultAsync();
@@ -231,6 +228,7 @@ namespace JLSDataAccess.Repositories
         /*
          * Get website and mobile slide from db
          */
+
         public async Task<List<WebsiteSlide>> GetWbesiteslides()
         {
             var result = await db.WebsiteSlide.ToListAsync();

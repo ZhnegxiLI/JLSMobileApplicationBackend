@@ -41,12 +41,14 @@ namespace JLSMobileApplication.Controllers
             _sendEmailAndMessageService = sendEmailAndMessageService;
             _env = env;
         }
+
         public class SaveOrderCriteria
         {
             public SaveOrderCriteria()
             {
                 this.References = new List<OrderProductViewModelMobile>();
             }
+
             public long ShippingAdressId { get; set; }
             public long FacturationAdressId { get; set; }
             public int UserId { get; set; }
@@ -93,7 +95,6 @@ namespace JLSMobileApplication.Controllers
                 var shippingAddressId = await _adressRepository.CreateOrUpdateAdress(shippingAddressToInsert);
                 var facturationAddressId = await _adressRepository.CreateOrUpdateAdress(facturationAddressToInsert);
 
-
                 /* Step3: Customer info */
                 var User = await _userManager.FindByIdAsync(criteria.UserId.ToString());
                 long CustomerId = 0;
@@ -137,7 +138,7 @@ namespace JLSMobileApplication.Controllers
                                                  join ri in criteria.References on p.ReferenceId equals ri.ReferenceId
                                                  select new OrderProductViewModelMobile()
                                                  {
-                                                     Price = p.Price, // Modify accroding to client specification 
+                                                     Price = p.Price, // Modify accroding to client specification
                                                      UnityQuantity = (int)p.QuantityPerBox,
                                                      Quantity = ri.Quantity,
                                                      ReferenceId = ri.ReferenceId
@@ -202,7 +203,6 @@ namespace JLSMobileApplication.Controllers
         {
             try
             {
-
                 return Json(new ApiResult()
                 {
                     Data = await _orderRepository.GetOrdersListByOrderId(OrderId, Lang),

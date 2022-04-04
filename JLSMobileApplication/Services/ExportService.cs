@@ -46,13 +46,11 @@ namespace JLSMobileApplication.Services
 
                 using (var fs = new FileStream(newFile, FileMode.Create, FileAccess.Write))
                 {
-
                     /* Step1: Get export model */
                     var ExportConfiguration = db.ExportConfiguration.Where(p => p.ExportName == ExportName).FirstOrDefault();
                     List<ExportModel> ExportConfigurationModel = null;
                     if (ExportConfiguration != null && ExportConfiguration.ExportModel != null && ExportConfiguration.ExportModel != "")
                     {
-
                         ExportConfigurationModel = JsonConvert.DeserializeObject<List<ExportModel>>(ExportConfiguration.ExportModel);
                     }
                     /* Step2: Calcul the targeted Column */
@@ -71,8 +69,6 @@ namespace JLSMobileApplication.Services
                             {
                                 targetCoulmnsWithOrder.Add(temp);
                             }
-
-
                         }
                         else
                         {
@@ -96,14 +92,12 @@ namespace JLSMobileApplication.Services
                     int columnsCounter = 0;
                     foreach (var item in targetCoulmnsWithOrder)
                     {
-
                         if (ExportConfigurationModel != null)
                         {
                             var temp = ExportConfigurationModel.Where(p => p.Name == item.Name).Select(p => p.DisplayName).FirstOrDefault();
                             var cell = header.CreateCell(columnsCounter);
                             cell.CellStyle = firstTitleStyle;
                             cell.SetCellValue(temp != null ? temp : item.Name);
-
                         }
                         else
                         {
@@ -120,7 +114,6 @@ namespace JLSMobileApplication.Services
                         columnsCounter = 0;
                         foreach (var column in targetCoulmnsWithOrder)
                         {
-
                             string valueFormatted = null;
                             var value = item.GetType().GetProperty(column.Name).GetValue(item, null);
                             if (value != null)
@@ -143,7 +136,6 @@ namespace JLSMobileApplication.Services
                                 {
                                     value = value + "€(HT)";
                                 }
-
                             }
                             else
                             {
@@ -184,7 +176,6 @@ namespace JLSMobileApplication.Services
                         sheet.SetColumnWidth(columnNum, columnWidth * 256);
                     }
 
-
                     workbook.Write(fs);
                 }
 
@@ -213,7 +204,7 @@ namespace JLSMobileApplication.Services
                 var tpl = System.IO.File.ReadAllText(tplPath);
 
                 /* GetOrderInfo todo change */
-                var orderInfo = await this._orderRepository.GetOrdersListByOrderId(OrderId, Lang); // todo change 
+                var orderInfo = await this._orderRepository.GetOrdersListByOrderId(OrderId, Lang); // todo change
 
                 /* Get order basic info */
                 var receipt = new ReceiptInfo();
@@ -295,7 +286,6 @@ namespace JLSMobileApplication.Services
             {
                 throw e;
             }
-
         }
     }
 }

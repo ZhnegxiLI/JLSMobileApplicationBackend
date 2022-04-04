@@ -57,6 +57,7 @@ namespace LjWebApplication.Middleware
                 }
             }
         }
+
         //异常错误信息捕获，将错误信息用Json方式返回
         private static Task HandleExceptionAsync(HttpContext context, int statusCode, string msg)
         {
@@ -65,6 +66,7 @@ namespace LjWebApplication.Middleware
             return context.Response.WriteAsync(result);
         }
     }
+
     //扩展方法
     public static class ErrorHandlingExtensions
     {

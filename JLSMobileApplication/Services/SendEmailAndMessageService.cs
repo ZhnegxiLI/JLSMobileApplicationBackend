@@ -48,7 +48,6 @@ namespace JLSMobileApplication.Services
                                select u.Email).ToList();
             // Here: not need to send to user role 'Admin'
 
-
             var emailModelClient = db.EmailTemplate.Where(p => p.Name == Type + "_Client").FirstOrDefault();
             var emailModelAdmin = db.EmailTemplate.Where(p => p.Name == Type + "_Admin").FirstOrDefault();
             var order = db.OrderInfo.Find(OrderId);
@@ -58,13 +57,12 @@ namespace JLSMobileApplication.Services
 
                 if (orderType != null && orderType.Code != null && orderType.Code == "OrderType_Internal")
                 {
-                    // When order is internal, also need to send email to operator user 'Admin' 
+                    // When order is internal, also need to send email to operator user 'Admin'
                     var orderOperatorEmail = db.Users.Where(p => p.Id == order.UserId).Select(p => p.Email).FirstOrDefault();
                     if (orderOperatorEmail != null)
                     {
                         adminEmails.Add(orderOperatorEmail);
                     }
-
                 }
 
                 var customerInfo = db.CustomerInfo.Where(p => p.Id == order.CustomerId).FirstOrDefault();
@@ -87,20 +85,15 @@ namespace JLSMobileApplication.Services
 
                         emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/NewOrderClient", new OrderEmailModel()
                         {
-
                             Username = customerInfo.Email,
                             OrderNumber = order.Id.ToString()
                         });
-
 
                         emailAdminTemplate = await _view.RenderToStringAsync("EmailTemplate/NewOrderAdmin", new OrderEmailModel()
                         {
-
                             Username = customerInfo.Email,
                             OrderNumber = order.Id.ToString()
                         });
-
-
                     }
                     else if (Type == "UpdateOrder")
                     {
@@ -108,7 +101,6 @@ namespace JLSMobileApplication.Services
 
                         emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ModifyOrderClient", new OrderEmailModel()
                         {
-
                             Username = customerInfo.Email,
                             OrderNumber = order.Id.ToString()
                         });
@@ -130,8 +122,8 @@ namespace JLSMobileApplication.Services
                         await this._messageRepository.CreateMessage(Message, null, order.UserId);
                     }
 
-                    // Generate invoice pdf 
-                    string pdfPath = await _exportService.ExportPdf(order.Id, "Fr"); // todo make language configurable 
+                    // Generate invoice pdf
+                    string pdfPath = await _exportService.ExportPdf(order.Id, "Fr"); // todo make language configurable
 
                     // todo: 改变发送逻辑, 目前的发送方式导致下单过慢,可加入一表格中之后定时发送
                     // 发送邮件
@@ -198,7 +190,6 @@ namespace JLSMobileApplication.Services
             return 0;
         }
 
-
         public async Task<int> AfterResetPasswordOuConfirmEmailLinkAsync(int UserId, string Type)
         {
             EmailTemplate emailModelClient = null;
@@ -232,9 +223,9 @@ namespace JLSMobileApplication.Services
             public string Email { get; set; }
             public string Message { get; set; }
         }
+
         public async Task<int> ClientMessageToAdminAsync(string ClientEmail, string Message)
         {
-
             var admins = (from u in db.Users
                           join ur in db.UserRoles on u.Id equals ur.UserId
                           join r in db.Roles on ur.RoleId equals r.Id
@@ -307,7 +298,6 @@ namespace JLSMobileApplication.Services
                 {
                     if (_appSettings.RedirectEmailTo != null && _appSettings.RedirectEmailTo != "")
                     {
-
                         Email.Title = Email.Title + "(" + Email.ToEmail + ")";
                         Email.ToEmail = _appSettings.RedirectEmailTo;
                     }
@@ -318,9 +308,6 @@ namespace JLSMobileApplication.Services
                 }
                 db.SaveChanges();
             }
-
         }
-
-
     }
 }
