@@ -1,8 +1,5 @@
-﻿using JLSDataModel.Models.Adress;
-using JLSDataModel.Models.Analytics;
-using System;
+﻿using JLSDataModel.Models.Analytics;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JLSDataAccess.Interfaces

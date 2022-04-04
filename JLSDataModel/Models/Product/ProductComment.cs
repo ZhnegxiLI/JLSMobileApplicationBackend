@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models.Product
+﻿namespace JLSDataModel.Models.Product
 {
-    public class ProductComment:BaseObject
+    public class ProductComment : BaseObject
     {
         public string Title { get; set; }
         public string Body { get; set; }

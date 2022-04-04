@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace JLSDataModel.Models.Order
 {
-    public class OrderInfoStatusLog:BaseObject
+    public class OrderInfoStatusLog : BaseObject
     {
         public long OrderInfoId { get; set; }
 

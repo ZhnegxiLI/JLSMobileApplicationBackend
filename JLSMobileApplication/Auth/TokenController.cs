@@ -1,20 +1,19 @@
-﻿using System;
+﻿using JLSDataAccess;
+using JLSDataModel.Models;
+using JLSDataModel.Models.User;
+using JLSMobileApplication.Heplers;
+using JLSMobileApplication.Resources;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using JLSDataAccess;
-using JLSDataModel.Models;
-using JLSDataModel.Models.User;
-using JLSMobileApplication.Heplers;
-using JLSMobileApplication.Resources;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 namespace JLSMobileApplication.Auth
 {
@@ -37,7 +36,7 @@ namespace JLSMobileApplication.Auth
         {
             _userManager = userManager;
             _appSettings = appSettings.Value;
-             _token = token; 
+            _token = token;
             _db = db;
         }
 
@@ -94,7 +93,7 @@ namespace JLSMobileApplication.Auth
                 var newRtoken = CreateRefreshToken(_appSettings.ClientId, user.Id);
 
                 // first we delete any existing old refreshtokens
-                var oldrTokens = _db.TokenModel.Where(rt => rt.UserId == user.Id && rt.ExpiryTime< DateTime.UtcNow); // Remove only the expired token, keep the possibility to login for mutiple platform in the same time 
+                var oldrTokens = _db.TokenModel.Where(rt => rt.UserId == user.Id && rt.ExpiryTime < DateTime.UtcNow); // Remove only the expired token, keep the possibility to login for mutiple platform in the same time 
 
                 if (oldrTokens != null)
                 {
@@ -130,12 +129,12 @@ namespace JLSMobileApplication.Auth
             try
             {
 
-            
-            double tokenExpiryTime = Convert.ToDouble(_appSettings.ExpireTime);
 
-            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.Secret));
+                double tokenExpiryTime = Convert.ToDouble(_appSettings.ExpireTime);
 
-            var roles = await _userManager.GetRolesAsync(user);
+                var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.Secret));
+
+                var roles = await _userManager.GetRolesAsync(user);
 
                 var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -147,7 +146,7 @@ namespace JLSMobileApplication.Auth
                             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString() ),
                             new Claim(ClaimTypes.Role, "client"), //todo change
-                            new Claim("LoggedOn", DateTime.Now.ToString()), 
+                            new Claim("LoggedOn", DateTime.Now.ToString()),
 
                          }),
 
@@ -165,13 +164,13 @@ namespace JLSMobileApplication.Auth
 
                 return new TokenResponseModel()
                 {
-                token = encodedToken,
-                expiration = newtoken.ValidTo,
-                refresh_token = refreshToken,
-                roles = roles[0],
-                username = user.UserName,
-                userId = user.Id,
-                entrepriseName = user.EntrepriseName
+                    token = encodedToken,
+                    expiration = newtoken.ValidTo,
+                    refresh_token = refreshToken,
+                    roles = roles[0],
+                    username = user.UserName,
+                    userId = user.Id,
+                    entrepriseName = user.EntrepriseName
                 };
             }
             catch (Exception e)
@@ -193,7 +192,7 @@ namespace JLSMobileApplication.Auth
                 UserId = userId,
                 Value = Guid.NewGuid().ToString("N"),
                 CreatedDate = DateTime.UtcNow,
-                ExpiryTime = (role==null || role.Contains("Admin")) ? DateTime.UtcNow.AddDays(1) : DateTime.UtcNow.AddDays(15)
+                ExpiryTime = (role == null || role.Contains("Admin")) ? DateTime.UtcNow.AddDays(1) : DateTime.UtcNow.AddDays(15)
             };
         }
 

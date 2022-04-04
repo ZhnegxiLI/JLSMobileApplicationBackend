@@ -6,7 +6,6 @@ using Magicodes.ExporterAndImporter.Pdf;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
@@ -14,15 +13,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Services
 {
     public class ExportService : IExportService
-        {
+    {
         private readonly AppSettings _appSettings;
         private readonly JlsDbContext db;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -38,9 +35,9 @@ namespace JLSMobileApplication.Services
 
         public MemoryStream ExportExcel(List<dynamic> List, string ExportName)
         {
-            if (List != null && List.Count()>0)
+            if (List != null && List.Count() > 0)
             {
-                /*Step0: Create file */ 
+                /*Step0: Create file */
                 var newFile = _appSettings.ExportPath + "/" + ExportName + ".xls";
                 if (System.IO.File.Exists(newFile))
                 {
@@ -53,12 +50,12 @@ namespace JLSMobileApplication.Services
                     /* Step1: Get export model */
                     var ExportConfiguration = db.ExportConfiguration.Where(p => p.ExportName == ExportName).FirstOrDefault();
                     List<ExportModel> ExportConfigurationModel = null;
-                    if (ExportConfiguration!=null && ExportConfiguration.ExportModel!=null && ExportConfiguration.ExportModel!="")
+                    if (ExportConfiguration != null && ExportConfiguration.ExportModel != null && ExportConfiguration.ExportModel != "")
                     {
 
                         ExportConfigurationModel = JsonConvert.DeserializeObject<List<ExportModel>>(ExportConfiguration.ExportModel);
                     }
-                   /* Step2: Calcul the targeted Column */
+                    /* Step2: Calcul the targeted Column */
 
                     // Get columns title from first object in the list
                     var columns = List[0].GetType().GetProperties();
@@ -75,7 +72,7 @@ namespace JLSMobileApplication.Services
                                 targetCoulmnsWithOrder.Add(temp);
                             }
 
-                         
+
                         }
                         else
                         {
@@ -99,14 +96,14 @@ namespace JLSMobileApplication.Services
                     int columnsCounter = 0;
                     foreach (var item in targetCoulmnsWithOrder)
                     {
-                      
-                        if (ExportConfigurationModel!=null)
+
+                        if (ExportConfigurationModel != null)
                         {
                             var temp = ExportConfigurationModel.Where(p => p.Name == item.Name).Select(p => p.DisplayName).FirstOrDefault();
                             var cell = header.CreateCell(columnsCounter);
                             cell.CellStyle = firstTitleStyle;
                             cell.SetCellValue(temp != null ? temp : item.Name);
-                           
+
                         }
                         else
                         {
@@ -123,14 +120,14 @@ namespace JLSMobileApplication.Services
                         columnsCounter = 0;
                         foreach (var column in targetCoulmnsWithOrder)
                         {
-                         
+
                             string valueFormatted = null;
-                            var value = item.GetType().GetProperty(column.Name).GetValue(item,null);
+                            var value = item.GetType().GetProperty(column.Name).GetValue(item, null);
                             if (value != null)
                             {
                                 var valueType = value.GetType();
-                               
-                                if (valueType.Name=="Boolean")
+
+                                if (valueType.Name == "Boolean")
                                 {
                                     valueFormatted = value ? "OUI" : "NON";
                                 }
@@ -140,13 +137,13 @@ namespace JLSMobileApplication.Services
                                 }
                                 if (column.Name.Contains("Path"))
                                 {
-                                    value = _httpContextAccessor.HttpContext.Request.Host  + _httpContextAccessor.HttpContext.Request.PathBase + "/"+ value;
+                                    value = _httpContextAccessor.HttpContext.Request.Host + _httpContextAccessor.HttpContext.Request.PathBase + "/" + value;
                                 }
                                 if (column.Name.Contains("Price"))
                                 {
                                     value = value + "€(HT)";
                                 }
-                             
+
                             }
                             else
                             {
@@ -159,8 +156,8 @@ namespace JLSMobileApplication.Services
 
                             var cell = datarow.CreateCell(columnsCounter);
 
-                            cell.SetCellValue(valueFormatted!=null? valueFormatted: value);
-                    
+                            cell.SetCellValue(valueFormatted != null ? valueFormatted : value);
+
                             columnsCounter++;
                         }
 
@@ -238,7 +235,7 @@ namespace JLSMobileApplication.Services
                 }
 
                 var clientRemark = orderInfo.GetType().GetProperty("ClientRemark").GetValue(orderInfo, null);
-                if (clientRemark!=null && clientRemark.Text!= null)
+                if (clientRemark != null && clientRemark.Text != null)
                 {
                     receipt.ClientRemark = clientRemark.Text;
                 }
@@ -294,11 +291,11 @@ namespace JLSMobileApplication.Services
 
                 return fileName;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }
-         
+
         }
     }
-    }
+}

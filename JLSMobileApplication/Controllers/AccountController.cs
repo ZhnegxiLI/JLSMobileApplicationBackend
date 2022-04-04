@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
 using JLSDataAccess;
 using JLSDataAccess.Interfaces;
-using JLSDataModel.Models;
 using JLSDataModel.Models.Adress;
 using JLSDataModel.Models.User;
 using JLSMobileApplication.Heplers;
 using JLSMobileApplication.Resources;
 using JLSMobileApplication.Services;
-using JLSMobileApplication.Services.EmailTemplateModel;
 using LjWebApplication.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -46,7 +44,7 @@ namespace JLSMobileApplication.Controllers
 
             this._view = view;
         }
-    
+
 
         public class RegistreCriteria
         {
@@ -85,10 +83,10 @@ namespace JLSMobileApplication.Controllers
                 userIdentity.Email = model.Email;
                 userIdentity.EntrepriseName = model.EntrepriseName;
                 userIdentity.Siret = model.Siret;
-               
+
 
                 var result = await _userManager.CreateAsync(userIdentity, model.Password);
-                
+
                 // Step3: 检查注册是否成功 
                 if (!result.Succeeded)
                 {
@@ -96,7 +94,7 @@ namespace JLSMobileApplication.Controllers
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
-                   return Json(new ApiResult()
+                    return Json(new ApiResult()
                     {
                         Msg = result.Errors.ToString(),
                         Success = false
@@ -105,7 +103,7 @@ namespace JLSMobileApplication.Controllers
 
                 // Step2bis : 添加发货地址与用户的关系
                 await _adressRepository.CreateUserShippingAdress(shippingAddressId, userIdentity.Id);
-                    
+
 
                 // Step3: 加入用户权限
                 var result1 = await _userManager.AddToRoleAsync(userIdentity, "Client");
@@ -130,17 +128,17 @@ namespace JLSMobileApplication.Controllers
                 return Json(new ApiResult()
                 {
                     DataExt = userIdentity.Email,
-                    Data= 1,
+                    Data = 1,
                     Msg = "OK",
                     Success = true
                 });
             }
-            catch (System.Exception exc )
+            catch (System.Exception exc)
             {
 
                 throw exc;
             }
-       
+
         }
 
 
@@ -154,7 +152,7 @@ namespace JLSMobileApplication.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
-            if (string.IsNullOrWhiteSpace(userId)||string.IsNullOrWhiteSpace(code))
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
             {
                 // TODO redirect to error page 
                 ModelState.AddModelError("", "User Id and Code are required");
@@ -171,7 +169,7 @@ namespace JLSMobileApplication.Controllers
             await _sendEmailAndMessageService.AfterResetPasswordOuConfirmEmailLinkAsync(user.Id, "AfterEmailConfirmation");
             if (user.EmailConfirmed)
             {
-                 return Redirect(_appSettings.WebSiteUrl); // 
+                return Redirect(_appSettings.WebSiteUrl); // 
             }
             var result = await _userManager.ConfirmEmailAsync(user, code);
 
@@ -192,7 +190,7 @@ namespace JLSMobileApplication.Controllers
                 var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = token }, HttpContext.Request.Scheme);
 
                 await _sendEmailAndMessageService.ResetPasswordOuConfirmEmailLinkAsync(user.Id, callbackUrl, "EmailConfirmation");
-                return  RedirectToAction("ResentEmail", "Notifications");
+                return RedirectToAction("ResentEmail", "Notifications");
             }
         }
 
@@ -209,7 +207,7 @@ namespace JLSMobileApplication.Controllers
 
 
         [HttpPost("[action]")]
-        public bool ResetPassword(ResetPasswordViewModel  obj)
+        public bool ResetPassword(ResetPasswordViewModel obj)
         {
             User userIdentity = _userManager.FindByNameAsync(obj.UserName).Result;
 
@@ -257,8 +255,8 @@ namespace JLSMobileApplication.Controllers
             byte[] tokenGeneratedBytes = Encoding.UTF8.GetBytes(token);
             var codeEncoded = WebEncoders.Base64UrlEncode(tokenGeneratedBytes); // encrypt
 
-            var resetLink = _appSettings.WebSiteUrl + "/account/resetPassword?Token=" + codeEncoded + "&Username="+ user.UserName;
-           await _sendEmailAndMessageService.ResetPasswordOuConfirmEmailLinkAsync(user.Id, resetLink, "ResetPassword");
+            var resetLink = _appSettings.WebSiteUrl + "/account/resetPassword?Token=" + codeEncoded + "&Username=" + user.UserName;
+            await _sendEmailAndMessageService.ResetPasswordOuConfirmEmailLinkAsync(user.Id, resetLink, "ResetPassword");
             return Json(new ApiResult()
             {
                 DataExt = resetLink,
@@ -268,7 +266,7 @@ namespace JLSMobileApplication.Controllers
             });
         }
 
- 
+
 
     }
 }

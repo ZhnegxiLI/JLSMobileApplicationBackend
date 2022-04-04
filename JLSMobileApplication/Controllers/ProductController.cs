@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using JLSDataAccess.Interfaces;
 using JLSDataModel.Models.Product;
-using JLSMobileApplication.Resources;
+using JLSDataModel.ViewModels;
 using LjWebApplication.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,9 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using JLSDataModel.ViewModels;
-using JLSMobileApplication.Services;
 
 namespace JLSMobileApplication.Controllers
 {
@@ -178,7 +175,7 @@ namespace JLSMobileApplication.Controllers
                 throw exc;
             }
         }
-        
+
 
         [HttpGet]
         public async Task<JsonResult> GetPromotionProduct(int Begin, int Step, string Lang)
@@ -195,10 +192,11 @@ namespace JLSMobileApplication.Controllers
                 {
                     list = productList.ToList();
                 }
-                return Json( new {
+                return Json(new
+                {
                     ProductList = list,
                     TotalCount = productList.Count()
-                } 
+                }
                );
             }
             catch (Exception exc)
@@ -268,11 +266,11 @@ namespace JLSMobileApplication.Controllers
         {
             try
             {
-                var result = await _productRepository.AdvancedProductSearchClient(criteria.SearchText,criteria.MainCategory,criteria.SecondCategory,criteria.PriceIntervalLower,criteria.PriceIntervalUpper,criteria.MinQuantity,criteria.OrderBy, criteria.Lang);
+                var result = await _productRepository.AdvancedProductSearchClient(criteria.SearchText, criteria.MainCategory, criteria.SecondCategory, criteria.PriceIntervalLower, criteria.PriceIntervalUpper, criteria.MinQuantity, criteria.OrderBy, criteria.Lang);
                 return Json(new
                 {
-                   TotalCount = result.Count,
-                   List = result.Skip(criteria.Begin * criteria.Step).Take(criteria.Step).ToList()
+                    TotalCount = result.Count,
+                    List = result.Skip(criteria.Begin * criteria.Step).Take(criteria.Step).ToList()
                 });
             }
             catch (Exception exc)
@@ -323,7 +321,7 @@ namespace JLSMobileApplication.Controllers
                 var favoriteProductList = await _productRepository.GetFavoriteListByUserId(UserId, Lang);
                 var totalCount = favoriteProductList.Count();
                 var result = favoriteProductList;
-                if (Step!=null && Begin!=null)
+                if (Step != null && Begin != null)
                 {
                     result = favoriteProductList.Skip((int)Begin * (int)Step).Take((int)Step).ToList();
                 }
@@ -379,7 +377,7 @@ namespace JLSMobileApplication.Controllers
         {
             try
             {
-                var result =await _productRepository.GetCategoryForWebSite(Lang);
+                var result = await _productRepository.GetCategoryForWebSite(Lang);
                 if (NumberOfCateogry != -1)
                 {
                     result = result.Take(NumberOfCateogry).ToList();
@@ -398,12 +396,13 @@ namespace JLSMobileApplication.Controllers
             int Begin = 0;
             try
             {
-                var productByPublishDate = await _productRepository.GetProductListByPublishDate(Lang,null, Begin, Step);
+                var productByPublishDate = await _productRepository.GetProductListByPublishDate(Lang, null, Begin, Step);
                 var productBySalesPerformance = await _productRepository.GetProductListBySalesPerformance(Lang, Begin, Step);
-                var productByPrice = (await _productRepository.GetProductByPrice(Lang,null)).Take(Step).ToList();
+                var productByPrice = (await _productRepository.GetProductByPrice(Lang, null)).Take(Step).ToList();
 
 
-                return Json(new {
+                return Json(new
+                {
                     resultByPublishDate = productByPublishDate,
                     resultBySalesPerformance = productBySalesPerformance,
                     resultByPrice = productByPrice

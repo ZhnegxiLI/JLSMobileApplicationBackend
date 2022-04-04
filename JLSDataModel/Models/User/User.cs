@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace JLSDataModel.Models.User
 {
-    public class User: IdentityUser<int>
+    public class User : IdentityUser<int>
     {
         public User()
         {
@@ -20,6 +18,6 @@ namespace JLSDataModel.Models.User
         public string EntrepriseName { get; set; }
 
         public long FacturationAdressId { get; set; }
-       // public Adress.Adress FacturationAdress { get; set; }
+        // public Adress.Adress FacturationAdress { get; set; }
     }
 }

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models.Adress
+﻿namespace JLSDataModel.Models.Adress
 {
-    public class Adress:BaseObject
+    public class Adress : BaseObject
     {
         public string ContactTelephone { get; set; }
 

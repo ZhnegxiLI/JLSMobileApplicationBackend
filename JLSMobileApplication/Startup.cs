@@ -1,34 +1,29 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AutoMapper;
+using Hangfire;
+using JLSDataAccess;
+using JLSDataAccess.Interfaces;
+using JLSDataAccess.Repositories;
+using JLSDataModel.Models;
+using JLSDataModel.Models.User;
+using JLSMobileApplication.Heplers;
+using JLSMobileApplication.hubs;
+using JLSMobileApplication.Services;
+using LjWebApplication.Middleware;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using JLSDataAccess;
-using Microsoft.AspNetCore.Identity;
-using AutoMapper;
-using JLSDataModel.Models.User;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System;
-using JLSMobileApplication.Heplers;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using JLSMobileApplication.Services;
-using Serilog;
-using Microsoft.Extensions.Options;
-using LjWebApplication.Middleware;
-using Newtonsoft.Json.Serialization;
-using JLSDataAccess.Interfaces;
-using JLSDataAccess.Repositories;
-using JLSDataModel.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Serialization;
+using Serilog;
+using System;
 using System.IO;
-using Microsoft.AspNetCore.Http;
-using Hangfire;
-using JLSMobileApplication.hubs;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
-using Microsoft.Extensions.Logging;
+using System.Text;
 namespace JLSMobileApplication
 {
     public class Startup
@@ -56,9 +51,9 @@ namespace JLSMobileApplication
             /* Init dbContext */
             services.AddDbContext<JlsDbContext>(
              /* Get connections string from config */
-             options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"), 
+             options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"),
                  /* Configure the pagination (take() skip())*/
-                 builder => builder.UseRowNumberForPaging()) 
+                 builder => builder.UseRowNumberForPaging())
              );
 
             /* Init identity */
@@ -183,7 +178,7 @@ namespace JLSMobileApplication
             /* This function will create new folder if folder not exist and return current folder if exists */
             System.IO.Directory.CreateDirectory("/images");
             /* Configure staticFiles path /images */
-            app.UseStaticFiles(new StaticFileOptions 
+            app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(
                    Path.Combine(Directory.GetCurrentDirectory(), "images")),// Todo add into the configure
@@ -276,18 +271,18 @@ namespace JLSMobileApplication
             });
 
             // for each angular client we want to host. 
-         
-                if (env.IsDevelopment())
+
+            if (env.IsDevelopment())
+            {
+                StaticFileOptions clientApp2Dist = new StaticFileOptions()
                 {
-                    StaticFileOptions clientApp2Dist = new StaticFileOptions()
-                    {
-                        FileProvider = new PhysicalFileProvider(
-                                Path.Combine(
-                                    Directory.GetCurrentDirectory(),
-                                    "Angular/Website"
-                                )
+                    FileProvider = new PhysicalFileProvider(
+                            Path.Combine(
+                                Directory.GetCurrentDirectory(),
+                                "Angular/Website"
                             )
-                    };
+                        )
+                };
                 app.UseSpaStaticFiles(clientApp2Dist);
                 app.UseSpa(spa =>
                     {
@@ -299,24 +294,24 @@ namespace JLSMobileApplication
                         spa.UseProxyToSpaDevelopmentServer("http://localhost:4201");
                     });
 
-                }
-                else
+            }
+            else
+            {
+                // Each map gets its own physical path
+                // for it to map the static files to. 
+                StaticFileOptions clientApp2Dist = new StaticFileOptions()
                 {
-                    // Each map gets its own physical path
-                    // for it to map the static files to. 
-                    StaticFileOptions clientApp2Dist = new StaticFileOptions()
-                    {
-                        FileProvider = new PhysicalFileProvider(
-                                Path.Combine(
-                                    Directory.GetCurrentDirectory(),
-                                    @"Angular/Website/dist"
-                                )
+                    FileProvider = new PhysicalFileProvider(
+                            Path.Combine(
+                                Directory.GetCurrentDirectory(),
+                                @"Angular/Website/dist"
                             )
-                    };
+                        )
+                };
 
-                    // Each map its own static files otherwise
-                    // it will only ever serve index.html no matter the filename 
-                    app.UseSpaStaticFiles(clientApp2Dist);
+                // Each map its own static files otherwise
+                // it will only ever serve index.html no matter the filename 
+                app.UseSpaStaticFiles(clientApp2Dist);
 
                 // Each map will call its own UseSpa where
                 // we give its own sourcepath
@@ -327,10 +322,10 @@ namespace JLSMobileApplication
                         spa.Options.DefaultPageStaticFileOptions = clientApp2Dist;
                     });
 
-                }
+            }
 
-            
-            
+
+
 
         }
     }

@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using JLSDataAccess.Interfaces;
+﻿using JLSDataAccess.Interfaces;
 using JLSDataModel.Models.Message;
 using JLSMobileApplication.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Controllers
 {
@@ -37,7 +35,7 @@ namespace JLSMobileApplication.Controllers
         }
         [AllowAnonymous]
         [HttpPost]
-        public async Task<long> SaveMessage([FromBody]SaveMessageCriteria criteria)
+        public async Task<long> SaveMessage([FromBody] SaveMessageCriteria criteria)
         {
             try
             {
@@ -46,7 +44,7 @@ namespace JLSMobileApplication.Controllers
                 {
                     await _email.ClientMessageToAdminAsync(criteria.Message.SenderEmail, criteria.Message.Body);
                 }
-              
+
                 return result;
             }
             catch (Exception exc)
@@ -60,7 +58,7 @@ namespace JLSMobileApplication.Controllers
             try
             {
                 var result = await _message.GetMessageByUserAndStatus(UserId, Status);
-                return  Json(new
+                return Json(new
                 {
                     TotalCount = result.Count,
                     List = result.Skip(Begin * Step).Take(Step).ToList()
@@ -72,7 +70,7 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-        
+
         public class UpdateMessageStatusCriteria
         {
             public long MessageId { get; set; }
@@ -80,7 +78,7 @@ namespace JLSMobileApplication.Controllers
             public int? UserId { get; set; }
         }
         [HttpPost]
-        public async Task<long> UpdateMessageStatus([FromBody]UpdateMessageStatusCriteria criteria)
+        public async Task<long> UpdateMessageStatus([FromBody] UpdateMessageStatusCriteria criteria)
         {
             try
             {

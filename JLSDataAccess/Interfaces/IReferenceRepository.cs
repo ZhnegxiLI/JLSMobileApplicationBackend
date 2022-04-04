@@ -1,11 +1,7 @@
-﻿using JLSDataModel.AdminViewModel;
-using JLSDataModel.Models;
+﻿using JLSDataModel.Models;
 using JLSDataModel.Models.Website;
 using JLSDataModel.ViewModels;
-using JLSMobileApplication.Resources;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JLSDataAccess.Interfaces
@@ -32,7 +28,7 @@ namespace JLSDataAccess.Interfaces
         Task<List<dynamic>> GetAllReferenceItemWithChildren(string Lang);
 
         Task<List<ReferenceItemViewModel>> GetReferenceItemsByCategoryLabelsAdmin(string shortLabels, string lang);
-    
+
         Task<List<ReferenceCategory>> GetAllReferenceCategory();
 
 

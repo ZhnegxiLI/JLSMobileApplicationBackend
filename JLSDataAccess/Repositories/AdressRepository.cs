@@ -1,16 +1,15 @@
 ﻿using JLSDataAccess.Interfaces;
 using JLSDataModel.Models.Adress;
+using JLSDataModel.Models.User;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using JLSDataModel.Models.User;
+using System.Threading.Tasks;
 
 namespace JLSDataAccess.Repositories
 {
-    public class AdressRepository: IAdressRepository
+    public class AdressRepository : IAdressRepository
     {
         private readonly JlsDbContext db;
 
@@ -21,19 +20,19 @@ namespace JLSDataAccess.Repositories
 
         public async Task<long> CreateOrUpdateAdress(Adress adress)
         {
-            if (adress.Id>0)
+            if (adress.Id > 0)
             {
                 db.Update(adress);
             }
             else
             {
-               await db.AddAsync(adress);
+                await db.AddAsync(adress);
             }
             await db.SaveChangesAsync();
             return adress.Id;
         }
 
-        public async Task<long> CreateUserShippingAdress(long adressId,int userId)
+        public async Task<long> CreateUserShippingAdress(long adressId, int userId)
         {
             var userShippingAdress = await db.UserShippingAdress.Where(p => p.ShippingAdressId == adressId && p.UserId == userId).FirstOrDefaultAsync();
             if (userShippingAdress == null)
@@ -54,8 +53,8 @@ namespace JLSDataAccess.Repositories
 
         public async Task<long> CreateFacturationAdress(long adressId, int userId)
         {
-            var User = await db.Users.Where(p =>  p.Id == userId).FirstOrDefaultAsync();
-            if (User!=null)
+            var User = await db.Users.Where(p => p.Id == userId).FirstOrDefaultAsync();
+            if (User != null)
             {
                 if (User.FacturationAdressId != adressId)
                 {
@@ -70,7 +69,7 @@ namespace JLSDataAccess.Repositories
             {
                 return 0;
             }
-           
+
         }
 
         public async Task<Adress> GetAdressByIdAsync(long Id)
@@ -122,7 +121,7 @@ namespace JLSDataAccess.Repositories
         {
             var address = await db.Adress.Where(p => p.Id == AddressId).FirstOrDefaultAsync();
             var userAddress = await db.UserShippingAdress.Where(p => p.ShippingAdressId == AddressId).FirstOrDefaultAsync();
-            if (address != null && userAddress!= null)
+            if (address != null && userAddress != null)
             {
                 db.Remove(address);
                 db.Remove(userAddress);
@@ -134,7 +133,7 @@ namespace JLSDataAccess.Repositories
             {
                 return 0;
             }
-           
+
         }
     }
 }

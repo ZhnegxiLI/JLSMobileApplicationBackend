@@ -1,11 +1,9 @@
 ﻿using JLSDataModel.Models.Product;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace JLSDataModel.ViewModels
 {
-    public class ProductDetailViewModelMobile: Product
+    public class ProductDetailViewModelMobile : Product
     {
         public ProductDetailViewModelMobile()
         {

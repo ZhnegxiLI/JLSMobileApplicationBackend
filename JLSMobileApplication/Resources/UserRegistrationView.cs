@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSMobileApplication.Resources
+﻿namespace JLSMobileApplication.Resources
 {
     public class UserRegistrationView
     {
@@ -18,7 +14,7 @@ namespace JLSMobileApplication.Resources
 
         public string PhoneNumber { get; set; }
 
-        public string  Country { get; set; }
+        public string Country { get; set; }
 
         public string ZipCode { get; set; }
         public bool? UseSameAddress { get; set; }

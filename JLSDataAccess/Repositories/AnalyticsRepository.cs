@@ -1,13 +1,9 @@
 ﻿using JLSDataAccess.Interfaces;
-using JLSDataModel.Models.Adress;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using JLSDataModel.Models.User;
 using JLSDataModel.Models.Analytics;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace JLSDataAccess.Repositories
 {
@@ -82,7 +78,8 @@ namespace JLSDataAccess.Repositories
         {
             var visitorData = await db.VisitorCounter.ToListAsync();
             var UserInfo = await db.Users.ToListAsync();
-            return new { 
+            return new
+            {
                 VisitorData = visitorData,
                 UserInfo = UserInfo
             };
@@ -113,7 +110,7 @@ namespace JLSDataAccess.Repositories
                                 join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
                                 from op in db.OrderProduct.Where(x => ri.Id == x.ReferenceId).DefaultIfEmpty()
                                 from o in db.OrderInfo.Where(x => op.OrderId == x.Id).DefaultIfEmpty()
-                                where o.StatusReferenceItemId != orderRefuseStatusId && rl.Lang == Lang && ri.ReferenceCategoryId ==rcProductId
+                                where o.StatusReferenceItemId != orderRefuseStatusId && rl.Lang == Lang && ri.ReferenceCategoryId == rcProductId
                                 group op by new { ri.Id, rl.Label, ri.Code } into g
                                 select new
                                 {
@@ -124,13 +121,14 @@ namespace JLSDataAccess.Repositories
 
                                 }).ToListAsync<dynamic>();
 
-        result = (from r in result
+            result = (from r in result
                       orderby r.totalQuantity descending
                       select r).ToList();
-            if(Limit!= null && Limit >0){
+            if (Limit != null && Limit > 0)
+            {
                 result = result.Take((int)Limit).ToList();
             }
-            
+
             return result;
         }
         public List<BestClientWidget> GetBestClientWidget(int Limit)
@@ -145,9 +143,9 @@ namespace JLSDataAccess.Repositories
             var result = await (from o in db.OrderInfo
                                 join op in db.OrderProduct on o.Id equals op.OrderId
                                 join riProduct in db.ReferenceItem on op.ReferenceId equals riProduct.Id
-                                join rlSecondCategory in db.ReferenceLabel on riProduct.ParentId equals rlSecondCategory.ReferenceItemId 
+                                join rlSecondCategory in db.ReferenceLabel on riProduct.ParentId equals rlSecondCategory.ReferenceItemId
                                 where riValidAndProgressing.Contains(o.StatusReferenceItemId) && rlSecondCategory.Lang == Lang
-                                group op by new {rlSecondCategory.ReferenceItemId, rlSecondCategory.Label } into g
+                                group op by new { rlSecondCategory.ReferenceItemId, rlSecondCategory.Label } into g
                                 select new
                                 {
                                     SecondCategoryLabel = g.Key.Label,

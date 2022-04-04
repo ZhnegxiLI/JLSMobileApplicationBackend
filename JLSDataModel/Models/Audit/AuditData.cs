@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models.Audit
+﻿namespace JLSDataModel.Models.Audit
 {
-    public class AuditData:BaseObject
+    public class AuditData : BaseObject
     {
         public long RowId { get; set; }
         public string FieldName { get; set; }

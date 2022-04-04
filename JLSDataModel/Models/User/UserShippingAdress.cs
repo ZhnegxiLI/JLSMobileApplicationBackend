@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models.User
+﻿namespace JLSDataModel.Models.User
 {
-    public class UserShippingAdress:BaseObject
+    public class UserShippingAdress : BaseObject
     {
         public int UserId { get; set; }
         public User User { get; set; }

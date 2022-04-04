@@ -1,6 +1,6 @@
 ﻿namespace JLSDataModel.Models.Product
 {
-    public class DiscountActivity:BaseObject
+    public class DiscountActivity : BaseObject
     {
         public string Title { get; set; }
 

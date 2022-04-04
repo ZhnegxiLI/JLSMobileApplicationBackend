@@ -10,9 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -56,7 +54,7 @@ namespace JLSMobileApplication.Auth
 
             if (await _userManager.CheckPasswordAsync(user, model.Password))
             {
-                if (user.EmailConfirmed==false)
+                if (user.EmailConfirmed == false)
                 {
                     return Json(new ApiResult()
                     {
@@ -64,7 +62,7 @@ namespace JLSMobileApplication.Auth
                         Success = false
                     });
                 }
-                if (user.Validity==null||user.Validity==false)
+                if (user.Validity == null || user.Validity == false)
                 {
                     return Json(new ApiResult()
                     {
@@ -136,4 +134,4 @@ namespace JLSMobileApplication.Auth
 
     }
 
-    }
+}

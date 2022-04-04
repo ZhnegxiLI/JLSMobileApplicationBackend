@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using JLSDataAccess;
-using JLSDataAccess.Interfaces;
-using JLSDataAccess.Repositories;
+﻿using JLSDataAccess.Interfaces;
 using JLSDataModel.Models.Adress;
 using LjWebApplication.Model;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Controllers
 {
@@ -39,13 +34,13 @@ namespace JLSMobileApplication.Controllers
             public string type { get; set; }
         }
         [HttpPost]
-        public async Task<JsonResult> CreateOrUpdateAdress([FromBody]CreateOrUpdateAdressCriteria criteria)
+        public async Task<JsonResult> CreateOrUpdateAdress([FromBody] CreateOrUpdateAdressCriteria criteria)
         {
             try
             {
                 var adressId = await _adress.CreateOrUpdateAdress(criteria.adress);
                 long userAdressId = 0;
-                if ( criteria.type == "shippingAdress")
+                if (criteria.type == "shippingAdress")
                 {
                     userAdressId = await _adress.CreateUserShippingAdress(adressId, criteria.userId);
                 }
@@ -55,7 +50,8 @@ namespace JLSMobileApplication.Controllers
                 }
                 return Json(new ApiResult()
                 {
-                    Data = new {
+                    Data = new
+                    {
                         AdressId = adressId,
                         UserAdressId = userAdressId
                     },

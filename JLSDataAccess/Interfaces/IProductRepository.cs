@@ -1,8 +1,5 @@
-﻿using JLSDataModel.AdminViewModel;
-using JLSDataModel.Models;
-using JLSDataModel.Models.Product;
+﻿using JLSDataModel.Models.Product;
 using JLSDataModel.ViewModels;
-using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -42,11 +39,11 @@ namespace JLSDataAccess.Interfaces
          */
         Task<List<dynamic>> AdvancedProductSearchByCriteria(string ProductLabel, long MainCategoryReferenceId, List<long> SecondCategoryReferenceId, bool? Validity, string Lang);
 
-        Task<long> SaveProductInfo(long ProductId, long ReferenceId, int? QuantityPerBox, int? QuantityPerParcel, int? MinQuantity, float? Price, long? TaxRate, string Description, string Color, string Material, string Size, string Forme,int? CreatedOrUpdatedBy);
+        Task<long> SaveProductInfo(long ProductId, long ReferenceId, int? QuantityPerBox, int? QuantityPerParcel, int? MinQuantity, float? Price, long? TaxRate, string Description, string Color, string Material, string Size, string Forme, int? CreatedOrUpdatedBy);
 
-        Task<dynamic> GetProductById(long id,string Lang, int? UserId);
+        Task<dynamic> GetProductById(long id, string Lang, int? UserId);
         Task<int> RemoveImageById(long id);
- 
+
 
         Task<List<dynamic>> GetFavoriteListByUserId(int UserId, string Lang);
         Task<long> AddIntoProductFavoriteList(int UserId, long ProductId, bool? IsFavorite);

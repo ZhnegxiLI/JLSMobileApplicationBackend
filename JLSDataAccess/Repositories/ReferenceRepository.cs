@@ -1,17 +1,12 @@
 ﻿using JLSDataAccess.Interfaces;
 using JLSDataModel.Models;
+using JLSDataModel.Models.Website;
+using JLSDataModel.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using JLSMobileApplication.Resources;
-using System.Linq.Expressions;
-using JLSDataModel.ViewModels;
-using Microsoft.Extensions.Configuration;
-using JLSDataModel.AdminViewModel;
-using JLSDataModel.Models.Website;
+using System.Threading.Tasks;
 
 namespace JLSDataAccess.Repositories
 {
@@ -25,7 +20,7 @@ namespace JLSDataAccess.Repositories
             db = context;
         }
 
-       
+
         public async Task<ReferenceCategory> GetReferenceCategoryByShortLabel(string ShortLabel)
         {
             return await db.ReferenceCategory.Where(p => p.ShortLabel == ShortLabel).FirstOrDefaultAsync();
@@ -34,11 +29,11 @@ namespace JLSDataAccess.Repositories
         public async Task<List<dynamic>> GetReferenceItemsByCategoryLabels(List<string> shortLabels, string lang)
         {
 
-            var result =  (from ri in db.ReferenceItem
-                           join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
-                           where shortLabels.Contains(rc.ShortLabel)
-                           orderby ri.Order
-                           select new 
+            var result = (from ri in db.ReferenceItem
+                          join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
+                          where shortLabels.Contains(rc.ShortLabel)
+                          orderby ri.Order
+                          select new
                           {
                               Id = ri.Id,
                               Code = ri.Code,
@@ -54,7 +49,7 @@ namespace JLSDataAccess.Repositories
             return await result.ToListAsync<dynamic>();
         }
 
-        public async Task<long> SaveReferenceItem(long ReferenceId, long CategoryId, string Code ,long? ParentId, bool Validity, string Value, int? CreatedOrUpdatedBy)
+        public async Task<long> SaveReferenceItem(long ReferenceId, long CategoryId, string Code, long? ParentId, bool Validity, string Value, int? CreatedOrUpdatedBy)
         {  // TODO Add createdBy / createdOn / UpdatedBy
             ReferenceItem ReferenceToUpdateOrCreate = null;
             if (ReferenceId == 0)
@@ -90,7 +85,7 @@ namespace JLSDataAccess.Repositories
             return 0;
         }
 
-        public async Task<long> SaveReferenceLabel(long ReferenceId, string Label , string Lang)
+        public async Task<long> SaveReferenceLabel(long ReferenceId, string Label, string Lang)
         {  // TODO Add createdBy / createdOn / UpdatedBy
 
             var ReferenceLabelToUpdateOrCreate = db.ReferenceLabel.Where(p => p.ReferenceItemId == ReferenceId && p.Lang == Lang).FirstOrDefault();
@@ -123,17 +118,17 @@ namespace JLSDataAccess.Repositories
             return result;
         }
 
-        public async Task<List<dynamic>> AdvancedSearchReferenceItem(string SearchText, long? ReferenceCategoryId,bool? Validity, long? ParentId, string Lang, bool? IgnoreProduct)
+        public async Task<List<dynamic>> AdvancedSearchReferenceItem(string SearchText, long? ReferenceCategoryId, bool? Validity, long? ParentId, string Lang, bool? IgnoreProduct)
         {
             var result = await (from ri in db.ReferenceItem
                                 from rl in db.ReferenceLabel.Where(p => p.ReferenceItemId == ri.Id).DefaultIfEmpty()
                                 join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
-                                where (rl==null || rl.Lang == Lang) &&
+                                where (rl == null || rl.Lang == Lang) &&
                                 (SearchText == "" || ri.Code.Contains(SearchText) || rl.Label.Contains(SearchText)) &&
                                 (ReferenceCategoryId == null || ri.ReferenceCategoryId == ReferenceCategoryId) &&
                                 (Validity == null || ri.Validity == Validity) &&
-                                (ParentId == null || ri.ParentId == ParentId ) && 
-                                (IgnoreProduct == null || IgnoreProduct == false || (IgnoreProduct == true && rc.ShortLabel!= "Product"))
+                                (ParentId == null || ri.ParentId == ParentId) &&
+                                (IgnoreProduct == null || IgnoreProduct == false || (IgnoreProduct == true && rc.ShortLabel != "Product"))
                                 select new
                                 {
                                     Id = ri.Id,
@@ -169,7 +164,7 @@ namespace JLSDataAccess.Repositories
                                                                CategoryId = rip.ReferenceCategoryId
                                                            }).FirstOrDefault(),
                                 }).ToListAsync<dynamic>();
-                          
+
             return result;
         }
 
@@ -179,7 +174,8 @@ namespace JLSDataAccess.Repositories
                                 join rl in db.ReferenceLabel on ri.Id equals rl.ReferenceItemId
                                 join rc in db.ReferenceCategory on ri.ReferenceCategoryId equals rc.Id
                                 where rl.Lang == Lang && rc.ShortLabel != "Product" // todo place all into an  configuration table
-                                select new {
+                                select new
+                                {
                                     Id = ri.Id,
                                     Code = ri.Code,
                                     Label = rl.Label,
@@ -229,7 +225,7 @@ namespace JLSDataAccess.Repositories
         {
             var result = await db.ReferenceItem.Where(p => p.Code == Code).FirstOrDefaultAsync();
 
-            return result!=null ? true : false;
+            return result != null ? true : false;
         }
 
         /*

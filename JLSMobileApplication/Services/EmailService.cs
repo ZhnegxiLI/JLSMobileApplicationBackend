@@ -1,25 +1,19 @@
 ﻿using JLSMobileApplication.Heplers;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using MailKit.Net.Smtp;
+using Microsoft.Extensions.Options;
 using MimeKit;
-
-using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Services
 {
     public class MailkitEmailService : IEmailService
-        {
-    
+    {
+
         private readonly AppSettings _appSettings;
         public MailkitEmailService(IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings.Value;
         }
-        public string SendEmail(string ToEmail,string Subjet, string Message, string AttachmentPath)
+        public string SendEmail(string ToEmail, string Subjet, string Message, string AttachmentPath)
         {
 
             try
@@ -39,7 +33,7 @@ namespace JLSMobileApplication.Services
                 message.Subject = Subjet;
                 BodyBuilder bodyBuilder = new BodyBuilder();
                 bodyBuilder.HtmlBody = Message;
-               
+
                 if (AttachmentPath != null)
                 {
                     bodyBuilder.Attachments.Add(AttachmentPath);
@@ -55,7 +49,7 @@ namespace JLSMobileApplication.Services
                 client.Send(message);
                 client.Disconnect(true);
                 client.Dispose();
-            
+
                 return "Email Sent Successfully!"; //todo change to code 
             }
             catch (System.Exception e)
@@ -64,4 +58,4 @@ namespace JLSMobileApplication.Services
             }
         }
     }
-    }
+}

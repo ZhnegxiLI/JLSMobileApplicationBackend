@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models.User
+﻿namespace JLSDataModel.Models.User
 {
-    public class UserCountInfo:BaseObject
+    public class UserCountInfo : BaseObject
     {
         public int OrderCount { get; set; }
 

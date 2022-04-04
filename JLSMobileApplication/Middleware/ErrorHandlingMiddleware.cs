@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using LjWebApplication.Model;
+﻿using LjWebApplication.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System;
+using System.Threading.Tasks;
 
 namespace LjWebApplication.Middleware
 {

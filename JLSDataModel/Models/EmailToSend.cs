@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models
+﻿namespace JLSDataModel.Models
 {
     public class EmailToSend : BaseObject
     {

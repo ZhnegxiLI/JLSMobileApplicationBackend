@@ -1,17 +1,13 @@
 ﻿using JLSMobileApplication.Heplers;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Mime;
-using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Services
 {
-    public class EmailService:IEmailService
-        {
+    public class EmailService : IEmailService
+    {
         /// <summary>
         /// 只用于测试目的请勿在生产环境中放入此代码
         /// </summary>
@@ -20,13 +16,13 @@ namespace JLSMobileApplication.Services
         {
             _appSettings = appSettings.Value;
         }
-        public string SendEmail(string ToEmail,string Subjet, string Message, string AttachmentPath)
+        public string SendEmail(string ToEmail, string Subjet, string Message, string AttachmentPath)
         {
 
             try
             {
                 // Credentials
-                var credentials = new NetworkCredential(_appSettings.EmailAccount , _appSettings.EmailPassword);
+                var credentials = new NetworkCredential(_appSettings.EmailAccount, _appSettings.EmailPassword);
 
                 // Mail message
                 var mail = new MailMessage()
@@ -62,4 +58,4 @@ namespace JLSMobileApplication.Services
             }
         }
     }
-    }
+}

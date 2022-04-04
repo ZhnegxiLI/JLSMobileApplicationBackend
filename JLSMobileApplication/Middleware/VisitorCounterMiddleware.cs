@@ -1,9 +1,9 @@
 ﻿using JLSDataAccess;
+using JLSDataModel.Models;
 using Microsoft.AspNetCore.Http;
 using System;
-using System.Threading.Tasks;
 using System.Linq;
-using JLSDataModel.Models;
+using System.Threading.Tasks;
 
 public class VisitorCounterMiddleware
 {
@@ -19,8 +19,8 @@ public class VisitorCounterMiddleware
         var request = context.Request;
 
         string visitorId = context.Request.Cookies["VisitorId"];
-      if (visitorId == null && CheckAgent(context) == false)
-      {
+        if (visitorId == null && CheckAgent(context) == false)
+        {
             //don the necessary staffs here to save the count by one
             int Year = DateTime.Now.Year;
             int Month = DateTime.Now.Month;
@@ -42,13 +42,13 @@ public class VisitorCounterMiddleware
             await db.SaveChangesAsync();
             context.Response.Cookies.Append("VisitorId", Guid.NewGuid().ToString(), new CookieOptions()
             {
-                    Path ="/",
-                    HttpOnly = true,
-                    Secure = false,
+                Path = "/",
+                HttpOnly = true,
+                Secure = false,
             });
-       }
+        }
 
-      await _requestDelegate(context);
+        await _requestDelegate(context);
     }
 
     public static bool CheckAgent(HttpContext context)

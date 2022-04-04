@@ -1,10 +1,8 @@
 ﻿using JLSDataModel.Models;
-using JLSDataModel.Models.Adress;
 using JLSDataModel.Models.Order;
 using JLSDataModel.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JLSDataAccess.Interfaces

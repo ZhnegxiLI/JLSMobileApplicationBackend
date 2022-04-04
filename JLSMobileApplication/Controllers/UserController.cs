@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using JLSDataAccess.Interfaces;
 using JLSDataModel.Models.User;
-using LjWebApplication.Model;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Controllers
 {
@@ -21,7 +18,7 @@ namespace JLSMobileApplication.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public UserController(UserManager<User> userManager,IMapper mapper, IUserRepository user)
+        public UserController(UserManager<User> userManager, IMapper mapper, IUserRepository user)
         {
             _mapper = mapper;
             _userRepository = user;
@@ -38,9 +35,9 @@ namespace JLSMobileApplication.Controllers
         {
             return await _userRepository.InsertSubscribeEmail(Email);
         }
-       
+
         [HttpGet]
-         public async Task<List<dynamic>> GetNoReadedDialogClient(int UserId)
+        public async Task<List<dynamic>> GetNoReadedDialogClient(int UserId)
         {
             return await _userRepository.GetNoReadedDialogClient(UserId);
         }
@@ -49,14 +46,14 @@ namespace JLSMobileApplication.Controllers
         {
             return await _userRepository.UpdateReadedDialog(UserId);
         }
-        
+
 
         [HttpGet]
         public async Task<List<dynamic>> GetChatDialog(int UserId)
         {
-            return await _userRepository.GetChatDialog(UserId,null);
+            return await _userRepository.GetChatDialog(UserId, null);
         }
-        
+
 
         /* Auth zoom  start */
         [Authorize]
@@ -101,7 +98,7 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-        public  class UpdatePasswordCriteria
+        public class UpdatePasswordCriteria
         {
             public int UserId { get; set; }
             public string PreviousPassword { get; set; }
@@ -129,7 +126,7 @@ namespace JLSMobileApplication.Controllers
                     {
                         return 0;
                     }
-                  
+
                 }
                 else
                 {

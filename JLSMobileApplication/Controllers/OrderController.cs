@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using JLSDataAccess.Interfaces;
 using JLSDataModel.Models;
 using JLSDataModel.Models.Adress;
@@ -13,13 +9,16 @@ using JLSMobileApplication.Services;
 using LjWebApplication.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Controllers
 {
-    [Authorize] 
+    [Authorize]
     [Route("api/[controller]/{action}/{id?}")]
     [ApiController]
     public class OrderController : Controller
@@ -42,7 +41,8 @@ namespace JLSMobileApplication.Controllers
             _sendEmailAndMessageService = sendEmailAndMessageService;
             _env = env;
         }
-        public class SaveOrderCriteria{
+        public class SaveOrderCriteria
+        {
             public SaveOrderCriteria()
             {
                 this.References = new List<OrderProductViewModelMobile>();
@@ -62,7 +62,7 @@ namespace JLSMobileApplication.Controllers
             {
                 /* Step1: Get shipping and facturation address */
                 var shippingAddress = await _adressRepository.GetAdressByIdAsync(criteria.ShippingAdressId);
-                var facturationAddress = await _adressRepository.GetAdressByIdAsync(criteria.FacturationAdressId) ;
+                var facturationAddress = await _adressRepository.GetAdressByIdAsync(criteria.FacturationAdressId);
 
                 /* Step2: Save both address for order */
                 var shippingAddressToInsert = new Adress();
@@ -97,7 +97,7 @@ namespace JLSMobileApplication.Controllers
                 /* Step3: Customer info */
                 var User = await _userManager.FindByIdAsync(criteria.UserId.ToString());
                 long CustomerId = 0;
-                if (User!=null)
+                if (User != null)
                 {
                     CustomerInfo customer = new CustomerInfo();
 
@@ -113,7 +113,7 @@ namespace JLSMobileApplication.Controllers
 
                 long ClientRemarkId = 0;
                 /* Step4: save Admin remark info */
-                if (criteria.ClientRemark!= "")
+                if (criteria.ClientRemark != "")
                 {
                     var ClientRemark = new Remark();
                     ClientRemark.Text = criteria.ClientRemark;
@@ -131,7 +131,7 @@ namespace JLSMobileApplication.Controllers
                     ReferenceList.Add(p.ReferenceId);
                 });
                 var ProductList = await _productRepository.GetProductInfoByReferenceIds(ReferenceList, "fr");
-                if (ProductList!=null)
+                if (ProductList != null)
                 {
                     var FormatedReferenceList = (from p in ProductList
                                                  join ri in criteria.References on p.ReferenceId equals ri.ReferenceId
@@ -179,11 +179,11 @@ namespace JLSMobileApplication.Controllers
             try
             {
                 var result = await _orderRepository.GetOrdersListByUserId(UserId, StatusCode, Lang);
-                if (Step!=null && Step>0 &&Begin!= null && Begin>= 0)
+                if (Step != null && Step > 0 && Begin != null && Begin >= 0)
                 {
                     result = result.Skip((int)Begin * (int)Step).Take((int)Step).ToList();
                 }
-           
+
                 return Json(new ApiResult()
                 {
                     Data = result,
@@ -198,7 +198,7 @@ namespace JLSMobileApplication.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetOrdersListByOrderId(long OrderId , string Lang)
+        public async Task<JsonResult> GetOrdersListByOrderId(long OrderId, string Lang)
         {
             try
             {

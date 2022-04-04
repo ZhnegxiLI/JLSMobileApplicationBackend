@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using JLSDataAccess.Interfaces;
+﻿using JLSDataAccess.Interfaces;
 using JLSMobileApplication.HtmlToPdf;
 using Magicodes.ExporterAndImporter.Pdf;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.FileProviders;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Controllers
 {
@@ -27,7 +23,7 @@ namespace JLSMobileApplication.Controllers
         public async Task<ActionResult> ExportPdf()
         {
             /* File name */
-            string fileName = "Exports/" + DateTime.Now.Second.ToString()+"_Invoice.pdf";
+            string fileName = "Exports/" + DateTime.Now.Second.ToString() + "_Invoice.pdf";
             /* Get template path */
             var tplPath = Path.Combine(Directory.GetCurrentDirectory(), "Views", "HtmlToPdf",
              "receipt.cshtml");
@@ -38,7 +34,7 @@ namespace JLSMobileApplication.Controllers
 
             /* Get order basic info */
             var receipt = new ReceiptInfo();
-            
+
             var order = orderInfo.GetType().GetProperty("OrderInfo").GetValue(orderInfo, null);
             if (order != null)
             {
@@ -47,7 +43,7 @@ namespace JLSMobileApplication.Controllers
                 receipt.TotalPrice = order.TotalPrice;
             }
             var customer = orderInfo.GetType().GetProperty("CustomerInfo").GetValue(orderInfo, null);
-            if (customer!=null)
+            if (customer != null)
             {
                 receipt.Username = customer.Email;
                 receipt.PhoneNumber = customer.PhoneNumber;
@@ -59,7 +55,7 @@ namespace JLSMobileApplication.Controllers
             var tax = orderInfo.GetType().GetProperty("TaxRate").GetValue(orderInfo, null);
             if (tax != null)
             {
-                receipt.Tax = receipt.TotalPrice *  double.Parse(tax.GetType().GetProperty("Value").GetValue(tax, null)) * 0.01;
+                receipt.Tax = receipt.TotalPrice * double.Parse(tax.GetType().GetProperty("Value").GetValue(tax, null)) * 0.01;
             }
 
             /* Get order product list info */
@@ -68,17 +64,19 @@ namespace JLSMobileApplication.Controllers
             {
                 foreach (var item in productList)
                 {
-                    receipt.ProductList.Add(new ReceiptProductList() { Code = item.GetType().GetProperty("Code").GetValue(item, null),
-                                                                    Label = item.GetType().GetProperty("Label").GetValue(item, null),
-                                                                    Price = item.GetType().GetProperty("Price").GetValue(item, null),
-                                                                    Quantity  = item.GetType().GetProperty("Quantity").GetValue(item, null),
+                    receipt.ProductList.Add(new ReceiptProductList()
+                    {
+                        Code = item.GetType().GetProperty("Code").GetValue(item, null),
+                        Label = item.GetType().GetProperty("Label").GetValue(item, null),
+                        Price = item.GetType().GetProperty("Price").GetValue(item, null),
+                        Quantity = item.GetType().GetProperty("Quantity").GetValue(item, null),
                     });
                 }
             }
 
             /* Get facturation address */
             var facturationAddress = orderInfo.GetType().GetProperty("ShippingAdress").GetValue(orderInfo, null);
-            if (facturationAddress!=null)
+            if (facturationAddress != null)
             {
                 receipt.FacturationAddress = facturationAddress;
             }

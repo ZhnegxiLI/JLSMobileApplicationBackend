@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models
+﻿namespace JLSDataModel.Models
 {
-    public class ReferenceLabel:BaseObject
+    public class ReferenceLabel : BaseObject
     {
         public string Label { get; set; }
         public string Lang { get; set; }

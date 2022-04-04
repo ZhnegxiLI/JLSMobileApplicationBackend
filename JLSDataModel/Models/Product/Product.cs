@@ -2,7 +2,7 @@
 
 namespace JLSDataModel.Models.Product
 {
-    public class Product:BaseObject
+    public class Product : BaseObject
     {
 
         public DateTime? ActualCreatedOn { get; set; }
@@ -13,7 +13,7 @@ namespace JLSDataModel.Models.Product
         public int? MinQuantity { get; set; }
 
         public long? TaxRateId { get; set; }// Link with ri
- 
+
         public string Color { get; set; }
 
         public string Material { get; set; }

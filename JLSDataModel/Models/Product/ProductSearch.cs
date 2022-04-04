@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models.Product
+﻿namespace JLSDataModel.Models.Product
 {
-    public class ProductSearchCount: BaseObject
+    public class ProductSearchCount : BaseObject
     {
         public int? UserId { get; set; }
         public string SearchText { get; set; }

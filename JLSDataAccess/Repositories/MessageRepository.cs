@@ -1,13 +1,10 @@
 ﻿using JLSDataAccess.Interfaces;
-using JLSDataModel.Models.Adress;
+using JLSDataModel.Models.Message;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using JLSDataModel.Models.User;
-using JLSDataModel.Models.Message;
+using System.Threading.Tasks;
 
 namespace JLSDataAccess.Repositories
 {
@@ -25,11 +22,11 @@ namespace JLSDataAccess.Repositories
             message.CreatedOn = DateTime.Now;
             db.Add(message);
             await db.SaveChangesAsync();
-            if (message.Id >0 && (FromUser!=null || ToUser!=null ))
+            if (message.Id > 0 && (FromUser != null || ToUser != null))
             {
                 MessageDestination messageDestination = new MessageDestination();
                 messageDestination.MessageId = message.Id;
-                messageDestination.FromUserId =  FromUser != null ? FromUser: null;
+                messageDestination.FromUserId = FromUser != null ? FromUser : null;
                 messageDestination.ToUserId = ToUser != null ? ToUser : null;
 
                 await db.AddAsync(messageDestination);
@@ -42,27 +39,27 @@ namespace JLSDataAccess.Repositories
         public async Task<List<dynamic>> GetMessageByUserAndStatus(int ToUserId, bool? IsReaded)
         {
             var result = await (from m in db.Message
-                          join md in db.MessageDestination on m.Id equals md.MessageId
-                          where md.ToUserId == ToUserId && (IsReaded == null || m.IsReaded == IsReaded)
-                          orderby m.CreatedOn descending
-                          select new
-                          {
-                              Id = m.Id,
-                              IsReaded = m.IsReaded,
-                              FromUserId = md.FromUserId,
-                              ToUserId = md.FromUserId,
-                              Title = m.Title,
-                              Body = m.Body,
-                              CreatedOn = m.CreatedOn
-                          }).ToListAsync<dynamic>();
+                                join md in db.MessageDestination on m.Id equals md.MessageId
+                                where md.ToUserId == ToUserId && (IsReaded == null || m.IsReaded == IsReaded)
+                                orderby m.CreatedOn descending
+                                select new
+                                {
+                                    Id = m.Id,
+                                    IsReaded = m.IsReaded,
+                                    FromUserId = md.FromUserId,
+                                    ToUserId = md.FromUserId,
+                                    Title = m.Title,
+                                    Body = m.Body,
+                                    CreatedOn = m.CreatedOn
+                                }).ToListAsync<dynamic>();
 
             return result;
         }
 
-        public async Task<long> UpdateMessageStatus(long MessageId, bool Status,int? UserId)
+        public async Task<long> UpdateMessageStatus(long MessageId, bool Status, int? UserId)
         {
             var Message = db.Message.Find(MessageId);
-            if (Message!=null)
+            if (Message != null)
             {
                 Message.UpdatedBy = UserId;
                 Message.IsReaded = Status;
@@ -74,6 +71,6 @@ namespace JLSDataAccess.Repositories
             return 0;
         }
 
-        
+
     }
 }

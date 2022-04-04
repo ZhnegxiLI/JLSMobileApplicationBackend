@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models
+﻿namespace JLSDataModel.Models
 {
-    public class ExportConfiguration:BaseObject
+    public class ExportConfiguration : BaseObject
     {
         public string ExportName { get; set; }
 

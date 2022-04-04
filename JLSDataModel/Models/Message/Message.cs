@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models.Message
+﻿namespace JLSDataModel.Models.Message
 {
-    public class Message:BaseObject
+    public class Message : BaseObject
     {
         public string SenderName { get; set; }
         public string SenderEmail { get; set; }

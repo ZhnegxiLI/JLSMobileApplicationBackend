@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models
+﻿namespace JLSDataModel.Models
 {
-    public class CustomerInfo: BaseObject
+    public class CustomerInfo : BaseObject
     {
         public string Email { get; set; }
         public string EntrepriseName { get; set; }

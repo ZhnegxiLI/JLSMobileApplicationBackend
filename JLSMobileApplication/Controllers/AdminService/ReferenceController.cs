@@ -1,16 +1,11 @@
-﻿using System;
+﻿using JLSDataAccess.Interfaces;
+using JLSDataModel.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JLSDataAccess.Interfaces;
-using JLSDataModel.AdminViewModel;
-using JLSDataModel.Models;
-using JLSDataModel.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
 
 namespace JLSConsoleApplication.Controllers.AdminService
 {
@@ -36,7 +31,7 @@ namespace JLSConsoleApplication.Controllers.AdminService
             public string Lang { get; set; }
         }
         [HttpPost]
-        public async Task<JsonResult> GetReferenceItemsByCategoryLabels([FromBody]GetReferenceItemsByCategoryLabelsCriteria criteria)
+        public async Task<JsonResult> GetReferenceItemsByCategoryLabels([FromBody] GetReferenceItemsByCategoryLabelsCriteria criteria)
         {
             try
             {
@@ -62,7 +57,7 @@ namespace JLSConsoleApplication.Controllers.AdminService
 
                 List<ReferenceCategory> list = new List<ReferenceCategory>();
 
-                if (step==0 && begin==0)
+                if (step == 0 && begin == 0)
                 {
                     list = result;
                 }
@@ -109,7 +104,7 @@ namespace JLSConsoleApplication.Controllers.AdminService
         {
             try
             {
-                var result = await _referenceRepository.AdvancedSearchReferenceItem(criteria.SearchText,criteria.ReferenceCategoryId,criteria.Validity,criteria.ParentId,criteria.Lang,criteria.IgnoreProduct);
+                var result = await _referenceRepository.AdvancedSearchReferenceItem(criteria.SearchText, criteria.ReferenceCategoryId, criteria.Validity, criteria.ParentId, criteria.Lang, criteria.IgnoreProduct);
                 var totalCount = result.Count();
                 var list = result.Skip(criteria.step * criteria.begin).Take(criteria.step);
 
@@ -169,16 +164,16 @@ namespace JLSConsoleApplication.Controllers.AdminService
             public string LabelEN { get; set; }
         }
         [HttpPost]
-        public async Task<JsonResult> SaveReferenceItem([FromBody]SaveReferenceItemCriteria criteria)
+        public async Task<JsonResult> SaveReferenceItem([FromBody] SaveReferenceItemCriteria criteria)
         {
             try
             {
-                var result = await _referenceRepository.SaveReferenceItem(criteria.Id, criteria.CategoryId,criteria.Code,criteria.ParentId,criteria.Validity,criteria.Value, criteria.CreatedOrUpdatedBy);
+                var result = await _referenceRepository.SaveReferenceItem(criteria.Id, criteria.CategoryId, criteria.Code, criteria.ParentId, criteria.Validity, criteria.Value, criteria.CreatedOrUpdatedBy);
 
                 long ReferenceLabelFrId = await _referenceRepository.SaveReferenceLabel(result, criteria.LabelFR, "fr");
                 long ReferenceLabelEnId = await _referenceRepository.SaveReferenceLabel(result, criteria.LabelEN, "en");
                 long ReferenceLabelCnId = await _referenceRepository.SaveReferenceLabel(result, criteria.LabelCN, "cn");
-           
+
 
                 return Json(result);
             }
@@ -188,6 +183,6 @@ namespace JLSConsoleApplication.Controllers.AdminService
             }
         }
 
-        
+
     }
 }

@@ -1,8 +1,5 @@
-﻿using JLSDataModel.Models;
-using JLSDataModel.Models.Adress;
+﻿using JLSDataModel.Models.Adress;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace JLSDataModel.ViewModels
 {

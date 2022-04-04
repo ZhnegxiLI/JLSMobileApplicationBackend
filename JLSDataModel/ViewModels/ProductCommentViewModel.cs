@@ -1,9 +1,6 @@
-﻿using JLSDataModel.Models;
-using JLSDataModel.Models.Product;
+﻿using JLSDataModel.Models.Product;
 using JLSDataModel.Models.User;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace JLSDataModel.ViewModels
 {

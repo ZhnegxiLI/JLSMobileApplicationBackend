@@ -78,7 +78,7 @@ namespace JLSDataAccess
         public virtual DbSet<SubscribeEmail> SubscribeEmail { get; set; }
         public virtual DbSet<Dialog> Dialog { get; set; }
         public virtual DbSet<VisitorCounter> VisitorCounter { get; set; }
-        public virtual DbQuery<BestClientWidget> BestClientWidget  { get; set; }
+        public virtual DbQuery<BestClientWidget> BestClientWidget { get; set; }
 
         // sql function 
         [DbFunction("fn_CheckNewProduct", "dbo")]

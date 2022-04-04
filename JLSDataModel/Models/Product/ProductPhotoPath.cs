@@ -1,6 +1,6 @@
 ﻿namespace JLSDataModel.Models.Product
 {
-    public class ProductPhotoPath:BaseObject
+    public class ProductPhotoPath : BaseObject
     {
         public string Path { get; set; }
 

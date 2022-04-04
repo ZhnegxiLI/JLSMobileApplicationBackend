@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using JLSDataAccess;
 using JLSDataAccess.Interfaces;
 using JLSDataModel.Models.User;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Controllers.AdminService
 {
@@ -32,7 +31,7 @@ namespace JLSMobileApplication.Controllers.AdminService
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetUserListByRole([FromBody]List<string> Roles) // todo change take other param
+        public async Task<JsonResult> GetUserListByRole([FromBody] List<string> Roles) // todo change take other param
         {
             try
             {
@@ -47,7 +46,8 @@ namespace JLSMobileApplication.Controllers.AdminService
         }
 
 
-        public class AdvancedUserSearchCriteria{
+        public class AdvancedUserSearchCriteria
+        {
             public int? UserType { get; set; }
             public bool? Validity { get; set; }
             public string Username { get; set; }
@@ -62,7 +62,8 @@ namespace JLSMobileApplication.Controllers.AdminService
                 var result = await _userRepository.AdvancedUserSearch(criteria.UserType, criteria.Validity, criteria.Username);
                 var totalCount = result.Count();
                 var list = result.Skip(criteria.begin * criteria.step).Take(criteria.step);
-                return Json(new {
+                return Json(new
+                {
                     UserList = list,
                     TotalCount = totalCount
                 });
@@ -102,7 +103,7 @@ namespace JLSMobileApplication.Controllers.AdminService
             public bool EmailConfirmed { get; set; }
         }
         [HttpPost]
-        public async Task<ActionResult> CreateOrUpdateUser([FromBody]CreateOrUpdateUserCriteria criteria)
+        public async Task<ActionResult> CreateOrUpdateUser([FromBody] CreateOrUpdateUserCriteria criteria)
         {
             try
             {
@@ -128,7 +129,7 @@ namespace JLSMobileApplication.Controllers.AdminService
                 }
                 UserToCreateOrUpdate.Validity = criteria.Validity;
                 UserToCreateOrUpdate.EmailConfirmed = criteria.EmailConfirmed;
-                
+
                 if (criteria.Validity == false)
                 {
                     var refreshToken = await db.TokenModel.Where(p => p.UserId == criteria.UserId).ToListAsync();

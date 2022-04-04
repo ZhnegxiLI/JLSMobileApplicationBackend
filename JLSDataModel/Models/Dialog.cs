@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models
+﻿namespace JLSDataModel.Models
 {
-    public class Dialog:BaseObject
+    public class Dialog : BaseObject
     {
         public int FromUserId { get; set; }
         public int? ToUserId { get; set; }

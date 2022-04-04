@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models.Website
+﻿namespace JLSDataModel.Models.Website
 {
-    public class WebsiteSlide: BaseObject
+    public class WebsiteSlide : BaseObject
     {
         public string PhotoPath { get; set; }
 

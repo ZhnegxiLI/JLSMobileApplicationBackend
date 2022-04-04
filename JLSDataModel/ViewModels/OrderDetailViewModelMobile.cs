@@ -1,8 +1,6 @@
 ﻿using JLSDataModel.Models.Adress;
 using JLSDataModel.Models.Order;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace JLSDataModel.ViewModels
 {

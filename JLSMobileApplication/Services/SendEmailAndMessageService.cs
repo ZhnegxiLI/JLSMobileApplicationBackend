@@ -6,20 +6,16 @@ using JLSDataModel.Models.User;
 using JLSMobileApplication.Heplers;
 using JLSMobileApplication.hubs;
 using JLSMobileApplication.Services.EmailTemplateModel;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 
 using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Services
 {
-    public class SendEmailAndMessageService: ISendEmailAndMessageService
+    public class SendEmailAndMessageService : ISendEmailAndMessageService
     {
         private readonly AppSettings _appSettings;
         private readonly JlsDbContext db;
@@ -31,7 +27,7 @@ namespace JLSMobileApplication.Services
 
         private IViewRenderService _view = null;
 
-        public SendEmailAndMessageService(IOptions<AppSettings> appSettings, JlsDbContext context,IEmailService email, UserManager<User> userManager, IMessageRepository messageRepository, IExportService export, IViewRenderService view)
+        public SendEmailAndMessageService(IOptions<AppSettings> appSettings, JlsDbContext context, IEmailService email, UserManager<User> userManager, IMessageRepository messageRepository, IExportService export, IViewRenderService view)
         {
             _appSettings = appSettings.Value;
             db = context;
@@ -48,23 +44,23 @@ namespace JLSMobileApplication.Services
             var adminEmails = (from u in db.Users
                                join ur in db.UserRoles on u.Id equals ur.UserId
                                join r in db.Roles on ur.RoleId equals r.Id
-                               where ( r.Name == "SuperAdmin") && u.Validity == true 
+                               where (r.Name == "SuperAdmin") && u.Validity == true
                                select u.Email).ToList();
             // Here: not need to send to user role 'Admin'
 
 
-            var emailModelClient = db.EmailTemplate.Where(p => p.Name == Type +"_Client").FirstOrDefault();
-            var emailModelAdmin = db.EmailTemplate.Where(p => p.Name == Type +"_Admin").FirstOrDefault();
+            var emailModelClient = db.EmailTemplate.Where(p => p.Name == Type + "_Client").FirstOrDefault();
+            var emailModelAdmin = db.EmailTemplate.Where(p => p.Name == Type + "_Admin").FirstOrDefault();
             var order = db.OrderInfo.Find(OrderId);
-            if (order!=null && emailModelClient != null && emailModelAdmin!=null)
+            if (order != null && emailModelClient != null && emailModelAdmin != null)
             {
                 var orderType = db.ReferenceItem.Where(p => p.Id == order.OrderTypeId).FirstOrDefault();
 
-                if (orderType!= null && orderType.Code!= null && orderType.Code == "OrderType_Internal")
+                if (orderType != null && orderType.Code != null && orderType.Code == "OrderType_Internal")
                 {
                     // When order is internal, also need to send email to operator user 'Admin' 
                     var orderOperatorEmail = db.Users.Where(p => p.Id == order.UserId).Select(p => p.Email).FirstOrDefault();
-                    if (orderOperatorEmail!=null)
+                    if (orderOperatorEmail != null)
                     {
                         adminEmails.Add(orderOperatorEmail);
                     }
@@ -72,7 +68,7 @@ namespace JLSMobileApplication.Services
                 }
 
                 var customerInfo = db.CustomerInfo.Where(p => p.Id == order.CustomerId).FirstOrDefault();
-                if (customerInfo !=null )
+                if (customerInfo != null)
                 {
                     // TODO : Replace the email here
                     var messageClientTemplate = emailModelClient.MessageBody;
@@ -91,7 +87,7 @@ namespace JLSMobileApplication.Services
 
                         emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/NewOrderClient", new OrderEmailModel()
                         {
-                     
+
                             Username = customerInfo.Email,
                             OrderNumber = order.Id.ToString()
                         });
@@ -106,7 +102,7 @@ namespace JLSMobileApplication.Services
 
 
                     }
-                    else if (Type == "UpdateOrder" )
+                    else if (Type == "UpdateOrder")
                     {
                         /* Replace client email */
 
@@ -131,19 +127,19 @@ namespace JLSMobileApplication.Services
                         Message.Title = emailModelClient.Title;
                         Message.Body = messageClientTemplate;
                         Message.IsReaded = false;
-                        await this._messageRepository.CreateMessage(Message,null, order.UserId);
+                        await this._messageRepository.CreateMessage(Message, null, order.UserId);
                     }
 
                     // Generate invoice pdf 
                     string pdfPath = await _exportService.ExportPdf(order.Id, "Fr"); // todo make language configurable 
-                    
+
                     // todo: 改变发送逻辑, 目前的发送方式导致下单过慢,可加入一表格中之后定时发送
                     // 发送邮件
                     /* 1.发给客户 */
                     if (customerInfo.Email != null)
                     {
                         //_email.SendEmail(customerInfo.Email, emailModelClient.Title, emailClientTemplate);
-                        await PushEmailIntoDb(customerInfo.Email, emailModelClient.Title, emailClientTemplate, pdfPath); 
+                        await PushEmailIntoDb(customerInfo.Email, emailModelClient.Title, emailClientTemplate, pdfPath);
                     }
                     /* 2.发给内部人员 */
                     foreach (var admin in adminEmails)
@@ -167,7 +163,7 @@ namespace JLSMobileApplication.Services
             emailModelClient = db.EmailTemplate.Where(p => p.Name == Type).FirstOrDefault();
             var user = db.Users.Find(UserId);
 
-            if (emailModelClient!=null && user != null && user.Email !=null)
+            if (emailModelClient != null && user != null && user.Email != null)
             {
                 var emailClientTemplate = emailModelClient.Body;
                 emailClientTemplate = emailClientTemplate.Replace("{email}", user.Email);
@@ -178,7 +174,7 @@ namespace JLSMobileApplication.Services
                     emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ActiverMonCompte", new ActiverMonCompteModel()
                     {
                         ConfirmationLink = Link,
-                        Username =  user.Email,
+                        Username = user.Email,
                         Entreprise = user.EntrepriseName,
                         Phone = user.PhoneNumber
                     });
@@ -194,7 +190,7 @@ namespace JLSMobileApplication.Services
                     });
                 }
                 // todo same for reset password
-   
+
                 await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate, null);
                 //_email.SendEmail(user.Email, emailModelClient.Title, emailClientTemplate);
                 return user.Id;
@@ -203,7 +199,7 @@ namespace JLSMobileApplication.Services
         }
 
 
-        public async Task<int> AfterResetPasswordOuConfirmEmailLinkAsync(int UserId,string Type)
+        public async Task<int> AfterResetPasswordOuConfirmEmailLinkAsync(int UserId, string Type)
         {
             EmailTemplate emailModelClient = null;
 
@@ -224,7 +220,7 @@ namespace JLSMobileApplication.Services
                 // todo send internal message
                 var Message = new JLSDataModel.Models.Message.Message();
 
-                await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate,null);
+                await PushEmailIntoDb(user.Email, emailModelClient.Title, emailClientTemplate, null);
                 //_email.SendEmail(user.Email, emailModelClient.Title, emailClientTemplate);
                 return user.Id;
             }
@@ -240,18 +236,19 @@ namespace JLSMobileApplication.Services
         {
 
             var admins = (from u in db.Users
-                           join ur in db.UserRoles on u.Id equals ur.UserId
-                           join r in db.Roles on ur.RoleId equals r.Id
-                           where u.Validity == true && r.Name == "SuperAdmin"
+                          join ur in db.UserRoles on u.Id equals ur.UserId
+                          join r in db.Roles on ur.RoleId equals r.Id
+                          where u.Validity == true && r.Name == "SuperAdmin"
                           select u.Email).ToList();
 
             if (ClientEmail != null && admins != null && admins.Count() > 0)
             {
-                var emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ClientMessageToAdmin", new ClientMessageToAdminCriteria (){ 
-                    Email= ClientEmail,
+                var emailClientTemplate = await _view.RenderToStringAsync("EmailTemplate/ClientMessageToAdmin", new ClientMessageToAdminCriteria()
+                {
+                    Email = ClientEmail,
                     Message = Message
                 });
-                
+
                 foreach (var a in admins)
                 {
                     await PushEmailIntoDb(a, "Nouveau message", emailClientTemplate, null);
@@ -267,13 +264,13 @@ namespace JLSMobileApplication.Services
             EmailTemplate emailModelClient = null;
 
             db.EmailTemplate.Where(p => p.Name == Type).FirstOrDefault();
-            var clients = ( from u in db.Users
-                            join ur in db.UserRoles on u.Id equals ur.UserId
-                            join r in db.Roles on ur.RoleId equals r.Id
-                            where u.Validity == true 
-                            select u.Email).ToList();
+            var clients = (from u in db.Users
+                           join ur in db.UserRoles on u.Id equals ur.UserId
+                           join r in db.Roles on ur.RoleId equals r.Id
+                           where u.Validity == true
+                           select u.Email).ToList();
 
-            if (emailModelClient != null && clients != null && clients.Count()>0)
+            if (emailModelClient != null && clients != null && clients.Count() > 0)
             {
                 var emailClientTemplate = emailModelClient.Body;
                 // todo send internal message
@@ -303,14 +300,14 @@ namespace JLSMobileApplication.Services
 
         public void SendEmailInDb()
         {
-            var EmailsToSend = db.EmailToSend.Where(p => (p.IsSended == false || p.IsSended == null) && !p.ToEmail.Contains("@jls.com") ).ToList();
-            if (EmailsToSend.Count()>0)
+            var EmailsToSend = db.EmailToSend.Where(p => (p.IsSended == false || p.IsSended == null) && !p.ToEmail.Contains("@jls.com")).ToList();
+            if (EmailsToSend.Count() > 0)
             {
                 foreach (var Email in EmailsToSend)
                 {
-                    if (_appSettings.RedirectEmailTo!=null && _appSettings.RedirectEmailTo!="")
+                    if (_appSettings.RedirectEmailTo != null && _appSettings.RedirectEmailTo != "")
                     {
-                    
+
                         Email.Title = Email.Title + "(" + Email.ToEmail + ")";
                         Email.ToEmail = _appSettings.RedirectEmailTo;
                     }
@@ -321,7 +318,7 @@ namespace JLSMobileApplication.Services
                 }
                 db.SaveChanges();
             }
-       
+
         }
 
 

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models.Order
+﻿namespace JLSDataModel.Models.Order
 {
-    public class OrderInfo:BaseObject
+    public class OrderInfo : BaseObject
     {
         public string OrderReferenceCode { get; set; }
 

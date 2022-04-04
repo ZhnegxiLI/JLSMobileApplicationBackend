@@ -1,24 +1,19 @@
-﻿using System;
+﻿using AutoMapper;
+using JLSDataAccess;
+using JLSDataAccess.Interfaces;
+using JLSDataModel.Models.Product;
+using JLSMobileApplication.Heplers;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using AutoMapper;
-using JLSDataAccess;
-using JLSDataAccess.Interfaces;
-using JLSDataModel.AdminViewModel;
-using JLSDataModel.Models;
-using JLSDataModel.Models.Product;
-using JLSDataModel.ViewModels;
-using JLSMobileApplication.Heplers;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
 
 namespace JLSMobileApplication.Controllers.AdminService
 {
@@ -43,7 +38,7 @@ namespace JLSMobileApplication.Controllers.AdminService
         }
 
         [HttpPost]
-        public async Task<long> RemoveImageById([FromBody]long Id)
+        public async Task<long> RemoveImageById([FromBody] long Id)
         {
             ProductPhotoPath image = await db.ProductPhotoPath.FindAsync(Id);
 
@@ -52,7 +47,7 @@ namespace JLSMobileApplication.Controllers.AdminService
                 return 0;
             }
 
-            string imagePath = Path.Combine(_appSettings.ImagePath,image.Path); // todo place into the configuration
+            string imagePath = Path.Combine(_appSettings.ImagePath, image.Path); // todo place into the configuration
 
             try
             {
@@ -126,7 +121,8 @@ namespace JLSMobileApplication.Controllers.AdminService
                 throw exc;
             }
         }
-        public class AdvancedProductSearchCriteria {
+        public class AdvancedProductSearchCriteria
+        {
 
             public AdvancedProductSearchCriteria()
             {
@@ -145,14 +141,15 @@ namespace JLSMobileApplication.Controllers.AdminService
             public int step { get; set; }
         }
         [HttpPost]
-        public async Task<JsonResult> AdvancedProductSearchByCriteria(AdvancedProductSearchCriteria criteria )
+        public async Task<JsonResult> AdvancedProductSearchByCriteria(AdvancedProductSearchCriteria criteria)
         {
             try
             {
-               var result = await _productRepository.AdvancedProductSearchByCriteria(criteria.ProductLabel, criteria.MainCategoryReferenceId, criteria.SecondCategoryReferenceId, criteria.Validity, criteria.Lang);
+                var result = await _productRepository.AdvancedProductSearchByCriteria(criteria.ProductLabel, criteria.MainCategoryReferenceId, criteria.SecondCategoryReferenceId, criteria.Validity, criteria.Lang);
                 var list = result.Skip(criteria.begin * criteria.step).Take(criteria.step);
 
-                return Json(new { 
+                return Json(new
+                {
                     ProductList = list,
                     TotalCount = result.Count()
                 });
@@ -215,7 +212,7 @@ namespace JLSMobileApplication.Controllers.AdminService
 
                     if (ReferenceId != 0)
                     {
-                        long ProductId = await _productRepository.SaveProductInfo(criteria.ProductId, ReferenceId, criteria.QuantityPerBox, criteria.QuantityPerParcel, criteria.MinQuantity, criteria.Price, criteria.TaxRateId, criteria.Description,criteria.Color, criteria.Material, criteria.Size, criteria.Forme,criteria.CreatedOrUpdatedBy);
+                        long ProductId = await _productRepository.SaveProductInfo(criteria.ProductId, ReferenceId, criteria.QuantityPerBox, criteria.QuantityPerParcel, criteria.MinQuantity, criteria.Price, criteria.TaxRateId, criteria.Description, criteria.Color, criteria.Material, criteria.Size, criteria.Forme, criteria.CreatedOrUpdatedBy);
                         // todo change : SaveReferenceLabel take an list of param and save one time all the three translation
                         long ReferenceLabelFrId = await _referenceRepository.SaveReferenceLabel(ReferenceId, criteria.Labelfr, "fr");
                         long ReferenceLabelEnId = await _referenceRepository.SaveReferenceLabel(ReferenceId, criteria.Labelen, "en");
@@ -271,16 +268,16 @@ namespace JLSMobileApplication.Controllers.AdminService
                 Request.Form.TryGetValue("ProductId", out ProductId); // get ProductId todo change 
 
 
-                var folderName = Path.Combine ("Images", ProductId.ToString()) ; // todo : place into the configruation file
-                var pathToSave = Path.Combine( _appSettings.ImagePath,folderName);
+                var folderName = Path.Combine("Images", ProductId.ToString()); // todo : place into the configruation file
+                var pathToSave = Path.Combine(_appSettings.ImagePath, folderName);
 
                 DirectoryInfo di = Directory.CreateDirectory(pathToSave); // 创建路径
 
                 if (file.Length > 0)
                 {
-                   
+
                     var fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-               
+
                     var fullPath = Path.Combine(pathToSave, fileName);
                     var dbPath = Path.Combine(folderName, fileName);
 
@@ -312,14 +309,14 @@ namespace JLSMobileApplication.Controllers.AdminService
             return Json(data);
         }
 
- 
+
 
         [HttpGet]
         public async Task<JsonResult> GetProductById(long Id)
         {
             try
             {
-               var data = await _productRepository.GetProductById(Id,"", null);
+                var data = await _productRepository.GetProductById(Id, "", null);
                 return Json(data);
             }
             catch (Exception e)

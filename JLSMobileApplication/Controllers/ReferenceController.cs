@@ -1,16 +1,10 @@
-﻿using System;
+﻿using JLSDataAccess.Interfaces;
+using JLSDataModel.Models;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JLSDataAccess.Interfaces;
-using JLSDataModel.AdminViewModel;
-using JLSDataModel.Models;
-using JLSDataModel.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
 
 namespace JLSConsoleApplication.Controllers
 {
@@ -35,7 +29,7 @@ namespace JLSConsoleApplication.Controllers
             public string Lang { get; set; }
         }
         [HttpPost]
-        public async Task<JsonResult> GetReferenceItemsByCategoryLabels([FromBody]GetReferenceItemsByCategoryLabelsCriteria criteria)
+        public async Task<JsonResult> GetReferenceItemsByCategoryLabels([FromBody] GetReferenceItemsByCategoryLabelsCriteria criteria)
         {
             try
             {
@@ -51,7 +45,7 @@ namespace JLSConsoleApplication.Controllers
 
         }
 
-        
+
         [HttpGet]
         public async Task<JsonResult> GetWbesiteslides()
         {

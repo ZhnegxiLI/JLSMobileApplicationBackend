@@ -1,12 +1,7 @@
 ﻿using JLSDataModel.Models.Adress;
-using JLSDataModel.Models.Order;
-using Magicodes.ExporterAndImporter.Core;
 using Magicodes.ExporterAndImporter.Pdf;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace JLSMobileApplication.HtmlToPdf
 {
@@ -32,7 +27,7 @@ namespace JLSMobileApplication.HtmlToPdf
         public float TotalPrice { get; set; }
 
         public float TaxRate { get; set; }
-     
+
         public float TotalPriceWithoutTax { get; set; }
 
         public Adress ShipmentAddress { get; set; }

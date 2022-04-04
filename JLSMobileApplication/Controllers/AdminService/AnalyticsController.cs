@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using JLSDataAccess;
+using JLSDataAccess.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using JLSDataAccess;
-using JLSDataAccess.Interfaces;
-using JLSDataAccess.Repositories;
-using JLSDataModel.Models.Adress;
-using LjWebApplication.Model;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace JLSMobileApplication.Controllers
 {
@@ -18,7 +13,7 @@ namespace JLSMobileApplication.Controllers
     [ApiController]
     public class AnalyticsController : Controller
     {
-        private readonly IAnalyticsReporsitory  _analytics;
+        private readonly IAnalyticsReporsitory _analytics;
         private readonly IOrderRepository _orderRepository;
         private readonly JlsDbContext db;
 
@@ -67,7 +62,7 @@ namespace JLSMobileApplication.Controllers
             {
                 var statusIdProgressingId = db.ReferenceItem.Where(p => p.Code == "OrderStatus_Progressing").Select(p => p.Id).FirstOrDefault();
                 // last 10 days 
-                var progressingList = (await _orderRepository.AdvancedOrderSearchByCriteria(Lang, null, null,null, null, statusIdProgressingId)).Skip(0).Take(10);//DateTime.Now.AddDays(-10)
+                var progressingList = (await _orderRepository.AdvancedOrderSearchByCriteria(Lang, null, null, null, null, statusIdProgressingId)).Skip(0).Take(10);//DateTime.Now.AddDays(-10)
 
                 var statusIdValidedId = db.ReferenceItem.Where(p => p.Code == "OrderStatus_Valid").Select(p => p.Id).FirstOrDefault();
                 // last 10 days 
@@ -116,12 +111,12 @@ namespace JLSMobileApplication.Controllers
         }
 
 
-          [HttpGet]
+        [HttpGet]
         public async Task<JsonResult> GetBestSalesSubCategory(string Lang, int Limit)
         {
             try
             {
-                var result = await _analytics.GetBestSalesSubCategory( Limit, Lang);
+                var result = await _analytics.GetBestSalesSubCategory(Limit, Lang);
                 return Json(result);
             }
             catch (Exception e)
@@ -136,7 +131,7 @@ namespace JLSMobileApplication.Controllers
         {
             try
             {
-                var result =  _analytics.GetBestClientWidget(Limit);
+                var result = _analytics.GetBestClientWidget(Limit);
                 return Json(result);
             }
             catch (Exception e)
@@ -146,7 +141,7 @@ namespace JLSMobileApplication.Controllers
             }
         }
 
-        
+
 
         [HttpGet]
         public async Task<JsonResult> GetInternalExternalSalesPerformance(string Lang)

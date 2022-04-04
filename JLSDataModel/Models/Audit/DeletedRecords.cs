@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace JLSDataModel.Models.Audit
 {
-    public class DeletedRecords: BaseObject
+    public class DeletedRecords : BaseObject
     {
         public string TableName { get; set; }
         public long? DeletedId { get; set; }

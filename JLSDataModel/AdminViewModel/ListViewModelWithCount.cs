@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace JLSDataModel.AdminViewModel
 {
@@ -8,6 +6,6 @@ namespace JLSDataModel.AdminViewModel
     {
         public List<T> Content { get; set; }
 
-        public int Count{get; set;}
+        public int Count { get; set; }
     }
 }

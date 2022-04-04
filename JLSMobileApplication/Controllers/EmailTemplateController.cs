@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using JLSMobileApplication.Services;
+﻿using JLSMobileApplication.Services;
 using JLSMobileApplication.Services.EmailTemplateModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static JLSMobileApplication.Services.SendEmailAndMessageService;
+using System.Threading.Tasks;
 
 namespace JLSMobileApplication.Controllers
 {
@@ -33,7 +29,7 @@ namespace JLSMobileApplication.Controllers
         public async Task<ActionResult> Test()
         {
             /* This function show only use for degug */
-      
+
 
             return View("ModifyOrderAdmin", new OrderEmailModel()
             {

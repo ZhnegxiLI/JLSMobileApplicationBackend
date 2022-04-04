@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JLSDataModel.Models.Order
+﻿namespace JLSDataModel.Models.Order
 {
-    public class OrderProduct:BaseObject
+    public class OrderProduct : BaseObject
     {
         public double? TotalPrice { get; set; }
         public double? UnitPrice { get; set; }
@@ -12,7 +8,7 @@ namespace JLSDataModel.Models.Order
         public long OrderId { get; set; }
         public int Colissage { get; set; }
         public OrderInfo OrderInfo { get; set; }
-        public long ReferenceId{ get; set; }
+        public long ReferenceId { get; set; }
         public ReferenceItem Reference { get; set; }
     }
 }
