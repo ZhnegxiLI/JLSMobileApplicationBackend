@@ -7,6 +7,7 @@
 - Add swagger
 - Refactor projet structure
 - Repair log system
+- Add health check
 
 # Potential changement
 - Maybe place staging environment into Azure portal

@@ -214,109 +214,31 @@ namespace JLSMobileApplication
 
             app.Map("/admin", client =>
             {
-                if (env.IsDevelopment())
+                client.UseSpa(spa =>
                 {
-                    StaticFileOptions clientApp2Dist = new StaticFileOptions()
+                    spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
+                    spa.Options.SourcePath = "Angular/Admin";
+                    if (env.IsDevelopment())
                     {
-                        FileProvider = new PhysicalFileProvider(
-                                Path.Combine(
-                                    Directory.GetCurrentDirectory(),
-                                    "Angular/Admin"
-                                )
-                            )
-                    };
-                    client.UseSpaStaticFiles(clientApp2Dist);
-                    client.UseSpa(spa =>
-                    {
-                        spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
-                        spa.Options.SourcePath = "Angular/Admin";
-
-                        // it will use package.json & will search for start command to run
-                        //spa.UseAngularCliServer(npmScript: "start");
-
                         spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
-                    });
-                }
-                else
-                {
-                    // Each map gets its own physical path
-                    // for it to map the static files to.
-                    StaticFileOptions clientApp2Dist = new StaticFileOptions()
-                    {
-                        FileProvider = new PhysicalFileProvider(
-                                Path.Combine(
-                                    Directory.GetCurrentDirectory(),
-                                    @"Angular/Admin/dist"
-                                )
-                            )
-                    };
-
-                    // Each map its own static files otherwise
-                    // it will only ever serve index.html no matter the filename
-                    client.UseSpaStaticFiles(clientApp2Dist);
-
-                    // Each map will call its own UseSpa where
-                    // we give its own sourcepath
-                    client.UseSpa(spa =>
-                    {
-                        spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
-                        spa.Options.SourcePath = "Angular/Admin";
-                        spa.Options.DefaultPageStaticFileOptions = clientApp2Dist;
-                    });
-                }
+                    }
+                });
             });
 
             // for each angular client we want to host.
 
-            if (env.IsDevelopment())
+            app.UseSpa(spa =>
             {
-                StaticFileOptions clientApp2Dist = new StaticFileOptions()
+                spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
+                spa.Options.SourcePath = "Angular/Website";
+
+                if (env.IsDevelopment())
                 {
-                    FileProvider = new PhysicalFileProvider(
-                            Path.Combine(
-                                Directory.GetCurrentDirectory(),
-                                "Angular/Website"
-                            )
-                        )
-                };
-                app.UseSpaStaticFiles(clientApp2Dist);
-                app.UseSpa(spa =>
-                    {
-                        spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
-                        spa.Options.SourcePath = "Angular/Website";
-
-                        // it will use package.json & will search for start command to run
-                        // spa.UseAngularCliServer(npmScript: "start");
-                        spa.UseProxyToSpaDevelopmentServer("http://localhost:4201");
-                    });
-            }
-            else
-            {
-                // Each map gets its own physical path
-                // for it to map the static files to.
-                StaticFileOptions clientApp2Dist = new StaticFileOptions()
-                {
-                    FileProvider = new PhysicalFileProvider(
-                            Path.Combine(
-                                Directory.GetCurrentDirectory(),
-                                @"Angular/Website/dist"
-                            )
-                        )
-                };
-
-                // Each map its own static files otherwise
-                // it will only ever serve index.html no matter the filename
-                app.UseSpaStaticFiles(clientApp2Dist);
-
-                // Each map will call its own UseSpa where
-                // we give its own sourcepath
-                app.UseSpa(spa =>
-                    {
-                        spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
-                        spa.Options.SourcePath = "Angular/Website";
-                        spa.Options.DefaultPageStaticFileOptions = clientApp2Dist;
-                    });
-            }
+                    // it will use package.json & will search for start command to run
+                    spa.UseProxyToSpaDevelopmentServer("http://localhost:4201");
+                }
+            });
+            
         }
     }
 }
