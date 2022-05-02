@@ -277,8 +277,7 @@ namespace JLSMobileApplication.Services
 
                 /* Generate pdf */
                 var exporter = new PdfExporter();
-                var result = await exporter.ExportByTemplate(fileName, receipt
-                   , tpl);
+                var result = await exporter.ExportByTemplate(fileName, receipt, tpl);
 
                 return fileName;
             }

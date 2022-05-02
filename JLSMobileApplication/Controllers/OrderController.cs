@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System.Transactions;
 
 namespace JLSMobileApplication.Controllers
 {
@@ -27,20 +29,20 @@ namespace JLSMobileApplication.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IOrderRepository _orderRepository;
         private readonly IAdressRepository _adressRepository;
-        private readonly IMapper _mapper;
         private readonly IProductRepository _productRepository;
         private readonly ISendEmailAndMessageService _sendEmailAndMessageService;
         private readonly IWebHostEnvironment _env;
+        private readonly ILogger _logger;
 
-        public OrderController(IMapper mapper, IOrderRepository order, IAdressRepository adress, UserManager<User> userManager, IProductRepository product, ISendEmailAndMessageService sendEmailAndMessageService, IWebHostEnvironment env)
+        public OrderController(IOrderRepository order, IAdressRepository adress, UserManager<User> userManager, IProductRepository product, ISendEmailAndMessageService sendEmailAndMessageService, IWebHostEnvironment env, ILogger<OrderController> logger)
         {
             _userManager = userManager;
             _orderRepository = order;
             _adressRepository = adress;
-            _mapper = mapper;
             _productRepository = product;
             _sendEmailAndMessageService = sendEmailAndMessageService;
             _env = env;
+            _logger = logger;
         }
 
         public class SaveOrderCriteria
@@ -61,107 +63,42 @@ namespace JLSMobileApplication.Controllers
         [HttpPost]
         public async Task<JsonResult> SaveOrder([FromBody] SaveOrderCriteria criteria)
         {
-            // TODO ADD TRANSACTION IN THIS FUNCTION
-            try
+            using (var scope = new TransactionScope(TransactionScopeOption.Required,new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }))
             {
-                /* Step1: Get shipping and facturation address */
-                var shippingAddress = await _adressRepository.GetAdressByIdAsync(criteria.ShippingAdressId);
-                var facturationAddress = await _adressRepository.GetAdressByIdAsync(criteria.FacturationAdressId);
-
-                /* Step2: Save both address for order */
-                var shippingAddressToInsert = new Adress();
-                shippingAddressToInsert.ZipCode = shippingAddress.ZipCode;
-                shippingAddressToInsert.ContactTelephone = shippingAddress.ContactTelephone;
-                shippingAddressToInsert.ContactFax = shippingAddress.ContactFax;
-                shippingAddressToInsert.ContactLastName = shippingAddress.ContactLastName;
-                shippingAddressToInsert.ContactFirstName = shippingAddress.ContactFirstName;
-                shippingAddressToInsert.SecondLineAddress = shippingAddress.SecondLineAddress;
-                shippingAddressToInsert.FirstLineAddress = shippingAddress.FirstLineAddress;
-                shippingAddressToInsert.City = shippingAddress.City;
-                shippingAddressToInsert.EntrepriseName = shippingAddress.EntrepriseName;
-                shippingAddressToInsert.Country = shippingAddress.Country;
-                shippingAddressToInsert.IsDefaultAdress = true;
-
-                var facturationAddressToInsert = new Adress();
-                facturationAddressToInsert.ZipCode = facturationAddress.ZipCode;
-                facturationAddressToInsert.ContactTelephone = facturationAddress.ContactTelephone;
-                facturationAddressToInsert.ContactFax = facturationAddress.ContactFax;
-                facturationAddressToInsert.ContactLastName = facturationAddress.ContactLastName;
-                facturationAddressToInsert.ContactFirstName = facturationAddress.ContactFirstName;
-                facturationAddressToInsert.SecondLineAddress = facturationAddress.SecondLineAddress;
-                facturationAddressToInsert.FirstLineAddress = facturationAddress.FirstLineAddress;
-                facturationAddressToInsert.City = facturationAddress.City;
-                facturationAddressToInsert.EntrepriseName = facturationAddress.EntrepriseName;
-                facturationAddressToInsert.Country = facturationAddress.Country;
-
-                var shippingAddressId = await _adressRepository.CreateOrUpdateAdress(shippingAddressToInsert);
-                var facturationAddressId = await _adressRepository.CreateOrUpdateAdress(facturationAddressToInsert);
-
-                /* Step3: Customer info */
-                var User = await _userManager.FindByIdAsync(criteria.UserId.ToString());
-                long CustomerId = 0;
-                if (User != null)
+                try
                 {
-                    CustomerInfo customer = new CustomerInfo();
-
-                    customer.PhoneNumber = User.PhoneNumber;
-                    customer.Siret = User.Siret;
-                    customer.EntrepriseName = User.EntrepriseName;
-                    customer.Email = User.Email;
-
-                    customer.UserId = User.Id;
-
-                    CustomerId = await _orderRepository.SaveCustomerInfo(customer, criteria.UserId);
-                }
-
-                long ClientRemarkId = 0;
-                /* Step4: save Admin remark info */
-                if (criteria.ClientRemark != "")
-                {
-                    var ClientRemark = new Remark();
-                    ClientRemark.Text = criteria.ClientRemark;
-                    ClientRemark.UserId = criteria.UserId;
-                    ClientRemark.CreatedBy = criteria.UserId;
-                    ClientRemark.CreatedOn = DateTime.Now;
-                    ClientRemarkId = await _orderRepository.SaveOrderRemark(ClientRemark, criteria.UserId);
-                }
-
-                /* Step5: reforme the productlist */
-                List<long> ReferenceList = new List<long>();
-
-                criteria.References.ForEach(p =>
-                {
-                    ReferenceList.Add(p.ReferenceId);
-                });
-                var ProductList = await _productRepository.GetProductInfoByReferenceIds(ReferenceList, "fr");
-                if (ProductList != null)
-                {
-                    var FormatedReferenceList = (from p in ProductList
-                                                 join ri in criteria.References on p.ReferenceId equals ri.ReferenceId
-                                                 select new OrderProductViewModelMobile()
-                                                 {
-                                                     Price = p.Price, // Modify accroding to client specification
-                                                     UnityQuantity = (int)p.QuantityPerBox,
-                                                     Quantity = ri.Quantity,
-                                                     ReferenceId = ri.ReferenceId
-                                                 }).ToList();
-                    var orderId = await _orderRepository.SaveOrder(FormatedReferenceList, shippingAddressId, criteria.FacturationAdressId, criteria.UserId, ClientRemarkId, CustomerId);
-
-                    if (!_env.IsDevelopment())
+                    var orderId = await SaveOrderAction(criteria);
+                    if (orderId != null && orderId > 0)
                     {
-                        await _sendEmailAndMessageService.CreateOrUpdateOrderAsync(orderId, "CreateNewOrder");
+                        if (!_env.IsDevelopment())
+                        {
+                            await _sendEmailAndMessageService.CreateOrUpdateOrderAsync((long)orderId, "CreateNewOrder");
+                        }
+
+                        var User = await _userManager.FindByIdAsync(criteria.UserId.ToString());
+                        return Json(new ApiResult()
+                        {
+                            Data = orderId,
+                            Msg = "OK",
+                            Success = true,
+                            DataExt = User.Email
+                        });
                     }
-
-                    return Json(new ApiResult()
+                    else
                     {
-                        Data = orderId,
-                        Msg = "OK",
-                        Success = true,
-                        DataExt = User.Email
-                    });
+                        return Json(new ApiResult()
+                        {
+                            Data = null,
+                            Msg = "Fail",
+                            Success = false
+                        });
+                    }
                 }
-                else
+                catch (Exception exc)
                 {
+                    // Log and rollback
+                    scope.Dispose();
+                    _logger.LogError(exc, "OrderController SaveOrder method fail");
                     return Json(new ApiResult()
                     {
                         Data = null,
@@ -169,10 +106,6 @@ namespace JLSMobileApplication.Controllers
                         Success = false
                     });
                 }
-            }
-            catch (Exception exc)
-            {
-                throw exc;
             }
         }
 
@@ -216,6 +149,100 @@ namespace JLSMobileApplication.Controllers
             {
                 throw exc;
             }
+        }
+
+        private async Task<long?> SaveOrderAction(SaveOrderCriteria criteria)
+        {
+            /* Step1: Get shipping and facturation address */
+            var shippingAddress = await _adressRepository.GetAdressByIdAsync(criteria.ShippingAdressId);
+            var facturationAddress = await _adressRepository.GetAdressByIdAsync(criteria.FacturationAdressId);
+
+
+            /* Step2: Save both address for order */
+            var shippingAddressToInsert = MappingAddress(shippingAddress);
+            shippingAddressToInsert.IsDefaultAdress = true;
+
+            var facturationAddressToInsert = MappingAddress(facturationAddress);
+
+            var shippingAddressId = await _adressRepository.CreateOrUpdateAdress(shippingAddressToInsert);
+            var facturationAddressId = await _adressRepository.CreateOrUpdateAdress(facturationAddressToInsert);
+
+            /* Step3: Customer info */
+            var User = await _userManager.FindByIdAsync(criteria.UserId.ToString());
+            long CustomerId = 0;
+            if (User != null)
+            {
+                var customer = MappingCustomerInfo(User);
+                CustomerId = await _orderRepository.SaveCustomerInfo(customer, criteria.UserId);
+            }
+
+            long ClientRemarkId = 0;
+            /* Step4: save Admin remark info */
+            if (criteria.ClientRemark != "")
+            {
+                var ClientRemark = MapingOrderRemark(criteria);
+                ClientRemarkId = await _orderRepository.SaveOrderRemark(ClientRemark, criteria.UserId);
+            }
+
+            /* Step5: reforme the productlist */
+            var ReferenceList = criteria.References.Select(x => x.ReferenceId).ToList(); ;
+            var ProductList = await _productRepository.GetProductInfoByReferenceIds(ReferenceList, "fr");
+            long? orderId = null;
+            if (ProductList != null)
+            {
+                var FormatedReferenceList = (from p in ProductList
+                                             join ri in criteria.References on p.ReferenceId equals ri.ReferenceId
+                                             select new OrderProductViewModelMobile()
+                                             {
+                                                 Price = p.Price, // Modify accroding to client specification
+                                                 UnityQuantity = (int)p.QuantityPerBox,
+                                                 Quantity = ri.Quantity,
+                                                 ReferenceId = ri.ReferenceId
+                                             }).ToList();
+                orderId = await _orderRepository.SaveOrder(FormatedReferenceList, shippingAddressId, criteria.FacturationAdressId, criteria.UserId, ClientRemarkId, CustomerId);
+            }
+            return orderId;
+        }
+
+        private Adress MappingAddress(Adress address)
+        {
+            var addressToInsert = new Adress();
+            addressToInsert.ZipCode = address.ZipCode;
+            addressToInsert.ContactTelephone = address.ContactTelephone;
+            addressToInsert.ContactFax = address.ContactFax;
+            addressToInsert.ContactLastName = address.ContactLastName;
+            addressToInsert.ContactFirstName = address.ContactFirstName;
+            addressToInsert.SecondLineAddress = address.SecondLineAddress;
+            addressToInsert.FirstLineAddress = address.FirstLineAddress;
+            addressToInsert.City = address.City;
+            addressToInsert.EntrepriseName = address.EntrepriseName;
+            addressToInsert.Country = address.Country;
+
+            return addressToInsert;
+        }
+
+        private CustomerInfo MappingCustomerInfo(User user)
+        {
+            CustomerInfo customer = new CustomerInfo();
+
+            customer.PhoneNumber = user.PhoneNumber;
+            customer.Siret = user.Siret;
+            customer.EntrepriseName = user.EntrepriseName;
+            customer.Email = user.Email;
+            customer.UserId = user.Id;
+
+            return customer;
+        }
+
+        private Remark MapingOrderRemark(SaveOrderCriteria criteria)
+        {
+            var ClientRemark = new Remark();
+            ClientRemark.Text = criteria.ClientRemark;
+            ClientRemark.UserId = criteria.UserId;
+            ClientRemark.CreatedBy = criteria.UserId;
+            ClientRemark.CreatedOn = DateTime.Now;
+
+            return ClientRemark;
         }
     }
 }

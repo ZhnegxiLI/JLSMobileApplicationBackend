@@ -1,6 +1,8 @@
 # TODO List
 - Migrate to .net core 3.1
 - Add transaction in order creation service
+    - test client save order controller 
+    - change for admin controller 
 - Add deployment pipeline
 - Replace current pdf generator(library)
 - Add unit test projet
